@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyek Anime - Portofolio Saya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Anime+Ace&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary-color: #f472b6;
+            --bg-light: #f9fafb;
+            --bg-dark: #1e293b;
+            --text-light: #1f2937;
+            --text-dark: #e5e7eb;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e0e7ff 100%);
+            transition: all 0.3s ease;
+        }
+        .dark {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #2a4365 100%);
+            color: var(--text-dark);
+        }
+        .dark .nav-link {
+            color: var(--text-dark);
+        }
+        .dark .section-title {
+            border-color: #475569;
+        }
+        .dark-mode-toggle {
+            transition: all 0.3s ease;
+            background: #e5e7eb;
+        }
+        .dark .dark-mode-toggle {
+            background: #475569;
+        }
+        .active {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        .dark .active {
+            color: #f9a8d4;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.2) translateY(-5px);
+            color: var(--secondary-color);
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 99;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .dark .back-to-top {
+            background: linear-gradient(45deg, #60a5fa, #f9a8d4);
+        }
+        .back-to-top.visible {
+            opacity: 1;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff, #e0e7ff);
+            padding: 24px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin: auto;
+            font-family: 'Anime Ace', sans-serif;
+        }
+        .dark .modal-content {
+            background: linear-gradient(135deg, #1e293b, #2a4365);
+            color: var(--text-dark);
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        .close-btn {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .close-btn:hover {
+            background: #d1d5db;
+        }
+        .download-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-decoration: none;
+        }
+        .download-btn:hover {
+            background: linear-gradient(45deg, var(--primary-dark), #db2777);
+        }
+        .dark .close-btn {
+            background: #4b5563;
+            color: var(--text-dark);
+        }
+        .dark .close-btn:hover {
+            background: #6b7280;
+        }
+        .dark .download-btn {
+            background: linear-gradient(45deg, #60a5fa, #f9a8d4);
+        }
+        .dark .download-btn:hover {
+            background: linear-gradient(45deg, #3b82f6, #db2777);
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            margin: 4px;
+            border-radius: 20px;
+            background: #e5e7eb;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        .filter-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        .filter-btn.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        .dark .filter-btn {
+            background: #4b5563;
+            color: var(--text-dark);
+        }
+        .dark .filter-btn:hover {
+            background: #60a5fa;
+            color: white;
+        }
+        .dark .filter-btn.active {
+            background: linear-gradient(45deg, #60a5fa, #f9a8d4);
+            color: white;
+        }
+        .anime-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        .anime-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        .dark .anime-card {
+            background: #2d3748;
+            color: var(--text-dark);
+        }
+        .anime-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        .anime-card h4 {
+            font-family: 'Anime Ace', sans-serif;
+            font-size: 1.25rem;
+            margin: 12px;
+        }
+        .header-gradient {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        .dark .header-gradient {
+            background: linear-gradient(90deg, #60a5fa, #f9a8d4);
+        }
+    </style>
+</head>
+<body class="text-gray-800 transition-colors duration-300 min-h-screen">
+    <!-- Header/Navigation -->
+    <header class="sticky top-0 z-50 header-gradient backdrop-blur-sm shadow-sm">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-2xl font-bold">
+                    <a href="index.html">Portofolio</a>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="nav-link hover:text-white transition">Beranda</a>
+                    <a href="profile.html" class="nav-link hover:text-white transition">Profil</a>
+                    <a href="tulisan.html" class="nav-link hover:text-white transition">Tulisan</a>
+                    <a href="galeri.html" class="nav-link hover:text-white transition">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link hover:text-white transition active">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link hover:text-white transition">Sosial Media</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <button id="darkModeToggle" class="dark-mode-toggle p-2 rounded-full">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block text-yellow-300"></i>
+                    </button>
+                    <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 dark:bg-slate-700">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2">
+                <div class="flex flex-col space-y-3">
+                    <a href="index.html" class="nav-link hover:text-white transition">Beranda</a>
+                    <a href="profile.html" class="nav-link hover:text-white transition">Profil</a>
+                    <a href="tulisan.html" class="nav-link hover:text-white transition">Tulisan</a>
+                    <a href="galeri.html" class="nav-link hover:text-white transition">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link hover:text-white transition active">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link hover:text-white transition">Sosial Media</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Anime Projects Section -->
+        <section id="proyek-anime" class="py-12 fade-in">
+            <div class="mb-12 text-center">
+                <h2 class="text-4xl font-bold mb-4 dark:text-white flex justify-center items-center">
+                    <span class="section-title border-b-4 border-secondary-color pb-2 pr-4">Proyek Anime</span>
+                </h2>
+                <p class="dark:text-gray-400 text-lg">Koleksi proyek terjemahan dan pengeditan anime saya, diurutkan berdasarkan abjad.</p>
+            </div>
+            <!-- Search and Filter -->
+            <div class="mb-8">
+                <div class="flex flex-col sm:flex-row gap-4 mb-6 justify-center">
+                    <input id="search" type="text" placeholder="Cari anime..." class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary-color w-full sm:w-1/2">
+                </div>
+                <div id="letterFilter" class="flex flex-wrap gap-2 justify-center">
+                    <button class="filter-btn" data-letter="all">Semua</button>
+                    <button class="filter-btn" data-letter="A">A</button>
+                    <button class="filter-btn" data-letter="B">B</button>
+                    <button class="filter-btn" data-letter="C">C</button>
+                    <button class="filter-btn" data-letter="D">D</button>
+                    <button class="filter-btn" data-letter="E">E</button>
+                    <button class="filter-btn" data-letter="F">F</button>
+                    <button class="filter-btn" data-letter="G">G</button>
+                    <button class="filter-btn" data-letter="H">H</button>
+                    <button class="filter-btn" data-letter="I">I</button>
+                    <button class="filter-btn" data-letter="J">J</button>
+                    <button class="filter-btn" data-letter="K">K</button>
+                    <button class="filter-btn" data-letter="L">L</button>
+                    <button class="filter-btn" data-letter="M">M</button>
+                    <button class="filter-btn" data-letter="N">N</button>
+                    <button class="filter-btn" data-letter="O">O</button>
+                    <button class="filter-btn" data-letter="P">P</button>
+                    <button class="filter-btn" data-letter="Q">Q</button>
+                    <button class="filter-btn" data-letter="R">R</button>
+                    <button class="filter-btn" data-letter="S">S</button>
+                    <button class="filter-btn" data-letter="T">T</button>
+                    <button class="filter-btn" data-letter="U">U</button>
+                    <button class="filter-btn" data-letter="V">V</button>
+                    <button class="filter-btn" data-letter="W">W</button>
+                    <button class="filter-btn" data-letter="X">X</button>
+                    <button class="filter-btn" data-letter="Y">Y</button>
+                    <button class="filter-btn" data-letter="Z">Z</button>
+                </div>
+            </div>
+            <!-- Anime List -->
+            <div id="anime-list">
+                <div class="category-section mb-12">
+                    <h3 class="text-2xl font-semibold mb-6 dark:text-white">B</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="anime-card anime-item" data-title="Benriya Saitou-san, Isekai ni Iku" data-initial="B">
+                            <img src="https://via.placeholder.com/300x150?text=Benriya+Saitou-san" alt="Anime Thumbnail">
+                            <h4>Benriya Saitou-san, Isekai ni Iku</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-section mb-12">
+                    <h3 class="text-2xl font-semibold mb-6 dark:text-white">K</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="anime-card anime-item" data-title="Kamonohashi Ron no Kindan Suiri" data-initial="K">
+                            <img src="https://via.placeholder.com/300x150?text=Kamonohashi+Ron" alt="Anime Thumbnail">
+                            <h4>Kamonohashi Ron no Kindan Suiri</h4>
+                        </div>
+                        <div class="anime-card anime-item" data-title="Kanchigai no Atelier Meister" data-initial="K">
+                            <img src="https://via.placeholder.com/300x150?text=Kanchigai+Atelier" alt="Anime Thumbnail">
+                            <h4>Kanchigai no Atelier Meister</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-section mb-12">
+                    <h3 class="text-2xl font-semibold mb-6 dark:text-white">T</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="anime-card anime-item" data-title="Tomo-chan wa Onna no Ko" data-initial="T">
+                            <img src="https://via.placeholder.com/300x150?text=Tomo-chan" alt="Anime Thumbnail">
+                            <h4>Tomo-chan wa Onna no Ko</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Modal -->
+    <div id="animeModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="text-2xl font-semibold mb-4"></h3>
+            <p><strong>Judul Alternatif:</strong></p>
+            <p id="modalJapaneseTitle" class="ml-4"></p>
+            <p id="modalIndonesianTitle" class="ml-4"></p>
+            <p id="modalEnglishTitle" class="ml-4"></p>
+            <p><strong>Jumlah Episode:</strong> <span id="modalEpisodes"></span></p>
+            <p><strong>Studio:</strong> <span id="modalStudio"></span></p>
+            <p><strong>Sumber:</strong> <span id="modalSource"></span></p>
+            <p><strong>Genre:</strong> <span id="modalGenre"></span></p>
+            <p class="mt-4"><strong>Sinopsis:</strong></p>
+            <p id="modalSynopsis" class="ml-4"></p>
+            <div class="modal-buttons">
+                <button id="closeModal" class="modal-btn close-btn">Tutup</button>
+                <a id="downloadLink" href="#" target="_blank" class="modal-btn download-btn">Download</a>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <span class="text-xl font-bold text-secondary-color">Portofolio</span>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">© 2023 John Doe. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="social-icon text-gray-500 hover:text-secondary-color dark:hover:text-pink-400">
+                        <i class="fab fa-telegram text-xl"></i>
+                    </a>
+                    <a href="#" class="social-icon text-gray-500 hover:text-secondary-color dark:hover:text-pink-400">
+                        <i class="fab fa-linkedin-in text-xl"></i>
+                    </a>
+                    <a href="#" class="social-icon text-gray-500 hover:text-secondary-color dark:hover:text-pink-400">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    <script>
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const html = document.documentElement;
+        const userPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const savedMode = localStorage.getItem('darkMode');
+        if (savedMode === 'dark' || (!savedMode && userPrefersDark)) {
+            html.classList.add('dark');
+        }
+        darkModeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('darkMode', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+        // Mobile Menu Toggle
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+        // Filter Anime Projects
+        const searchInput = document.getElementById('search');
+        const letterFilter = document.getElementById('letterFilter');
+        const filterButtons = letterFilter.querySelectorAll('.filter-btn');
+        const animeItems = document.querySelectorAll('.anime-item');
+        const categorySections = document.querySelectorAll('.category-section');
+        function filterProjects() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const activeLetter = letterFilter.querySelector('.filter-btn.active')?.getAttribute('data-letter') || 'all';
+            // Filter individual items
+            animeItems.forEach(item => {
+                const title = item.getAttribute('data-title').toLowerCase();
+                const initial = item.getAttribute('data-initial');
+                const matchesSearch = title.includes(searchTerm);
+                const matchesLetter = activeLetter === 'all' || initial === activeLetter;
+                if (matchesSearch && matchesLetter) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            // Show/hide category sections based on visible items
+            categorySections.forEach(section => {
+                const itemsInSection = section.querySelectorAll('.anime-item');
+                const hasVisibleItems = Array.from(itemsInSection).some(item => item.style.display === 'block');
+                section.style.display = hasVisibleItems ? 'block' : 'none';
+            });
+        }
+        // Search input event listener
+        searchInput.addEventListener('input', filterProjects);
+        // Letter filter button event listeners
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                filterProjects();
+            });
+        });
+        // Set "Semua" as default active filter
+        letterFilter.querySelector('[data-letter="all"]').classList.add('active');
+        // Initial filter on page load
+        filterProjects();
+        // Modal Functionality
+        const modal = document.getElementById('animeModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalJapaneseTitle = document.getElementById('modalJapaneseTitle');
+        const modalIndonesianTitle = document.getElementById('modalIndonesianTitle');
+        const modalEnglishTitle = document.getElementById('modalEnglishTitle');
+        const modalEpisodes = document.getElementById('modalEpisodes');
+        const modalStudio = document.getElementById('modalStudio');
+        const modalSource = document.getElementById('modalSource');
+        const modalGenre = document.getElementById('modalGenre');
+        const modalSynopsis = document.getElementById('modalSynopsis');
+        const downloadLink = document.getElementById('downloadLink');
+        modal.style.display = 'none';
+        // Fetch anime data from JSON file
+        let animeData = {};
+        fetch('anime-data.json')
+            .then(response => response.json())
+            .then(data => {
+                animeData = data;
+                animeItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        const title = item.getAttribute('data-title');
+                        const data = animeData[title];
+                        if (data) {
+                            modalTitle.textContent = title;
+                            modalJapaneseTitle.textContent = `Jepang: ${data.japaneseTitle}`;
+                            modalIndonesianTitle.textContent = `Indonesia: ${data.indonesianTitle}`;
+                            modalEnglishTitle.textContent = `Inggris: ${data.englishTitle}`;
+                            modalEpisodes.textContent = data.episodes;
+                            modalStudio.textContent = data.studio;
+                            modalSource.textContent = data.source;
+                            modalGenre.textContent = data.genre;
+                            modalSynopsis.textContent = data.synopsis;
+                            downloadLink.setAttribute('href', data.downloadLink);
+                            modal.style.display = 'flex';
+                        }
+                    });
+                });
+            })
+            .catch(error => console.error('Error loading anime data:', error));
+        // Close modal when "Tutup" button is clicked
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        // Close modal when clicking outside of modal content
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>
