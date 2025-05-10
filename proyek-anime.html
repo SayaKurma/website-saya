@@ -6,7 +6,7 @@
     <title>Proyek Anime - Portofolio Saya</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Anime+Ace&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Anime+Ace&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -16,11 +16,16 @@
             --bg-dark: #1e293b;
             --text-light: #1f2937;
             --text-dark: #e5e7eb;
+            --modal-accent: #8b5cf6;
+            --modal-accent-dark: #a78bfa;
         }
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, var(--bg-light) 0%, #e0e7ff 100%);
             transition: all 0.3s ease;
+        }
+        h2, h3, .nav-link, .font-heading {
+            font-family: 'Quicksand', sans-serif;
         }
         .dark {
             background: linear-gradient(135deg, var(--bg-dark) 0%, #2a4365 100%);
@@ -40,11 +45,25 @@
             background: #475569;
         }
         .active {
+            position: relative;
             font-weight: 600;
             color: var(--secondary-color);
         }
+        .active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+        }
         .dark .active {
             color: #f9a8d4;
+        }
+        .dark .active::after {
+            background: linear-gradient(90deg, #60a5fa, #f9a8d4);
         }
         .fade-in {
             animation: fadeIn 0.5s ease-in;
@@ -92,32 +111,81 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
             align-items: center;
         }
         .modal-content {
-            background: linear-gradient(135deg, #ffffff, #e0e7ff);
-            padding: 24px;
-            border-radius: 12px;
-            max-width: 600px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 550px;
             width: 90%;
             max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             margin: auto;
-            font-family: 'Anime Ace', sans-serif;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            animation: modalOpen 0.4s ease-out;
+            font-family: 'Poppins', sans-serif;
+        }
+        @keyframes modalOpen {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
         .dark .modal-content {
-            background: linear-gradient(135deg, #1e293b, #2a4365);
-            color: var(--text-dark);
+            background-color: rgb(30 41 59);
+            color: white;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+        }
+        .modal-title {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--modal-accent);
+            color: #4b5563;
+            text-align: center;
+        }
+        .dark .modal-title {
+            color: white;
+            border-bottom: 2px solid var(--modal-accent-dark);
+        }
+        .detail-group {
+            margin-bottom: 15px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: var(--modal-accent);
+            display: block;
+            margin-bottom: 5px;
+        }
+        .dark .detail-label {
+            color: var(--modal-accent-dark);
+        }
+        .detail-value {
+            padding-left: 15px;
+            display: block;
+        }
+        .synopsis-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f9fafb;
+            border-left: 4px solid var(--modal-accent);
+        }
+        .dark .synopsis-container {
+            background-color: rgb(30 41 59);
+            border-left: 4px solid var(--modal-accent-dark);
         }
         .modal-buttons {
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
-            margin-top: 24px;
+            gap: 10px;
+            margin-top: 20px;
         }
         .modal-btn {
             padding: 10px 20px;
@@ -125,35 +193,41 @@
             cursor: pointer;
             font-weight: 500;
             transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .close-btn {
-            background: #e5e7eb;
+            background-color: #e5e7eb;
             color: #374151;
         }
         .close-btn:hover {
-            background: #d1d5db;
+            background-color: #d1d5db;
+            transform: translateY(-2px);
         }
         .download-btn {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--modal-accent), var(--secondary-color));
             color: white;
             text-decoration: none;
         }
         .download-btn:hover {
-            background: linear-gradient(45deg, var(--primary-dark), #db2777);
+            background: linear-gradient(135deg, #7c3aed, #db2777);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
         .dark .close-btn {
-            background: #4b5563;
-            color: var(--text-dark);
+            background-color: #4b5563;
+            color: #e5e7eb;
         }
         .dark .close-btn:hover {
-            background: #6b7280;
+            background-color: #6b7280;
         }
         .dark .download-btn {
-            background: linear-gradient(45deg, #60a5fa, #f9a8d4);
+            background: linear-gradient(135deg, var(--modal-accent-dark), #f9a8d4);
         }
         .dark .download-btn:hover {
-            background: linear-gradient(45deg, #3b82f6, #db2777);
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3);
         }
         .filter-btn {
             padding: 8px 16px;
@@ -185,32 +259,37 @@
             background: linear-gradient(45deg, #60a5fa, #f9a8d4);
             color: white;
         }
-        .anime-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        .anime-item {
+            position: relative;
             cursor: pointer;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            background-color: #f9fafb;
+            border-left: 4px solid var(--modal-accent);
+            font-family: 'Anime Ace', sans-serif;
         }
-        .anime-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        .anime-item:hover {
+            background-color: #f3f4f6;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-        .dark .anime-card {
-            background: #2d3748;
+        .dark .anime-item {
+            background-color: rgb(30 41 59);
+            border-left: 4px solid var(--modal-accent-dark);
             color: var(--text-dark);
         }
-        .anime-card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-bottom: 2px solid var(--primary-color);
+        .dark .anime-item:hover {
+            background-color: rgb(51 65 85);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
-        .anime-card h4 {
-            font-family: 'Anime Ace', sans-serif;
-            font-size: 1.25rem;
-            margin: 12px;
+        .anime-item::before {
+            content: "📺";
+            margin-right: 10px;
+            font-size: 1.2rem;
         }
         .header-gradient {
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
@@ -218,6 +297,23 @@
         }
         .dark .header-gradient {
             background: linear-gradient(90deg, #60a5fa, #f9a8d4);
+        }
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--modal-accent), var(--secondary-color));
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #7c3aed, #db2777);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #374151;
         }
     </style>
 </head>
@@ -309,32 +405,28 @@
             <div id="anime-list">
                 <div class="category-section mb-12">
                     <h3 class="text-2xl font-semibold mb-6 dark:text-white">B</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="anime-card anime-item" data-title="Benriya Saitou-san, Isekai ni Iku" data-initial="B">
-                            <img src="https://via.placeholder.com/300x150?text=Benriya+Saitou-san" alt="Anime Thumbnail">
-                            <h4>Benriya Saitou-san, Isekai ni Iku</h4>
+                    <div class="space-y-2">
+                        <div class="anime-item" data-title="Benriya Saitou-san, Isekai ni Iku" data-initial="B">
+                            Benriya Saitou-san, Isekai ni Iku
                         </div>
                     </div>
                 </div>
                 <div class="category-section mb-12">
                     <h3 class="text-2xl font-semibold mb-6 dark:text-white">K</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="anime-card anime-item" data-title="Kamonohashi Ron no Kindan Suiri" data-initial="K">
-                            <img src="https://via.placeholder.com/300x150?text=Kamonohashi+Ron" alt="Anime Thumbnail">
-                            <h4>Kamonohashi Ron no Kindan Suiri</h4>
+                    <div class="space-y-2">
+                        <div class="anime-item" data-title="Kamonohashi Ron no Kindan Suiri" data-initial="K">
+                            Kamonohashi Ron no Kindan Suiri
                         </div>
-                        <div class="anime-card anime-item" data-title="Kanchigai no Atelier Meister" data-initial="K">
-                            <img src="https://via.placeholder.com/300x150?text=Kanchigai+Atelier" alt="Anime Thumbnail">
-                            <h4>Kanchigai no Atelier Meister</h4>
+                        <div class="anime-item" data-title="Kanchigai no Atelier Meister" data-initial="K">
+                            Kanchigai no Atelier Meister
                         </div>
                     </div>
                 </div>
                 <div class="category-section mb-12">
                     <h3 class="text-2xl font-semibold mb-6 dark:text-white">T</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="anime-card anime-item" data-title="Tomo-chan wa Onna no Ko" data-initial="T">
-                            <img src="https://via.placeholder.com/300x150?text=Tomo-chan" alt="Anime Thumbnail">
-                            <h4>Tomo-chan wa Onna no Ko</h4>
+                    <div class="space-y-2">
+                        <div class="anime-item" data-title="Tomo-chan wa Onna no Ko" data-initial="T">
+                            Tomo-chan wa Onna no Ko
                         </div>
                     </div>
                 </div>
@@ -344,20 +436,40 @@
     <!-- Modal -->
     <div id="animeModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" class="text-2xl font-semibold mb-4"></h3>
-            <p><strong>Judul Alternatif:</strong></p>
-            <p id="modalJapaneseTitle" class="ml-4"></p>
-            <p id="modalIndonesianTitle" class="ml-4"></p>
-            <p id="modalEnglishTitle" class="ml-4"></p>
-            <p><strong>Jumlah Episode:</strong> <span id="modalEpisodes"></span></p>
-            <p><strong>Studio:</strong> <span id="modalStudio"></span></p>
-            <p><strong>Sumber:</strong> <span id="modalSource"></span></p>
-            <p><strong>Genre:</strong> <span id="modalGenre"></span></p>
-            <p class="mt-4"><strong>Sinopsis:</strong></p>
-            <p id="modalSynopsis" class="ml-4"></p>
+            <h3 id="modalTitle" class="modal-title"></h3>
+            <div class="detail-group">
+                <span class="detail-label">Judul Alternatif:</span>
+                <span id="modalJapaneseTitle" class="detail-value"></span>
+                <span id="modalIndonesianTitle" class="detail-value"></span>
+                <span id="modalEnglishTitle" class="detail-value"></span>
+            </div>
+            <div class="detail-group">
+                <span class="detail-label">Jumlah Episode:</span>
+                <span id="modalEpisodes" class="detail-value"></span>
+            </div>
+            <div class="detail-group">
+                <span class="detail-label">Studio:</span>
+                <span id="modalStudio" class="detail-value"></span>
+            </div>
+            <div class="detail-group">
+                <span class="detail-label">Sumber:</span>
+                <span id="modalSource" class="detail-value"></span>
+            </div>
+            <div class="detail-group">
+                <span class="detail-label">Genre:</span>
+                <span id="modalGenre" class="detail-value"></span>
+            </div>
+            <div class="synopsis-container">
+                <span class="detail-label">Sinopsis:</span>
+                <p id="modalSynopsis" class="detail-value text-justify"></p>
+            </div>
             <div class="modal-buttons">
-                <button id="closeModal" class="modal-btn close-btn">Tutup</button>
-                <a id="downloadLink" href="#" target="_blank" class="modal-btn download-btn">Download</a>
+                <button id="closeModal" class="modal-btn close-btn">
+                    <i class="fas fa-times mr-2"></i>Tutup
+                </button>
+                <a id="downloadLink" href="#" target="_blank" class="modal-btn download-btn">
+                    <i class="fas fa-download"></i>Download
+                </a>
             </div>
         </div>
     </div>
@@ -437,7 +549,7 @@
                 const matchesSearch = title.includes(searchTerm);
                 const matchesLetter = activeLetter === 'all' || initial === activeLetter;
                 if (matchesSearch && matchesLetter) {
-                    item.style.display = 'block';
+                    item.style.display = 'flex';
                 } else {
                     item.style.display = 'none';
                 }
@@ -445,7 +557,7 @@
             // Show/hide category sections based on visible items
             categorySections.forEach(section => {
                 const itemsInSection = section.querySelectorAll('.anime-item');
-                const hasVisibleItems = Array.from(itemsInSection).some(item => item.style.display === 'block');
+                const hasVisibleItems = Array.from(itemsInSection).some(item => item.style.display === 'flex');
                 section.style.display = hasVisibleItems ? 'block' : 'none';
             });
         }
@@ -499,6 +611,7 @@
                             modalSynopsis.textContent = data.synopsis;
                             downloadLink.setAttribute('href', data.downloadLink);
                             modal.style.display = 'flex';
+                            document.body.style.overflow = 'hidden';
                         }
                     });
                 });
@@ -507,11 +620,13 @@
         // Close modal when "Tutup" button is clicked
         closeModalBtn.addEventListener('click', () => {
             modal.style.display = 'none';
+            document.body.style.overflow = '';
         });
         // Close modal when clicking outside of modal content
         window.addEventListener('click', (event) => {
             if (event.target === modal) {
                 modal.style.display = 'none';
+                document.body.style.overflow = '';
             }
         });
         // Back to Top Button
