@@ -259,38 +259,6 @@
             background: linear-gradient(45deg, #60a5fa, #f9a8d4);
             color: white;
         }
-        .anime-item {
-            position: relative;
-            cursor: pointer;
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            background-color: #f9fafb;
-            border-left: 4px solid var(--modal-accent);
-            font-family: 'Anime Ace', sans-serif;
-        }
-        .anime-item:hover {
-            background-color: #f3f4f6;
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        .dark .anime-item {
-            background-color: rgb(30 41 59);
-            border-left: 4px solid var(--modal-accent-dark);
-            color: var(--text-dark);
-        }
-        .dark .anime-item:hover {
-            background-color: rgb(51 65 85);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-        .anime-item::before {
-            content: "📺";
-            margin-right: 10px;
-            font-size: 1.2rem;
-        }
         .header-gradient {
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -406,7 +374,7 @@
                 <div class="category-section mb-12">
                     <h3 class="text-2xl font-semibold mb-6 dark:text-white">B</h3>
                     <div class="space-y-2">
-                        <div class="anime-item" data-title="Benriya Saitou-san, Isekai ni Iku" data-initial="B">
+                        <div class="cursor-pointer" data-title="Benriya Saitou-san, Isekai ni Iku" data-initial="B">
                             Benriya Saitou-san, Isekai ni Iku
                         </div>
                     </div>
@@ -414,10 +382,10 @@
                 <div class="category-section mb-12">
                     <h3 class="text-2xl font-semibold mb-6 dark:text-white">K</h3>
                     <div class="space-y-2">
-                        <div class="anime-item" data-title="Kamonohashi Ron no Kindan Suiri" data-initial="K">
+                        <div class="cursor-pointer" data-title="Kamonohashi Ron no Kindan Suiri" data-initial="K">
                             Kamonohashi Ron no Kindan Suiri
                         </div>
-                        <div class="anime-item" data-title="Kanchigai no Atelier Meister" data-initial="K">
+                        <div class="cursor-pointer" data-title="Kanchigai no Atelier Meister" data-initial="K">
                             Kanchigai no Atelier Meister
                         </div>
                     </div>
@@ -425,7 +393,7 @@
                 <div class="category-section mb-12">
                     <h3 class="text-2xl font-semibold mb-6 dark:text-white">T</h3>
                     <div class="space-y-2">
-                        <div class="anime-item" data-title="Tomo-chan wa Onna no Ko" data-initial="T">
+                        <div class="cursor-pointer" data-title="Tomo-chan wa Onna no Ko" data-initial="T">
                             Tomo-chan wa Onna no Ko
                         </div>
                     </div>
@@ -537,7 +505,7 @@
         const searchInput = document.getElementById('search');
         const letterFilter = document.getElementById('letterFilter');
         const filterButtons = letterFilter.querySelectorAll('.filter-btn');
-        const animeItems = document.querySelectorAll('.anime-item');
+        const animeItems = document.querySelectorAll('[data-title]');
         const categorySections = document.querySelectorAll('.category-section');
         function filterProjects() {
             const searchTerm = searchInput.value.toLowerCase();
@@ -548,16 +516,12 @@
                 const initial = item.getAttribute('data-initial');
                 const matchesSearch = title.includes(searchTerm);
                 const matchesLetter = activeLetter === 'all' || initial === activeLetter;
-                if (matchesSearch && matchesLetter) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
+                item.style.display = matchesSearch && matchesLetter ? 'block' : 'none';
             });
             // Show/hide category sections based on visible items
             categorySections.forEach(section => {
-                const itemsInSection = section.querySelectorAll('.anime-item');
-                const hasVisibleItems = Array.from(itemsInSection).some(item => item.style.display === 'flex');
+                const itemsInSection = section.querySelectorAll('[data-title]');
+                const hasVisibleItems = Array.from(itemsInSection).some(item => item.style.display === 'block');
                 section.style.display = hasVisibleItems ? 'block' : 'none';
             });
         }
