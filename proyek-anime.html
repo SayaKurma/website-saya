@@ -6,103 +6,152 @@
     <title>Proyek Anime - Portofolio Saya</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Anime+Ace&display=swap" rel="stylesheet">
     <style>
+        /* Theme Settings */
         :root {
             --primary-color: #3b82f6;
-            --primary-dark: #2563eb;
-            --secondary-color: #f472b6;
-            --bg-light: #f9fafb;
-            --bg-dark: #1e293b;
-            --text-light: #1f2937;
-            --text-dark: #e5e7eb;
-            --modal-accent: #8b5cf6;
-            --modal-accent-dark: #a78bfa;
+            --primary-hover: #2563eb;
+            --dark-bg: #0f172a;
+            --dark-secondary: #1e293b;
+            --light-text: #f8fafc;
+            --dark-text: #334155;
         }
+        /* Base Styles */
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--bg-light) 0%, #e0e7ff 100%);
-            transition: all 0.3s ease;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        h2, h3, .nav-link, .font-heading {
-            font-family: 'Quicksand', sans-serif;
-        }
+        /* Dark Mode Styles */
         .dark {
-            background: linear-gradient(135deg, var(--bg-dark) 0%, #2a4365 100%);
-            color: var(--text-dark);
+            background-color: var(--dark-bg);
+            color: var(--light-text);
         }
         .dark .nav-link {
-            color: var(--text-dark);
+            color: var(--light-text);
         }
-        .dark .section-title {
-            border-color: #475569;
-        }
+        /* Navigation & Menu */
         .dark-mode-toggle {
             transition: all 0.3s ease;
-            background: #e5e7eb;
-        }
-        .dark .dark-mode-toggle {
-            background: #475569;
         }
         .active {
-            position: relative;
             font-weight: 600;
-            color: var(--secondary-color);
+            color: var(--primary-color);
+            position: relative;
         }
         .active::after {
             content: '';
             position: absolute;
-            bottom: -8px;
+            bottom: -6px;
             left: 0;
             width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border-radius: 10px;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
         }
         .dark .active {
-            color: #f9a8d4;
+            color: #60a5fa;
         }
         .dark .active::after {
-            background: linear-gradient(90deg, #60a5fa, #f9a8d4);
+            background-color: #60a5fa;
         }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        .dark .nav-link::after {
+            background-color: #60a5fa;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        /* Animation Effects */
         .fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.8s ease-in;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .slide-in-right {
+            animation: slideInRight 0.8s ease-out;
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease-out;
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        /* Social Media Icons */
         .social-icon {
             transition: all 0.3s ease;
         }
         .social-icon:hover {
             transform: scale(1.2) translateY(-5px);
-            color: var(--secondary-color);
         }
-        .back-to-top {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 3rem;
-            height: 3rem;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
             color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
             transition: all 0.3s ease;
-            z-index: 99;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
         }
-        .dark .back-to-top {
-            background: linear-gradient(45deg, #60a5fa, #f9a8d4);
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
-        .back-to-top.visible {
-            opacity: 1;
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
         }
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
+        }
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .dark .btn-outline {
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+        .dark .btn-outline:hover {
+            background-color: rgba(96, 165, 250, 0.1);
+        }
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -127,44 +176,42 @@
             overflow-y: auto;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             margin: auto;
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            border: 1px solid var(--primary-color);
             animation: modalOpen 0.4s ease-out;
-            font-family: 'Poppins', sans-serif;
         }
         @keyframes modalOpen {
             from { opacity: 0; transform: scale(0.8); }
             to { opacity: 1; transform: scale(1); }
         }
         .dark .modal-content {
-            background-color: rgb(30 41 59);
-            color: white;
-            border: 1px solid rgba(167, 139, 250, 0.3);
+            background-color: var(--dark-secondary);
+            color: var(--light-text);
+            border: 1px solid #60a5fa;
         }
         .modal-title {
-            font-family: 'Quicksand', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid var(--modal-accent);
-            color: #4b5563;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--dark-text);
             text-align: center;
         }
         .dark .modal-title {
-            color: white;
-            border-bottom: 2px solid var(--modal-accent-dark);
+            color: var(--light-text);
+            border-bottom: 2px solid #60a5fa;
         }
         .detail-group {
             margin-bottom: 15px;
         }
         .detail-label {
             font-weight: 600;
-            color: var(--modal-accent);
+            color: var(--primary-color);
             display: block;
             margin-bottom: 5px;
         }
         .dark .detail-label {
-            color: var(--modal-accent-dark);
+            color: #60a5fa;
         }
         .detail-value {
             padding-left: 15px;
@@ -175,11 +222,11 @@
             padding: 15px;
             border-radius: 10px;
             background-color: #f9fafb;
-            border-left: 4px solid var(--modal-accent);
+            border-left: 4px solid var(--primary-color);
         }
         .dark .synopsis-container {
-            background-color: rgb(30 41 59);
-            border-left: 4px solid var(--modal-accent-dark);
+            background-color: var(--dark-secondary);
+            border-left: 4px solid #60a5fa;
         }
         .modal-buttons {
             display: flex;
@@ -187,48 +234,7 @@
             gap: 10px;
             margin-top: 20px;
         }
-        .modal-btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .close-btn {
-            background-color: #e5e7eb;
-            color: #374151;
-        }
-        .close-btn:hover {
-            background-color: #d1d5db;
-            transform: translateY(-2px);
-        }
-        .download-btn {
-            background: linear-gradient(135deg, var(--modal-accent), var(--secondary-color));
-            color: white;
-            text-decoration: none;
-        }
-        .download-btn:hover {
-            background: linear-gradient(135deg, #7c3aed, #db2777);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        }
-        .dark .close-btn {
-            background-color: #4b5563;
-            color: #e5e7eb;
-        }
-        .dark .close-btn:hover {
-            background-color: #6b7280;
-        }
-        .dark .download-btn {
-            background: linear-gradient(135deg, var(--modal-accent-dark), #f9a8d4);
-        }
-        .dark .download-btn:hover {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3);
-        }
+        /* Filter Button Styles */
         .filter-btn {
             padding: 8px 16px;
             margin: 4px;
@@ -237,89 +243,95 @@
             color: #374151;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
         }
         .filter-btn:hover {
             background: var(--primary-color);
             color: white;
         }
         .filter-btn.active {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
             color: white;
         }
         .dark .filter-btn {
             background: #4b5563;
-            color: var(--text-dark);
+            color: var(--light-text);
         }
         .dark .filter-btn:hover {
             background: #60a5fa;
             color: white;
         }
         .dark .filter-btn.active {
-            background: linear-gradient(45deg, #60a5fa, #f9a8d4);
+            background: #60a5fa;
             color: white;
         }
-        .header-gradient {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            background: var(--primary-color);
             color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 99;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
-        .dark .header-gradient {
-            background: linear-gradient(90deg, #60a5fa, #f9a8d4);
+        .dark .back-to-top {
+            background: #60a5fa;
         }
-        ::-webkit-scrollbar {
-            width: 10px;
+        .back-to-top.visible {
+            opacity: 1;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--modal-accent), var(--secondary-color));
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #7c3aed, #db2777);
-        }
-        .dark ::-webkit-scrollbar-track {
-            background: #374151;
+        /* Footer Styles */
+        footer {
+            transition: background-color 0.5s ease;
         }
     </style>
 </head>
-<body class="text-gray-800 transition-colors duration-300 min-h-screen">
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen dark:bg-slate-900 dark:text-white">
     <!-- Header/Navigation -->
-    <header class="sticky top-0 z-50 header-gradient backdrop-blur-sm shadow-sm">
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md dark:bg-slate-800/90 shadow-md">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="text-2xl font-bold">
-                    <a href="index.html">Portofolio</a>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600">Portofolio</span>
+                    </a>
                 </div>
                 <nav class="hidden md:flex space-x-8">
-                    <a href="index.html" class="nav-link hover:text-white transition">Beranda</a>
-                    <a href="profile.html" class="nav-link hover:text-white transition">Profil</a>
-                    <a href="tulisan.html" class="nav-link hover:text-white transition">Tulisan</a>
-                    <a href="galeri.html" class="nav-link hover:text-white transition">Galeri</a>
-                    <a href="proyek-anime.html" class="nav-link hover:text-white transition active">Proyek Anime</a>
-                    <a href="sosmed.html" class="nav-link hover:text-white transition">Sosial Media</a>
+                    <a href="index.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition">Beranda</a>
+                    <a href="profile.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition">Profil</a>
+                    <a href="tulisan.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition">Tulisan</a>
+                    <a href="galeri.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition active">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition">Sosial Media</a>
                 </nav>
                 <div class="flex items-center space-x-4">
-                    <button id="darkModeToggle" class="dark-mode-toggle p-2 rounded-full">
+                    <button id="darkModeToggle" class="dark-mode-toggle p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 transition-all duration-300">
                         <i class="fas fa-moon dark:hidden"></i>
                         <i class="fas fa-sun hidden dark:block text-yellow-300"></i>
                     </button>
-                    <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 dark:bg-slate-700">
+                    <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 transition-all">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
             </div>
             <!-- Mobile Menu -->
-            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2">
-                <div class="flex flex-col space-y-3">
-                    <a href="index.html" class="nav-link hover:text-white transition">Beranda</a>
-                    <a href="profile.html" class="nav-link hover:text-white transition">Profil</a>
-                    <a href="tulisan.html" class="nav-link hover:text-white transition">Tulisan</a>
-                    <a href="galeri.html" class="nav-link hover:text-white transition">Galeri</a>
-                    <a href="proyek-anime.html" class="nav-link hover:text-white transition active">Proyek Anime</a>
-                    <a href="sosmed.html" class="nav-link hover:text-white transition">Sosial Media</a>
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2 rounded-xl bg-white dark:bg-slate-800 shadow-lg p-4 transition-all duration-300">
+                <div class="flex flex-col space-y-4">
+                    <a href="index.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700">Beranda</a>
+                    <a href="profile.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700">Profil</a>
+                    <a href="tulisan.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700">Tulisan</a>
+                    <a href="galeri.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition active py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700">Sosial Media</a>
                 </div>
             </div>
         </div>
@@ -327,17 +339,17 @@
     <!-- Main Content -->
     <main class="container mx-auto px-6 py-12">
         <!-- Anime Projects Section -->
-        <section id="proyek-anime" class="py-12 fade-in">
+        <section id="proyek-anime" class="py-12 md:py-16 lg:py-20 fade-in">
             <div class="mb-12 text-center">
-                <h2 class="text-4xl font-bold mb-4 dark:text-white flex justify-center items-center">
-                    <span class="section-title border-b-4 border-secondary-color pb-2 pr-4">Proyek Anime</span>
+                <h2 class="text-4xl font-bold mb-4 dark:text-white">
+                    <span class="border-b-4 border-blue-500 pb-2 dark:border-blue-400">Proyek Anime</span>
                 </h2>
-                <p class="dark:text-gray-400 text-lg">Koleksi proyek terjemahan dan pengeditan anime saya, diurutkan berdasarkan abjad.</p>
+                <p class="text-lg text-gray-600 dark:text-gray-300">Koleksi proyek terjemahan dan pengeditan anime saya, diurutkan berdasarkan abjad.</p>
             </div>
             <!-- Search and Filter -->
             <div class="mb-8">
                 <div class="flex flex-col sm:flex-row gap-4 mb-6 justify-center">
-                    <input id="search" type="text" placeholder="Cari anime..." class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary-color w-full sm:w-1/2">
+                    <input id="search" type="text" placeholder="Cari anime..." class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-1/2">
                 </div>
                 <div id="letterFilter" class="flex flex-wrap gap-2 justify-center">
                     <button class="filter-btn" data-letter="all">Semua</button>
@@ -374,7 +386,7 @@
                 <div class="category-section mb-12">
                     <h3 class="text-2xl font-semibold mb-6 dark:text-white">B</h3>
                     <div class="space-y-2">
-                        <div class="cursor-pointer" data-title="Benriya Saitou-san, Isekai ni Iku" data-initial="B">
+                        <div class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" data-title="Benriya Saitou-san, Isekai ni Iku" data-initial="B">
                             Benriya Saitou-san, Isekai ni Iku
                         </div>
                     </div>
@@ -382,10 +394,10 @@
                 <div class="category-section mb-12">
                     <h3 class="text-2xl font-semibold mb-6 dark:text-white">K</h3>
                     <div class="space-y-2">
-                        <div class="cursor-pointer" data-title="Kamonohashi Ron no Kindan Suiri" data-initial="K">
+                        <div class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" data-title="Kamonohashi Ron no Kindan Suiri" data-initial="K">
                             Kamonohashi Ron no Kindan Suiri
                         </div>
-                        <div class="cursor-pointer" data-title="Kanchigai no Atelier Meister" data-initial="K">
+                        <div class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" data-title="Kanchigai no Atelier Meister" data-initial="K">
                             Kanchigai no Atelier Meister
                         </div>
                     </div>
@@ -393,7 +405,7 @@
                 <div class="category-section mb-12">
                     <h3 class="text-2xl font-semibold mb-6 dark:text-white">T</h3>
                     <div class="space-y-2">
-                        <div class="cursor-pointer" data-title="Tomo-chan wa Onna no Ko" data-initial="T">
+                        <div class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" data-title="Tomo-chan wa Onna no Ko" data-initial="T">
                             Tomo-chan wa Onna no Ko
                         </div>
                     </div>
@@ -432,32 +444,35 @@
                 <p id="modalSynopsis" class="detail-value text-justify"></p>
             </div>
             <div class="modal-buttons">
-                <button id="closeModal" class="modal-btn close-btn">
+                <button id="closeModal" class="modal-btn btn-outline px-4 py-2 rounded-lg">
                     <i class="fas fa-times mr-2"></i>Tutup
                 </button>
-                <a id="downloadLink" href="#" target="_blank" class="modal-btn download-btn">
-                    <i class="fas fa-download"></i>Download
+                <a id="downloadLink" href="#" target="_blank" class="modal-btn btn-primary px-4 py-2 rounded-lg">
+                    <i class="fas fa-download mr-2"></i>Download
                 </a>
             </div>
         </div>
     </div>
     <!-- Footer -->
-    <footer class="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
+    <footer class="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 mt-12">
         <div class="container mx-auto px-6 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-6 md:mb-0">
-                    <span class="text-xl font-bold text-secondary-color">Portofolio</span>
+                    <span class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600">Portofolio</span>
                     <p class="text-gray-600 dark:text-gray-400 mt-2">© 2023 John Doe. All rights reserved.</p>
                 </div>
                 <div class="flex space-x-6">
-                    <a href="#" class="social-icon text-gray-500 hover:text-secondary-color dark:hover:text-pink-400">
+                    <a href="#" class="social-icon text-gray-500 hover:text-blue-400 dark:hover:text-blue-300">
                         <i class="fab fa-telegram text-xl"></i>
                     </a>
-                    <a href="#" class="social-icon text-gray-500 hover:text-secondary-color dark:hover:text-pink-400">
+                    <a href="#" class="social-icon text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
                         <i class="fab fa-linkedin-in text-xl"></i>
                     </a>
-                    <a href="#" class="social-icon text-gray-500 hover:text-secondary-color dark:hover:text-pink-400">
+                    <a href="#" class="social-icon text-gray-500 hover:text-pink-500 dark:hover:text-pink-400">
                         <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="social-icon text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        <i class="fab fa-github text-xl"></i>
                     </a>
                 </div>
             </div>
@@ -484,20 +499,28 @@
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
         mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('fade-in');
+            } else {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('fade-in');
+            }
         });
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 100,
-                        behavior: 'smooth'
-                    });
-                    mobileMenu.classList.add('hidden');
+                const targetId = this.getAttribute('href').substring(1);
+                if (targetId) {
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                        mobileMenu.classList.add('hidden');
+                    }
                 }
             });
         });
@@ -510,7 +533,6 @@
         function filterProjects() {
             const searchTerm = searchInput.value.toLowerCase();
             const activeLetter = letterFilter.querySelector('.filter-btn.active')?.getAttribute('data-letter') || 'all';
-            // Filter individual items
             animeItems.forEach(item => {
                 const title = item.getAttribute('data-title').toLowerCase();
                 const initial = item.getAttribute('data-initial');
@@ -518,16 +540,13 @@
                 const matchesLetter = activeLetter === 'all' || initial === activeLetter;
                 item.style.display = matchesSearch && matchesLetter ? 'block' : 'none';
             });
-            // Show/hide category sections based on visible items
             categorySections.forEach(section => {
                 const itemsInSection = section.querySelectorAll('[data-title]');
                 const hasVisibleItems = Array.from(itemsInSection).some(item => item.style.display === 'block');
                 section.style.display = hasVisibleItems ? 'block' : 'none';
             });
         }
-        // Search input event listener
         searchInput.addEventListener('input', filterProjects);
-        // Letter filter button event listeners
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 filterButtons.forEach(btn => btn.classList.remove('active'));
@@ -535,9 +554,7 @@
                 filterProjects();
             });
         });
-        // Set "Semua" as default active filter
         letterFilter.querySelector('[data-letter="all"]').classList.add('active');
-        // Initial filter on page load
         filterProjects();
         // Modal Functionality
         const modal = document.getElementById('animeModal');
@@ -553,7 +570,6 @@
         const modalSynopsis = document.getElementById('modalSynopsis');
         const downloadLink = document.getElementById('downloadLink');
         modal.style.display = 'none';
-        // Fetch anime data from JSON file
         let animeData = {};
         fetch('anime-data.json')
             .then(response => response.json())
@@ -581,12 +597,10 @@
                 });
             })
             .catch(error => console.error('Error loading anime data:', error));
-        // Close modal when "Tutup" button is clicked
         closeModalBtn.addEventListener('click', () => {
             modal.style.display = 'none';
             document.body.style.overflow = '';
         });
-        // Close modal when clicking outside of modal content
         window.addEventListener('click', (event) => {
             if (event.target === modal) {
                 modal.style.display = 'none';
@@ -608,6 +622,38 @@
                 behavior: 'smooth'
             });
         });
+        // Add fade-in animation to sections when scrolling
+        function addFadeInOnScroll() {
+            const sections = document.querySelectorAll('section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => {
+                if (!section.classList.contains('fade-in')) {
+                    observer.observe(section);
+                }
+            });
+        }
+        addFadeInOnScroll();
+        // Track current active navigation link
+        function updateActiveNavLink() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            navLinks.forEach(link => {
+                const linkHref = link.getAttribute('href');
+                if (linkHref === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        updateActiveNavLink();
     </script>
 </body>
 </html>
