@@ -447,7 +447,7 @@
                 <button id="closeModal" class="modal-btn btn-outline px-4 py-2 rounded-lg">
                     <i class="fas fa-times mr-2"></i>Tutup
                 </button>
-                <a id="downloadLink" href="#" target="_blank" class="modal-btn btn-primary px-4 py-2 rounded-lg">
+                <a id="downloadLink" href="#" target="_blank" class="modal-btn btn-primary px-4 py-2 rounded-lg" rel="noopener noreferrer">
                     <i class="fas fa-download mr-2"></i>Download
                 </a>
             </div>
@@ -606,6 +606,11 @@
                 modal.style.display = 'none';
                 document.body.style.overflow = '';
             }
+        });
+        // Ensure download link opens directly
+        downloadLink.addEventListener('click', (event) => {
+            // The default behavior of the <a> tag with href and target="_blank" will handle the navigation
+            // No need to preventDefault or add custom navigation logic
         });
         // Back to Top Button
         const backToTopButton = document.getElementById('backToTop');
