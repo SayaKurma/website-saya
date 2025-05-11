@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri - Portofolio Saya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Theme Settings */
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --dark-text: #334155;
+        }
+        /* Base Styles */
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        /* Navigation & Menu */
+        .active {
+            font-weight: 600;
+            color: var(--primary-color);
+            position: relative;
+        }
+        .active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        /* Animation Effects */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in-right {
+            animation: slideInRight 0.8s ease-out;
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease-out;
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        /* Social Media Icons */
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.2) translateY(-5px);
+        }
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
+        }
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
+        }
+        /* Gallery Item Styles */
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+        .gallery-item.image-only img {
+            height: 100%;
+        }
+        .gallery-item:not(.image-only) img {
+            height: 12rem;
+        }
+        .card-container {
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        .card-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 99;
+        }
+        .back-to-top.visible {
+            opacity: 1;
+        }
+        /* Footer Styles */
+        footer {
+            transition: background-color 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen">
+    <!-- Header/Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-md">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-2xl font-bold">
+                    <a href="index.html" class="flex items-center gap-2">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Portofolio</span>
+                    </a>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="nav-link hover:text-blue-500 transition">Beranda</a>
+                    <a href="profile.html" class="nav-link hover:text-blue-500 transition">Profil</a>
+                    <a href="tulisan.html" class="nav-link hover:text-blue-500 transition">Tulisan</a>
+                    <a href="galeri.html" class="nav-link hover:text-blue-500 transition active">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link hover:text-blue-500 transition">Sosial Media</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2 rounded-xl bg-white shadow-lg p-4 transition-all duration-300">
+                <div class="flex flex-col space-y-4">
+                    <a href="index.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Beranda</a>
+                    <a href="profile.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Profil</a>
+                    <a href="tulisan.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Tulisan</a>
+                    <a href="galeri.html" class="nav-link hover:text-blue-500 transition active py-2 px-3 rounded-lg hover:bg-gray-100">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Sosial Media</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Galeri Section -->
+        <section id="galeri" class="py-12 md:py-16 lg:py-20 fade-in">
+            <div class="mb-12 slide-in-left">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Galeri Saya</span>
+                </h2>
+                <p class="text-lg text-gray-600 leading-relaxed">Koleksi karya visual dan fotografi saya.</p>
+            </div>
+            <!-- Filter Section -->
+            <div class="mb-8 slide-in-right">
+                <div class="flex flex-wrap gap-4">
+                    <button class="tag-filter-btn btn-primary px-6 py-2 rounded-full font-semibold active" data-tag="all">Semua</button>
+                    <button class="tag-filter-btn btn-outline px-6 py-2 rounded-full font-semibold" data-tag="fotografi">Fotografi</button>
+                    <button class="tag-filter-btn btn-outline px-6 py-2 rounded-full font-semibold" data-tag="karya">Karya</button>
+                </div>
+            </div>
+            <!-- Gallery Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <div class="gallery-item fade-in" data-tag="fotografi">
+                    <img src="https://media.discordapp.net/attachments/1370635728635301942/1370636027215216730/2024_0824_04174200.jpg?ex=682037c6&is=681ee646&hm=25126e2cd027734c988d43e9bebdb3763d084a1f0ef4369b27c13f2bb7677199&=&width=720&height=480" alt="Fotografi 1">
+                    <div class="card-container bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 transition-all duration-300">
+                        <div class="p-4">
+                            <span class="tag-label text-sm font-medium text-blue-800 bg-blue-100 px-2.5 py-0.5 rounded">Fotografi</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-item fade-in" data-tag="fotografi">
+                    <img src="https://media.discordapp.net/attachments/1370635728635301942/1370636328093356053/2024_1108_02334700.jpg?ex=6820380d&is=681ee68d&hm=b47d4b4f92908d873ec3788ddcf7787ca07594fccb5df3f9b75ac43425f0240c&=&width=720&height=480" alt="Fotografi 2">
+                    <div class="card-container bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 transition-all duration-300">
+                        <div class="p-4">
+                            <span class="tag-label text-sm font-medium text-blue-800 bg-blue-100 px-2.5 py-0.5 rounded">Fotografi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <span class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Portofolio</span>
+                    <p class="text-gray-600 mt-2">© 2023 John Doe. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="social-icon text-gray-500 hover:text-blue-400">
+                        <i class="fab fa-telegram text-xl"></i>
+                    </a>
+                    <a href="#" class="social-icon text-gray-500 hover:text-blue-600">
+                        <i class="fab fa-linkedin-in text-xl"></i>
+                    </a>
+                    <a href="#" class="social-icon text-gray-500 hover:text-pink-500">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="social-icon text-gray-500 hover:text-gray-700">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    <script>
+        // Mobile Menu Toggle with animation
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuButton.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('fade-in');
+            } else {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('fade-in');
+            }
+        });
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                if (targetId) {
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        // Tag Filter Functionality
+        const tagFilterButtons = document.querySelectorAll('.tag-filter-btn');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        function filterGallery() {
+            const activeTag = document.querySelector('.tag-filter-btn.active')?.getAttribute('data-tag') || 'all';
+            galleryItems.forEach(item => {
+                const itemTag = item.getAttribute('data-tag');
+                const cardContainer = item.querySelector('.card-container');
+                if (activeTag === 'all' || itemTag === activeTag) {
+                    item.style.display = 'block';
+                    if (activeTag === 'all') {
+                        cardContainer.style.display = 'block';
+                        item.classList.remove('image-only');
+                    } else {
+                        cardContainer.style.display = 'none';
+                        item.classList.add('image-only');
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        // Tag filter button event listeners
+        tagFilterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tagFilterButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline');
+                });
+                button.classList.add('active', 'btn-primary');
+                button.classList.remove('btn-outline');
+                filterGallery();
+            });
+        });
+        // Set "Semua" as default active filter
+        document.querySelector('.tag-filter-btn[data-tag="all"]').classList.add('active', 'btn-primary');
+        document.querySelector('.tag-filter-btn[data-tag="all"]').classList.remove('btn-outline');
+        // Initial filter on page load
+        filterGallery();
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        // Disable right-click for all images
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+            }
+        });
+        // Add fade-in animation to sections when scrolling
+        function addFadeInOnScroll() {
+            const sections = document.querySelectorAll('section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => {
+                if (!section.classList.contains('fade-in')) {
+                    observer.observe(section);
+                }
+            });
+        }
+        // Initialize animations
+        addFadeInOnScroll();
+        // Track current active navigation link
+        function updateActiveNavLink() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            navLinks.forEach(link => {
+                const linkHref = link.getAttribute('href');
+                if (linkHref === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        // Initialize active nav link
+        updateActiveNavLink();
+    </script>
+</body>
+</html>
