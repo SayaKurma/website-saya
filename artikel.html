@@ -12,7 +12,6 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
         }
-
         /* Dark Mode */
         .dark {
             --tw-bg-opacity: 1;
@@ -38,7 +37,6 @@
         .dark .active {
             color: #60a5fa;
         }
-
         /* Animations */
         .fade-in {
             animation: fadeIn 0.6s ease-out;
@@ -47,11 +45,9 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Back to Top Button */
-        .back-to-top {
+        /* Floating Action Buttons */
+        .floating-action {
             position: fixed;
-            bottom: 2.5rem;
             right: 2.5rem;
             width: 2.75rem;
             height: 2.75rem;
@@ -67,17 +63,22 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 99;
         }
-        .dark .back-to-top {
+        .dark .floating-action {
             background-color: #3b82f6;
         }
-        .back-to-top.visible {
+        .floating-action.visible {
             opacity: 1;
             transform: translateY(0);
         }
-        .back-to-top:hover {
+        .floating-action:hover {
             transform: translateY(-4px);
         }
-
+        .back-to-top {
+            bottom: 2.5rem;
+        }
+        .share-button {
+            bottom: 6rem;
+        }
         /* Article Content */
         .article-content {
             line-height: 1.9;
@@ -114,7 +115,6 @@
         .article-content li {
             margin-bottom: 0.75rem;
         }
-
         /* Header */
         header {
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
@@ -138,7 +138,6 @@
         .dark header .nav-link:hover::after {
             background-color: #60a5fa;
         }
-
         /* Buttons */
         button {
             transition: background-color 0.3s ease, transform 0.2s ease;
@@ -158,7 +157,6 @@
         .dark #mobileMenuButton {
             background-color: rgb(55 65 81);
         }
-
         /* Footer */
         footer {
             transition: background-color 0.3s ease;
@@ -169,7 +167,6 @@
         .social-icon:hover {
             transform: scale(1.2);
         }
-
         /* Article Meta and Author Credit */
         #articleMeta {
             display: flex;
@@ -266,13 +263,7 @@
                     <span id="articleDate" class="text-sm text-gray-500 dark:text-gray-400">Tanggal</span>
                 </div>
                 <h1 id="articleTitle" class="text-3xl font-bold mb-4 dark:text-white">Judul Artikel</h1>
-                <div id="articleAuthor" class="text-sm text-gray-500 dark:text-gray-400">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Author" class="author-avatar">
-                    <div class="author-info">
-                        <span class="author-name">Penulis</span>
-                        <span class="author-title">Penulis</span>
-                    </div>
-                </div>
+                <div id="articleAuthor" class="text-sm text-gray-500 dark:text-gray-400"></div>
             </div>
             <!-- Article Content -->
             <div id="articleBody" class="article-content dark:text-gray-300 mb-12">
@@ -306,9 +297,12 @@
             </div>
         </div>
     </footer>
-    <!-- Back to Top Button -->
-    <div class="back-to-top" id="backToTop">
+    <!-- Floating Action Buttons -->
+    <div class="floating-action back-to-top" id="backToTop">
         <i class="fas fa-arrow-up"></i>
+    </div>
+    <div class="floating-action share-button" id="shareButton">
+        <i class="fas fa-share-alt"></i>
     </div>
     <script>
         // Dark Mode Toggle
@@ -356,13 +350,16 @@
         fadeElements.forEach(element => {
             fadeInObserver.observe(element);
         });
-        // Back to Top Button
+        // Floating Action Buttons
         const backToTopButton = document.getElementById('backToTop');
+        const shareButton = document.getElementById('shareButton');
         window.addEventListener('scroll', () => {
             if (window.pageYOffset > 300) {
                 backToTopButton.classList.add('visible');
+                shareButton.classList.add('visible');
             } else {
                 backToTopButton.classList.remove('visible');
+                shareButton.classList.remove('visible');
             }
         });
         backToTopButton.addEventListener('click', () => {
@@ -370,6 +367,16 @@
                 top: 0,
                 behavior: 'smooth'
             });
+        });
+        shareButton.addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.getElementById('articleTitle').textContent,
+                    url: window.location.href
+                }).catch(error => console.error('Error sharing:', error));
+            } else {
+                alert('Fitur berbagi tidak didukung di peramban ini.');
+            }
         });
         // Dynamic Article Loading
         async function loadArticle() {
@@ -401,12 +408,11 @@
                 }`;
                 document.getElementById('articleDate').textContent = article.date;
                 // Update author credit
-                const authorElement = document.getElementById('articleAuthor');
-                authorElement.innerHTML = `
+                document.getElementById('articleAuthor').innerHTML = `
                     <img src="${article.authorImage || 'https://randomuser.me/api/portraits/men/32.jpg'}" alt="Author" class="author-avatar">
                     <div class="author-info">
                         <span class="author-name">${article.author}</span>
-                        <span class="author-title">Penulis</span>
+                        <span class="author-title">${article.authorTitle || 'Penulis'}</span>
                     </div>
                 `;
                 document.getElementById('articleBody').innerHTML = article.content;
