@@ -16,28 +16,34 @@
             --light-text: #f8fafc;
             --dark-text: #334155;
         }
+
         /* Base Styles */
         body {
             transition: background-color 0.5s ease, color 0.5s ease;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
+
         /* Dark Mode Styles */
         .dark {
             background-color: var(--dark-bg);
             color: var(--light-text);
         }
+
         .dark .nav-link {
             color: var(--light-text);
         }
+
         /* Navigation & Menu */
         .dark-mode-toggle {
             transition: all 0.3s ease;
         }
+
         .active {
             font-weight: 600;
             color: var(--primary-color);
             position: relative;
         }
+
         .active::after {
             content: '';
             position: absolute;
@@ -48,15 +54,19 @@
             background-color: var(--primary-color);
             border-radius: 2px;
         }
+
         .dark .active {
             color: #60a5fa;
         }
+
         .dark .active::after {
             background-color: #60a5fa;
         }
+
         .nav-link {
             position: relative;
         }
+
         .nav-link::after {
             content: '';
             position: absolute;
@@ -68,41 +78,52 @@
             transition: width 0.3s ease;
             border-radius: 2px;
         }
+
         .dark .nav-link::after {
             background-color: #60a5fa;
         }
+
         .nav-link:hover::after {
             width: 100%;
         }
+
         /* Animation Effects */
         .fade-in {
             animation: fadeIn 0.8s ease-in;
         }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
         .slide-in-right {
             animation: slideInRight 0.8s ease-out;
         }
+
         @keyframes slideInRight {
             from { opacity: 0; transform: translateX(50px); }
             to { opacity: 1; transform: translateX(0); }
         }
+
         .slide-in-left {
             animation: slideInLeft 0.8s ease-out;
         }
+
         @keyframes slideInLeft {
             from { opacity: 0; transform: translateX(-50px); }
             to { opacity: 1; transform: translateX(0); }
         }
+
         /* Social Media Icons */
         .social-icon {
             transition: all 0.3s ease;
         }
+
         .social-icon:hover {
             transform: scale(1.2) translateY(-5px);
         }
+
         /* Typing Animation */
         .typing-cursor {
             display: inline-block;
@@ -113,34 +134,43 @@
             animation: blink 1s infinite;
             vertical-align: text-top;
         }
+
         .dark .typing-cursor {
             background: #60a5fa;
         }
+
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
+
         /* Profile Image Effects */
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
         }
-        .floating {
-            animation: float 6s ease-in-out infinite;
+
+        .floating { 
+            animation: float 6s ease-in-out infinite; 
         }
+
         .profile-image-container {
             position: relative;
             transition: transform 0.3s ease;
         }
+
         .profile-image-container:hover {
             transform: scale(1.05);
         }
+
         .glow {
             box-shadow: 0 0 25px rgba(59, 130, 246, 0.7);
         }
+
         .dark .glow {
             box-shadow: 0 0 25px rgba(96, 165, 250, 0.7);
         }
+
         /* Button Styles */
         .btn-primary {
             background-color: var(--primary-color);
@@ -149,11 +179,13 @@
             position: relative;
             overflow: hidden;
         }
+
         .btn-primary:hover {
             background-color: var(--primary-hover);
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
+
         .btn-primary::after {
             content: '';
             position: absolute;
@@ -166,10 +198,12 @@
             transform: translate(-50%, -50%) scale(0);
             transition: transform 0.5s;
         }
+
         .btn-primary:active::after {
             transform: translate(-50%, -50%) scale(1);
             transition: 0s;
         }
+
         .btn-outline {
             border: 2px solid var(--primary-color);
             color: var(--primary-color);
@@ -177,31 +211,38 @@
             position: relative;
             overflow: hidden;
         }
+
         .dark .btn-outline {
             color: #60a5fa;
             border-color: #60a5fa;
         }
+
         .btn-outline:hover {
             background-color: rgba(59, 130, 246, 0.1);
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
         }
+
         .dark .btn-outline:hover {
             background-color: rgba(96, 165, 250, 0.1);
         }
+
         /* Badge Styles */
         .status-badge {
             transition: all 0.3s ease;
         }
+
         .status-badge:hover {
             transform: translateY(-5px);
         }
+
         /* Footer Styles */
         footer {
             transition: background-color 0.5s ease;
         }
     </style>
 </head>
+
 <body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen dark:bg-slate-900 dark:text-white">
     <!-- Header/Navigation -->
     <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md dark:bg-slate-800/90 shadow-md">
@@ -212,6 +253,7 @@
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600">Portofolio</span>
                     </a>
                 </div>
+
                 <nav class="hidden md:flex space-x-8">
                     <a href="index.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition active">Beranda</a>
                     <a href="profile.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition">Profil</a>
@@ -220,16 +262,19 @@
                     <a href="proyek-anime.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition">Proyek Anime</a>
                     <a href="sosmed.html" class="nav-link hover:text-blue-500 dark:hover:text-blue-400 transition">Sosial Media</a>
                 </nav>
+
                 <div class="flex items-center space-x-4">
                     <button id="darkModeToggle" class="dark-mode-toggle p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 transition-all duration-300">
-                        <i class="fas fa-moon text-gray-600 dark:hidden"></i>
+                        <i class="fas fa-moon dark:hidden"></i>
                         <i class="fas fa-sun hidden dark:block text-yellow-300"></i>
                     </button>
+
                     <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 transition-all">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
             </div>
+
             <!-- Mobile Menu -->
             <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2 rounded-xl bg-white dark:bg-slate-800 shadow-lg p-4 transition-all duration-300">
                 <div class="flex flex-col space-y-4">
@@ -243,6 +288,7 @@
             </div>
         </div>
     </header>
+
     <!-- Main Content -->
     <main class="container mx-auto px-6 py-12">
         <!-- Home Section -->
@@ -253,35 +299,44 @@
                     <h1 class="text-4xl md:text-6xl font-bold dark:text-white">
                         Hai, Saya <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600">John Doe</span>
                     </h1>
+
                     <div class="text-2xl md:text-3xl font-medium dark:text-gray-300 h-12">
                         <span id="typing-text"></span><span class="typing-cursor"></span>
                     </div>
+
                     <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                         Saya menciptakan situs web yang indah dan fungsional serta berbagi kegemaran saya terhadap anime melalui berbagai proyek. Dengan pengalaman lebih dari 5 tahun, saya membangun aplikasi web yang responsif dan performan tinggi.
                     </p>
+
                     <div class="flex flex-wrap gap-4">
                         <a href="mailto:emailkamu@example.com" class="btn-primary px-8 py-3 rounded-full font-semibold">
                             <i class="fas fa-envelope mr-2"></i> Hubungi Saya
                         </a>
+
                         <a href="profile.html" class="btn-outline px-8 py-3 rounded-full font-semibold">
                             <i class="fas fa-user mr-2"></i> Tentang Saya
                         </a>
                     </div>
+
                     <div class="flex gap-6 pt-4">
                         <a href="#" class="social-icon text-blue-500 dark:text-blue-400 hover:text-blue-400 dark:hover:text-blue-300 text-2xl">
                             <i class="fab fa-telegram"></i>
                         </a>
+
                         <a href="#" class="social-icon text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-400 text-2xl">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
+
                         <a href="#" class="social-icon text-blue-500 dark:text-blue-400 hover:text-pink-500 dark:hover:text-pink-400 text-2xl">
                             <i class="fab fa-instagram"></i>
                         </a>
+
                         <a href="#" class="social-icon text-blue-500 dark:text-blue-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl">
                             <i class="fab fa-github"></i>
                         </a>
                     </div>
                 </div>
+
                 <!-- Right Column - Profile Image -->
                 <div class="lg:w-1/2 flex justify-center relative slide-in-right">
                     <div class="profile-image-container">
@@ -292,6 +347,7 @@
                             class="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white dark:border-slate-800 floating shadow-lg"
                             id="profileImage">
                     </div>
+
                     <!-- Floating badge -->
                     <div class="status-badge absolute -bottom-6 -left-6 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
                         <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -301,6 +357,7 @@
             </div>
         </section>
     </main>
+
     <!-- Footer -->
     <footer class="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 mt-12">
         <div class="container mx-auto px-6 py-8">
@@ -309,16 +366,20 @@
                     <span class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600">Portofolio</span>
                     <p class="text-gray-600 dark:text-gray-400 mt-2">© 2023 John Doe. All rights reserved.</p>
                 </div>
+
                 <div class="flex space-x-6">
                     <a href="#" class="social-icon text-gray-500 hover:text-blue-400 dark:hover:text-blue-300">
                         <i class="fab fa-telegram text-xl"></i>
                     </a>
+
                     <a href="#" class="social-icon text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
                         <i class="fab fa-linkedin-in text-xl"></i>
                     </a>
+
                     <a href="#" class="social-icon text-gray-500 hover:text-pink-500 dark:hover:text-pink-400">
                         <i class="fab fa-instagram text-xl"></i>
                     </a>
+
                     <a href="#" class="social-icon text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                         <i class="fab fa-github text-xl"></i>
                     </a>
@@ -326,6 +387,7 @@
             </div>
         </div>
     </footer>
+
     <script>
         // Dark Mode Toggle
         const darkModeToggle = document.getElementById('darkModeToggle');
@@ -336,8 +398,6 @@
         // Set initial dark mode
         if (savedMode === 'dark' || (!savedMode && userPrefersDark)) {
             html.classList.add('dark');
-        } else {
-            html.classList.remove('dark');
         }
 
         // Dark mode toggle functionality
@@ -349,7 +409,9 @@
         // Mobile Menu Toggle with animation
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
+
         mobileMenuButton.addEventListener('click', () => {
+            // Toggle mobile menu
             if (mobileMenu.classList.contains('hidden')) {
                 mobileMenu.classList.remove('hidden');
                 mobileMenu.classList.add('fade-in');
@@ -363,8 +425,10 @@
         const typingText = document.getElementById('typing-text');
         const phrases = ["Pengembang Web", "Pecinta Anime", "Desainer UI/UX", "Pemecah Masalah"];
         let phraseIndex = 0, charIndex = 0, isDeleting = false, isEnd = false;
+
         function type() {
             const currentPhrase = phrases[phraseIndex];
+
             if (isDeleting) {
                 typingText.textContent = currentPhrase.substring(0, charIndex - 1);
                 charIndex--;
@@ -372,6 +436,7 @@
                 typingText.textContent = currentPhrase.substring(0, charIndex + 1);
                 charIndex++;
             }
+
             if (!isDeleting && charIndex === currentPhrase.length) {
                 isEnd = true;
                 setTimeout(() => { isDeleting = true; }, 1500);
@@ -380,23 +445,32 @@
                 phraseIndex = (phraseIndex + 1) % phrases.length;
                 isEnd = false;
             }
+
+            // Varying speeds for more natural typing
             let typeSpeed = 150;
+
             if (isDeleting) {
                 typeSpeed = 80;
             } else if (isEnd) {
                 typeSpeed = 1500;
             } else {
+                // Random variation for more natural typing appearance
                 typeSpeed = Math.random() * 50 + 120;
             }
+
             setTimeout(type, typeSpeed);
         }
+
+        // Start typing animation
         setTimeout(type, 1000);
 
         // Add glow effect on hover for profile image
         const profileImg = document.getElementById('profileImage');
+
         profileImg.addEventListener('mouseenter', () => {
             profileImg.classList.add('glow');
         });
+
         profileImg.addEventListener('mouseleave', () => {
             profileImg.classList.remove('glow');
         });
@@ -412,6 +486,7 @@
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
+
                 const targetId = this.getAttribute('href').substring(1);
                 if (targetId) {
                     const targetElement = document.getElementById(targetId);
@@ -428,6 +503,7 @@
         // Add fade-in animation to sections when scrolling
         function addFadeInOnScroll() {
             const sections = document.querySelectorAll('section');
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -436,18 +512,22 @@
                     }
                 });
             }, { threshold: 0.1 });
+
             sections.forEach(section => {
                 if (!section.classList.contains('fade-in')) {
                     observer.observe(section);
                 }
             });
         }
+
+        // Initialize animations
         addFadeInOnScroll();
 
         // Track current active navigation link
         function updateActiveNavLink() {
             const navLinks = document.querySelectorAll('.nav-link');
             const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+
             navLinks.forEach(link => {
                 const linkHref = link.getAttribute('href');
                 if (linkHref === currentPage) {
@@ -457,6 +537,8 @@
                 }
             });
         }
+
+        // Initialize active nav link
         updateActiveNavLink();
     </script>
 </body>
