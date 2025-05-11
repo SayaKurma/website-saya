@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="light">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,42 +7,56 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Global Styles */
+        /* Theme Settings */
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --dark-text: #334155;
+        }
+        /* Base Styles */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        /* Dark Mode */
-        .dark {
-            --tw-bg-opacity: 1;
-            background-color: rgb(17 24 39 / var(--tw-bg-opacity));
-            color: rgb(229 231 235);
-        }
-        .dark .nav-link {
-            color: rgb(209 213 219);
-        }
-        .dark .section-title {
-            border-color: rgb(55 65 81);
-        }
-        .dark .social-icon {
-            color: rgb(209 213 219);
-        }
-        .dark-mode-toggle {
-            transition: all 0.3s ease;
-        }
+        /* Navigation & Menu */
         .active {
             font-weight: 600;
-            color: #2563eb;
+            color: var(--primary-color);
+            position: relative;
         }
-        .dark .active {
-            color: #60a5fa;
+        .active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
         }
-        /* Animations */
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        /* Animation Effects */
         .fade-in {
-            animation: fadeIn 0.6s ease-out;
+            animation: fadeIn 0.8s ease-in;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         /* Floating Action Buttons */
@@ -64,17 +78,11 @@
         }
         .back-to-top {
             bottom: 2.5rem;
-            background-color: #2563eb;
-        }
-        .dark .back-to-top {
-            background-color: #3b82f6;
+            background-color: var(--primary-color);
         }
         .share-button {
             bottom: 6rem;
-            background-color: #f97316;
-        }
-        .dark .share-button {
-            background-color: #fb923c;
+            background-color: #f97316; /* Fixed orange color */
         }
         .floating-action.visible {
             opacity: 1;
@@ -90,19 +98,13 @@
         }
         .article-content p {
             margin-bottom: 1.75rem;
-            color: rgb(55 65 81);
-        }
-        .dark .article-content p {
-            color: rgb(209 213 219);
+            color: var(--dark-text);
         }
         .article-content h2 {
             font-size: 1.75rem;
             font-weight: 700;
             margin: 2rem 0 1.25rem;
-            color: #2563eb;
-        }
-        .dark .article-content h2 {
-            color: #60a5fa;
+            color: var(--primary-color);
         }
         .article-content img {
             max-width: 100%;
@@ -119,57 +121,34 @@
         .article-content li {
             margin-bottom: 0.75rem;
         }
-        /* Header */
-        header {
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        header .nav-link {
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
             position: relative;
-            transition: color 0.3s ease;
+            overflow: hidden;
         }
-        header .nav-link:hover::after {
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary::after {
             content: '';
             position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #2563eb;
-            transform: scaleX(1);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
         }
-        .dark header .nav-link:hover::after {
-            background-color: #60a5fa;
-        }
-        /* Buttons */
-        button {
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        button:hover {
-            transform: translateY(-2px);
-        }
-        #darkModeToggle {
-            background-color: rgb(229 231 235);
-        }
-        .dark #darkModeToggle {
-            background-color: rgb(55 65 81);
-        }
-        #mobileMenuButton {
-            background-color: rgb(229 231 235);
-        }
-        .dark #mobileMenuButton {
-            background-color: rgb(55 65 81);
-        }
-        /* Footer */
-        footer {
-            transition: background-color 0.3s ease;
-        }
-        .social-icon {
-            transition: color 0.3s ease, transform 0.2s ease;
-        }
-        .social-icon:hover {
-            transform: scale(1.2);
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
         }
         /* Article Meta and Author Credit */
         #articleMeta {
@@ -203,55 +182,57 @@
         #articleAuthor .author-name {
             font-size: 0.95rem;
             font-weight: 600;
-            color: rgb(31 41 55);
-        }
-        .dark #articleAuthor .author-name {
-            color: rgb(229 231 235);
+            color: var(--dark-text);
         }
         #articleAuthor .author-title {
             font-size: 0.8rem;
             color: rgb(107 114 128);
         }
-        .dark #articleAuthor .author-title {
-            color: rgb(156 163 175);
+        /* Footer Styles */
+        footer {
+            transition: background-color 0.5s ease;
+        }
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.2) translateY(-5px);
         }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen">
     <!-- Header/Navigation -->
-    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm dark:bg-gray-900/90 shadow-sm">
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-md">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
-                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    <a href="index.html">Portofolio</a>
+                <div class="text-2xl font-bold">
+                    <a href="index.html" class="flex items-center gap-2">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Portofolio</span>
+                    </a>
                 </div>
                 <nav class="hidden md:flex space-x-8">
-                    <a href="index.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Beranda</a>
-                    <a href="profile.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Profil</a>
-                    <a href="tulisan.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition active">Tulisan</a>
-                    <a href="galeri.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Galeri</a>
-                    <a href="proyek-anime.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Proyek Anime</a>
-                    <a href="sosmed.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Sosial Media</a>
+                    <a href="index.html" class="nav-link hover:text-blue-500 transition">Beranda</a>
+                    <a href="profile.html" class="nav-link hover:text-blue-500 transition">Profil</a>
+                    <a href="tulisan.html" class="nav-link hover:text-blue-500 transition active">Tulisan</a>
+                    <a href="galeri.html" class="nav-link hover:text-blue-500 transition">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link hover:text-blue-500 transition">Sosial Media</a>
                 </nav>
                 <div class="flex items-center space-x-4">
-                    <button id="darkModeToggle" class="dark-mode-toggle p-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:block text-yellow-300"></i>
-                    </button>
-                    <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                    <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
             </div>
             <!-- Mobile Menu -->
-            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2">
-                <div class="flex flex-col space-y-3">
-                    <a href="index.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Beranda</a>
-                    <a href="profile.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Profil</a>
-                    <a href="tulisan.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition active">Tulisan</a>
-                    <a href="galeri.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Galeri</a>
-                    <a href="proyek-anime.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Proyek Anime</a>
-                    <a href="sosmed.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition">Sosial Media</a>
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2 rounded-xl bg-white shadow-lg p-4 transition-all duration-300">
+                <div class="flex flex-col space-y-4">
+                    <a href="index.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Beranda</a>
+                    <a href="profile.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Profil</a>
+                    <a href="tulisan.html" class="nav-link hover:text-blue-500 transition active py-2 px-3 rounded-lg hover:bg-gray-100">Tulisan</a>
+                    <a href="galeri.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Sosial Media</a>
                 </div>
             </div>
         </div>
@@ -262,40 +243,45 @@
         <article id="articleContent">
             <div class="mb-8">
                 <div id="articleMeta" class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-                    <span id="articleCategory" class="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded-full dark:bg-gray-700 dark:text-gray-300">Kategori</span>
+                    <span id="articleCategory" class="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded-full">Kategori</span>
                     <span class="separator">•</span>
-                    <span id="articleDate" class="text-sm text-gray-500 dark:text-gray-400">Tanggal</span>
+                    <span id="articleDate" class="text-sm text-gray-500">Tanggal</span>
                 </div>
-                <h1 id="articleTitle" class="text-3xl font-bold mb-4 dark:text-white">Judul Artikel</h1>
-                <div id="articleAuthor" class="text-sm text-gray-500 dark:text-gray-400"></div>
+                <h1 id="articleTitle" class="text-3xl font-bold mb-4">Judul Artikel</h1>
+                <div id="articleAuthor" class="text-sm text-gray-500"></div>
             </div>
             <!-- Article Content -->
-            <div id="articleBody" class="article-content dark:text-gray-300 mb-12">
+            <div id="articleBody" class="article-content mb-12">
                 <p>Loading article...</p>
             </div>
             <!-- Article Footer -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <a href="tulisan.html" class="text-blue-600 hover:underline dark:text-blue-400">← Kembali ke semua tulisan</a>
+            <div class="border-t border-gray-200 pt-6">
+                <a href="tulisan.html" class="btn-primary px-6 py-2 rounded-full font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i> Kembali ke semua tulisan
+                </a>
             </div>
         </article>
     </main>
     <!-- Footer -->
-    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+    <footer class="bg-white border-t border-gray-200 mt-12">
         <div class="container mx-auto px-6 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-6 md:mb-0">
-                    <span class="text-xl font-bold text-blue-600 dark:text-blue-400">Portofolio</span>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2">© 2023 John Doe. All rights reserved.</p>
+                    <span class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Portofolio</span>
+                    <p class="text-gray-600 mt-2">© 2023 John Doe. All rights reserved.</p>
                 </div>
                 <div class="flex space-x-6">
-                    <a href="#" class="social-icon text-gray-500 hover:text-blue-400 dark:hover:text-blue-300">
+                    <a href="#" class="social-icon text-gray-500 hover:text-blue-400">
                         <i class="fab fa-telegram text-xl"></i>
                     </a>
-                    <a href="#" class="social-icon text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
+                    <a href="#" class="social-icon text-gray-500 hover:text-blue-600">
                         <i class="fab fa-linkedin-in text-xl"></i>
                     </a>
-                    <a href="#" class="social-icon text-gray-500 hover:text-pink-500 dark:hover:text-pink-400">
+                    <a href="#" class="social-icon text-gray-500 hover:text-pink-500">
                         <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="social-icon text-gray-500 hover:text-gray-700">
+                        <i class="fab fa-github text-xl"></i>
                     </a>
                 </div>
             </div>
@@ -309,51 +295,53 @@
         <i class="fas fa-share-alt"></i>
     </div>
     <script>
-        // Dark Mode Toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const html = document.documentElement;
-        const userPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const savedMode = localStorage.getItem('darkMode');
-        if (savedMode === 'dark' || (!savedMode && userPrefersDark)) {
-            html.classList.add('dark');
-        }
-        darkModeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            localStorage.setItem('darkMode', html.classList.contains('dark') ? 'dark' : 'light');
-        });
         // Mobile Menu Toggle
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
         mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('fade-in');
+            } else {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('fade-in');
+            }
         });
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 100,
-                        behavior: 'smooth'
-                    });
-                    mobileMenu.classList.add('hidden');
+                const targetId = this.getAttribute('href').substring(1);
+                if (targetId) {
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                        mobileMenu.classList.add('hidden');
+                    }
                 }
             });
         });
         // Animation on scroll
-        const fadeElements = document.querySelectorAll('.fade-in');
-        const fadeInObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in');
+        function addFadeInOnScroll() {
+            const sections = document.querySelectorAll('section, main');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => {
+                if (!section.classList.contains('fade-in')) {
+                    observer.observe(section);
                 }
             });
-        }, { threshold: 0.1 });
-        fadeElements.forEach(element => {
-            fadeInObserver.observe(element);
-        });
+        }
+        addFadeInOnScroll();
         // Floating Action Buttons
         const backToTopButton = document.getElementById('backToTop');
         const shareButton = document.getElementById('shareButton');
@@ -385,14 +373,12 @@
         // Dynamic Article Loading
         async function loadArticle() {
             try {
-                // Get article ID from URL
                 const urlParams = new URLSearchParams(window.location.search);
                 const articleId = urlParams.get('id');
                 if (!articleId) {
                     document.getElementById('articleBody').innerHTML = '<p>Artikel tidak ditemukan.</p>';
                     return;
                 }
-                // Fetch articles JSON
                 const response = await fetch('articles.json');
                 const data = await response.json();
                 const article = data.articles.find(a => a.id === articleId);
@@ -400,18 +386,15 @@
                     document.getElementById('articleBody').innerHTML = '<p>Artikel tidak ditemukan.</p>';
                     return;
                 }
-                // Update page title
                 document.getElementById('pageTitle').textContent = `${article.title} - Portofolio Pribadi`;
-                // Update article content
                 document.getElementById('articleTitle').textContent = article.title;
                 document.getElementById('articleCategory').textContent = article.category.charAt(0).toUpperCase() + article.category.slice(1);
                 document.getElementById('articleCategory').className = `text-sm font-medium px-3 py-1 rounded-full ${
-                    article.category === 'teknologi' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
-                    article.category === 'desain' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
-                    'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
+                    article.category === 'teknologi' ? 'bg-blue-100 text-blue-800' :
+                    article.category === 'desain' ? 'bg-green-100 text-green-800' :
+                    'bg-purple-100 text-purple-800'
                 }`;
                 document.getElementById('articleDate').textContent = article.date;
-                // Update author credit
                 document.getElementById('articleAuthor').innerHTML = `
                     <img src="${article.authorImage || 'https://randomuser.me/api/portraits/men/32.jpg'}" alt="Author" class="author-avatar">
                     <div class="author-info">
@@ -425,14 +408,27 @@
                 document.getElementById('articleBody').innerHTML = '<p>Terjadi kesalahan saat memuat artikel.</p>';
             }
         }
-        // Load article when page loads
         window.addEventListener('DOMContentLoaded', loadArticle);
-        // Disable klik kanan khusus gambar
+        // Disable right-click for images
         document.addEventListener('contextmenu', function(e) {
             if (e.target.tagName === 'IMG') {
                 e.preventDefault();
             }
         });
+        // Track current active navigation link
+        function updateActiveNavLink() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            navLinks.forEach(link => {
+                const linkHref = link.getAttribute('href');
+                if (linkHref === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        updateActiveNavLink();
     </script>
 </body>
 </html>
