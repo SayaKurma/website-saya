@@ -3,10 +3,12 @@
         {
             "id": "1",
             "title": "Masa Depan Pengembangan Web",
-            "subtitle": "Ini adalah contoh keterangan", 
+            "subtitle": "Ini adalah contoh keterangan",
             "category": "teknologi",
             "date": "12 Juni 2023",
-            "author" : "Nama Penulis", 
+            "author": "Nama Penulis",
+            "authorImage": "https://randomuser.me/api/portraits/men/32.jpg",
+            "authorTitle": "Penulis",
             "content": "<img src='https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&auto=format&fit=crop&w=764&q=80' alt='Pengembangan Web' class='w-full h-64 object-cover'><p>Landskap pengembangan web sedang berevolusi dengan kecepatan yang belum pernah terjadi sebelumnya. Ketika kita melihat ke masa depan, beberapa tren kunci mulai muncul yang akan membentuk cara kita membangun dan berinteraksi dengan aplikasi web dalam beberapa tahun ke depan.</p><h2>1. Kenaikan WebAssembly</h2><p>WebAssembly (Wasm) merevolusi kinerja web dengan memungkinkan kode yang ditulis dalam bahasa seperti C, C++, dan Rust untuk berjalan di browser dengan kecepatan hampir natif. Teknologi ini sangat berpengaruh untuk:</p><ul><li>Aplikasi web berperforma tinggi (game, perangkat CAD, editing video)</li><li>Porting aplikasi desktop ke web</li><li>Tugas komputasi intensif seperti machine learning di browser</li></ul><h2>2. Pengembangan Aplikasi Web Progresif (PWA) Matur</h2><p>PWA terus menutup celah antara aplikasi web dan natif, menawarkan:</p><ul><li>Fungsi offline melalui service worker</li><li>Instalasi seperti aplikasi dan kehadiran di layar utama</li><li>Notifikasi push dan sinkronisasi latar belakang</li></ul><p>Dengan dukungan platform utama sekarang untuk PWA, kita melihat adopsi luas di berbagai industri.</p><h2>3. Integrasi AI dan Machine Learning</h2><p>AI menjadi semakin mudah diakses bagi pengembang web melalui:</p><ul><li>Perpustakaan ML berbasis browser seperti TensorFlow.js</li><li>Alat pengembangan bantuan AI (autocompletion, pengujian otomatis)</li><li>Mesin personalisasi yang mengadaptasi konten secara real-time</li></ul><h2>4. Evolusi Arsitektur JAMstack</h2><p>Arsitektur JAMstack (JavaScript, API, Markup) terus berkembang dengan:</p><ul><li>Generator situs statis yang lebih kuat (Next.js, Gatsby)</li><li>Kemampuan komputasi edge</li><li>Pengalaman pengembang yang lebih modern dengan alat canggih</li></ul><p>Karena teknologi ini matang, pengembang web perlu menyesuaikan keterampilan mereka untuk tetap kompetitif di landskap yang semakin canggih.</p>"
         }
     ]
