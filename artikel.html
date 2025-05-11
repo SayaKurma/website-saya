@@ -51,7 +51,6 @@
             right: 2.5rem;
             width: 2.75rem;
             height: 2.75rem;
-            background-color: #2563eb;
             color: white;
             border-radius: 50%;
             display: flex;
@@ -63,8 +62,19 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 99;
         }
-        .dark .floating-action {
+        .back-to-top {
+            bottom: 2.5rem;
+            background-color: #2563eb;
+        }
+        .dark .back-to-top {
             background-color: #3b82f6;
+        }
+        .share-button {
+            bottom: 6rem;
+            background-color: #f97316;
+        }
+        .dark .share-button {
+            background-color: #fb923c;
         }
         .floating-action.visible {
             opacity: 1;
@@ -72,12 +82,6 @@
         }
         .floating-action:hover {
             transform: translateY(-4px);
-        }
-        .back-to-top {
-            bottom: 2.5rem;
-        }
-        .share-button {
-            bottom: 6rem;
         }
         /* Article Content */
         .article-content {
