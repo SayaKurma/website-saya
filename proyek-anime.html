@@ -168,6 +168,9 @@
             padding-left: 15px;
             display: block;
         }
+        .detail-value.title-label {
+            font-weight: bold;
+        }
         .synopsis-container {
             margin-top: 20px;
             padding: 15px;
@@ -316,9 +319,9 @@
             <h3 id="modalTitle" class="modal-title"></h3>
             <div class="detail-group">
                 <span class="detail-label">Judul Alternatif:</span>
-                <span id="modalJapaneseTitle" class="detail-value"></span>
-                <span id="modalIndonesianTitle" class="detail-value"></span>
-                <span id="modalEnglishTitle" class="detail-value"></span>
+                <span id="modalJapaneseTitle" class="detail-value title-label"></span>
+                <span id="modalIndonesianTitle" class="detail-value title-label"></span>
+                <span id="modalEnglishTitle" class="detail-value title-label"></span>
             </div>
             <div class="detail-group">
                 <span class="detail-label">Jumlah Episode:</span>
@@ -454,9 +457,9 @@
                         const data = animeData[title];
                         if (data) {
                             modalTitle.textContent = title;
-                            modalJapaneseTitle.textContent = `<b>Jepang:</b> ${data.japaneseTitle}`;
-                            modalIndonesianTitle.textContent = `<b>Indonesia:</b> ${data.indonesianTitle}`;
-                            modalEnglishTitle.textContent = `<b>Inggris:</b> ${data.englishTitle}`;
+                            modalJapaneseTitle.textContent = `Jepang: ${data.japaneseTitle}`;
+                            modalIndonesianTitle.textContent = `Indonesia: ${data.indonesianTitle}`;
+                            modalEnglishTitle.textContent = `Inggris: ${data.englishTitle}`;
                             modalEpisodes.textContent = data.episodes;
                             modalStudio.textContent = data.studio;
                             modalSource.textContent = data.source;
