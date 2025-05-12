@@ -125,7 +125,6 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
-            display: flex;
             justify-content: center;
             align-items: center;
         }
@@ -168,8 +167,12 @@
             padding-left: 15px;
             display: block;
         }
-        .detail-value.title-label {
+        .title-label {
             font-weight: bold;
+            display: inline;
+        }
+        .title-value {
+            display: inline;
         }
         .synopsis-container {
             margin-top: 20px;
@@ -319,9 +322,9 @@
             <h3 id="modalTitle" class="modal-title"></h3>
             <div class="detail-group">
                 <span class="detail-label">Judul Alternatif:</span>
-                <span id="modalJapaneseTitle" class="detail-value title-label"></span>
-                <span id="modalIndonesianTitle" class="detail-value title-label"></span>
-                <span id="modalEnglishTitle" class="detail-value title-label"></span>
+                <div id="modalJapaneseTitle" class="detail-value"><span class="title-label">Jepang:</span> <span class="title-value"></span></div>
+                <div id="modalIndonesianTitle" class="detail-value"><span class="title-label">Indonesia:</span> <span class="title-value"></span></div>
+                <div id="modalEnglishTitle" class="detail-value"><span class="title-label">Inggris:</span> <span class="title-value"></span></div>
             </div>
             <div class="detail-group">
                 <span class="detail-label">Jumlah Episode:</span>
@@ -375,148 +378,157 @@
         </div>
     </footer>
     <script>
-        const mobileMenuButton = document.getElementById('mobileMenuButton');
-        const mobileMenu = document.getElementById('mobileMenu');
-        mobileMenuButton.addEventListener('click', () => {
-            if (mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.remove('hidden');
-                mobileMenu.classList.add('fade-in');
-            } else {
-                mobileMenu.classList.add('hidden');
-                mobileMenu.classList.remove('fade-in');
-            }
-        });
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href').substring(1);
-                if (targetId) {
-                    const targetElement = document.getElementById(targetId);
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 100,
-                            behavior: 'smooth'
-                        });
-                        mobileMenu.classList.add('hidden');
-                    }
-                }
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('fade-in');
             });
-        });
-        const searchInput = document.getElementById('search');
-        const letterFilter = document.getElementById('letterFilter');
-        const filterButtons = letterFilter.querySelectorAll('.filter-btn');
-        const animeItems = document.querySelectorAll('[data-title]');
-        const categorySections = document.querySelectorAll('.category-section');
-        function filterProjects() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const activeLetter = letterFilter.querySelector('.filter-btn.active')?.getAttribute('data-letter') || 'all';
-            animeItems.forEach(item => {
-                const title = item.getAttribute('data-title').toLowerCase();
-                const initial = item.getAttribute('data-initial');
-                const matchesSearch = title.includes(searchTerm);
-                const matchesLetter = activeLetter === 'all' || initial === activeLetter;
-                item.style.display = matchesSearch && matchesLetter ? 'block' : 'none';
-            });
-            categorySections.forEach(section => {
-                const itemsInSection = section.querySelectorAll('[data-title]');
-                const hasVisibleItems = Array.from(itemsInSection).some(item => item.style.display === 'block');
-                section.style.display = hasVisibleItems ? 'block' : 'none';
-            });
-        }
-        searchInput.addEventListener('input', filterProjects);
-        filterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                filterProjects();
-            });
-        });
-        letterFilter.querySelector('[data-letter="all"]').classList.add('active');
-        filterProjects();
-        const modal = document.getElementById('animeModal');
-        const closeModalBtn = document.getElementById('closeModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalJapaneseTitle = document.getElementById('modalJapaneseTitle');
-        const modalIndonesianTitle = document.getElementById('modalIndonesianTitle');
-        const modalEnglishTitle = document.getElementById('modalEnglishTitle');
-        const modalEpisodes = document.getElementById('modalEpisodes');
-        const modalStudio = document.getElementById('modalStudio');
-        const modalSource = document.getElementById('modalSource');
-        const modalGenre = document.getElementById('modalGenre');
-        const modalSynopsis = document.getElementById('modalSynopsis');
-        const downloadLink = document.getElementById('downloadLink');
-        modal.style.display = 'none';
-        let animeData = {};
-        fetch('anime-data.json')
-            .then(response => response.json())
-            .then(data => {
-                animeData = data;
-                animeItems.forEach(item => {
-                    item.addEventListener('click', () => {
-                        const title = item.getAttribute('data-title');
-                        const data = animeData[title];
-                        if (data) {
-                            modalTitle.textContent = title;
-                            modalJapaneseTitle.textContent = `Jepang: ${data.japaneseTitle}`;
-                            modalIndonesianTitle.textContent = `Indonesia: ${data.indonesianTitle}`;
-                            modalEnglishTitle.textContent = `Inggris: ${data.englishTitle}`;
-                            modalEpisodes.textContent = data.episodes;
-                            modalStudio.textContent = data.studio;
-                            modalSource.textContent = data.source;
-                            modalGenre.textContent = data.genre;
-                            modalSynopsis.textContent = data.synopsis;
-                            downloadLink.setAttribute('href', data.downloadLink);
-                            modal.style.display = 'flex';
-                            document.body.style.overflow = 'hidden';
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    if (targetId) {
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 100,
+                                behavior: 'smooth'
+                            });
+                            mobileMenu.classList.add('hidden');
                         }
-                    });
+                    }
                 });
-            })
-            .catch(error => console.error('Error loading anime data:', error));
-        closeModalBtn.addEventListener('click', () => {
+            });
+
+            const searchInput = document.getElementById('search');
+            const letterFilter = document.getElementById('letterFilter');
+            const filterButtons = letterFilter.querySelectorAll('.filter-btn');
+            const animeItems = document.querySelectorAll('[data-title]');
+            const categorySections = document.querySelectorAll('.category-section');
+
+            function filterProjects() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const activeLetter = letterFilter.querySelector('.filter-btn.active')?.getAttribute('data-letter') || 'all';
+                animeItems.forEach(item => {
+                    const title = item.getAttribute('data-title').toLowerCase();
+                    const initial = item.getAttribute('data-initial');
+                    const matchesSearch = title.includes(searchTerm);
+                    const matchesLetter = activeLetter === 'all' || initial === activeLetter;
+                    item.style.display = matchesSearch && matchesLetter ? 'block' : 'none';
+                });
+                categorySections.forEach(section => {
+                    const itemsInSection = section.querySelectorAll('[data-title]');
+                    const hasVisibleItems = Array.from(itemsInSection).some(item => item.style.display === 'block');
+                    section.style.display = hasVisibleItems ? 'block' : 'none';
+                });
+            }
+
+            searchInput.addEventListener('input', filterProjects);
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    filterProjects();
+                });
+            });
+            letterFilter.querySelector('[data-letter="all"]').classList.add('active');
+            filterProjects();
+
+            const modal = document.getElementById('animeModal');
+            const closeModalBtn = document.getElementById('closeModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalJapaneseTitle = document.getElementById('modalJapaneseTitle').querySelector('.title-value');
+            const modalIndonesianTitle = document.getElementById('modalIndonesianTitle').querySelector('.title-value');
+            const modalEnglishTitle = document.getElementById('modalEnglishTitle').querySelector('.title-value');
+            const modalEpisodes = document.getElementById('modalEpisodes');
+            const modalStudio = document.getElementById('modalStudio');
+            const modalSource = document.getElementById('modalSource');
+            const modalGenre = document.getElementById('modalGenre');
+            const modalSynopsis = document.getElementById('modalSynopsis');
+            const downloadLink = document.getElementById('downloadLink');
+
             modal.style.display = 'none';
-            document.body.style.overflow = '';
-        });
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) {
+
+            let animeData = {};
+            fetch('anime-data.json')
+                .then(response => response.json())
+                .then(data => {
+                    animeData = data;
+                    animeItems.forEach(item => {
+                        item.addEventListener('click', () => {
+                            const title = item.getAttribute('data-title');
+                            const data = animeData[title];
+                            if (data) {
+                                modalTitle.textContent = title;
+                                modalJapaneseTitle.textContent = data.japaneseTitle;
+                                modalIndonesianTitle.textContent = data.indonesianTitle;
+                                modalEnglishTitle.textContent = data.englishTitle;
+                                modalEpisodes.textContent = data.episodes;
+                                modalStudio.textContent = data.studio;
+                                modalSource.textContent = data.source;
+                                modalGenre.textContent = data.genre;
+                                modalSynopsis.textContent = data.synopsis;
+                                downloadLink.setAttribute('href', data.downloadLink);
+                                modal.style.display = 'flex';
+                                document.body.style.overflow = 'hidden';
+                            }
+                        });
+                    });
+                })
+                .catch(error => console.error('Error loading anime data:', error));
+
+            closeModalBtn.addEventListener('click', () => {
                 modal.style.display = 'none';
                 document.body.style.overflow = '';
-            }
-        });
-        function addFadeInOnScroll() {
-            const sections = document.querySelectorAll('section');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in');
-                        observer.unobserve(entry.target);
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            });
+
+            function addFadeInOnScroll() {
+                const sections = document.querySelectorAll('section');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('fade-in');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+                sections.forEach(section => {
+                    if (!section.classList.contains('fade-in')) {
+                        observer.observe(section);
                     }
                 });
-            }, { threshold: 0.1 });
-            sections.forEach(section => {
-                if (!section.classList.contains('fade-in')) {
-                    observer.observe(section);
-                }
-            });
-        }
-        addFadeInOnScroll();
-        function updateActiveNavLink() {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-            navLinks.forEach(link => {
-                const linkHref = link.getAttribute('href');
-                if (linkHref === currentPage) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-        }
-        updateActiveNavLink();
-        document.addEventListener('contextmenu', function(e) {
-            if (e.target.tagName === 'IMG') {
-                e.preventDefault();
             }
+            addFadeInOnScroll();
+
+            function updateActiveNavLink() {
+                const navLinks = document.querySelectorAll('.nav-link');
+                const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+                navLinks.forEach(link => {
+                    const linkHref = link.getAttribute('href');
+                    if (linkHref === currentPage) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+            updateActiveNavLink();
+
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                }
+            });
         });
     </script>
 </body>
