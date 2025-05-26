@@ -171,9 +171,8 @@
                 </p>
             </div>
             <div class="mb-8 slide-in-left">
-                <div class="flex flex-wrap gap-4">
-                    <button class="tulisan-filter-btn btn-primary px-6 py-2 rounded-full font-semibold" data-filter="all">Semua Tulisan</button>
-                    <button class="tulisan-filter-btn btn-outline px-6 py-2 rounded-full font-semibold" data-filter="teknologi">Kolom</button>
+                <div class="flex flex-wrap gap-4" id="filter-buttons">
+                    <!-- Filter buttons will be dynamically inserted here -->
                 </div>
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12" id="tulisan-list">
@@ -251,7 +250,31 @@
                 const response = await fetch('articles.json');
                 const data = await response.json();
                 const tulisanList = document.getElementById('tulisan-list');
+                const filterButtonsContainer = document.getElementById('filter-buttons');
                 tulisanList.innerHTML = '';
+                
+                // Extract unique categories
+                const categories = [...new Set(data.articles.map(article => article.category))];
+                
+                // Create filter buttons
+                filterButtonsContainer.innerHTML = '';
+                // Add "Semua Tulisan" button
+                const allButton = document.createElement('button');
+                allButton.className = 'tulisan-filter-btn btn-primary px-6 py-2 rounded-full font-semibold';
+                allButton.setAttribute('data-filter', 'all');
+                allButton.textContent = 'Semua Tulisan';
+                filterButtonsContainer.appendChild(allButton);
+                
+                // Add category buttons
+                categories.forEach(category => {
+                    const button = document.createElement('button');
+                    button.className = 'tulisan-filter-btn btn-outline px-6 py-2 rounded-full font-semibold';
+                    button.setAttribute('data-filter', category);
+                    button.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    filterButtonsContainer.appendChild(button);
+                });
+
+                // Render articles
                 data.articles.forEach(article => {
                     const articleElement = document.createElement('div');
                     articleElement.className = `tulisan-item card bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 transition-all duration-300 card-hover fade-in`;
@@ -262,7 +285,8 @@
                                 <span class="text-xs font-medium px-2.5 py-0.5 rounded ${
                                     article.category === 'teknologi' ? 'bg-blue-100 text-blue-800' :
                                     article.category === 'desain' ? 'bg-green-100 text-green-800' :
-                                    'bg-purple-100 text-purple-800'
+                                    article.category === 'pendidikan' ? 'bg-purple-100 text-purple-800' :
+                                    'bg-gray-100 text-gray-800'
                                 }">${article.category.charAt(0).toUpperCase() + article.category.slice(1)}</span>
                             </div>
                             <h3 class="mb-2 text-xl font-bold tracking-tight">${article.title}</h3>
