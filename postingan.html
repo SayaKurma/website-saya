@@ -255,7 +255,7 @@
                 <time id="post-date" class="post-date" aria-label="Posted date"></time>
             </article>
             <div class="pt-6 max-w-600 mx-auto">
-                <a href="insta-post.html" class="btn-primary px-8 py-3 rounded-full font-semibold">
+                <a href="tulisan.html" class="btn-primary px-8 py-3 rounded-full font-semibold">
                     <i class="fas fa-arrow-left mr-2"></i> Kembali ke semua postingan
                 </a>
             </div>
@@ -338,13 +338,19 @@
             }).format(date);
         }
         function sharePost() {
-            const url = window.location.href;
-            navigator.clipboard.writeText(url).then(() => {
-                alert('Link copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy link:', err);
-                alert('Failed to copy link. Please try again.');
-            });
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out this post!',
+                    url: window.location.href
+                }).then(() => {
+                    console.log('Post shared successfully');
+                }).catch(err => {
+                    console.error('Error sharing post:', err);
+                    alert('Failed to share post. Please try again.');
+                });
+            } else {
+                alert('Sharing is not supported on this device or browser.');
+            }
         }
         async function loadPost() {
             try {
