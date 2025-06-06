@@ -247,7 +247,7 @@
                 </header>
                 <img id="post-image" src="" alt="Posted content image" class="post-image slide-in-right" loading="lazy" width="600" height="600" />
                 <section class="post-actions" aria-label="Post action buttons">
-                    <button type="button" class="action-button" aria-label="Share post">
+                    <button type="button" class="action-button" aria-label="Share post" onclick="sharePost()">
                         <i class="fas fa-share"></i>
                     </button>
                 </section>
@@ -255,7 +255,7 @@
                 <time id="post-date" class="post-date" aria-label="Posted date"></time>
             </article>
             <div class="pt-6 max-w-600 mx-auto">
-                <a href="tulisan.html" class="btn-primary px-8 py-3 rounded-full font-semibold">
+                <a href="insta-post.html" class="btn-primary px-8 py-3 rounded-full font-semibold">
                     <i class="fas fa-arrow-left mr-2"></i> Kembali ke semua postingan
                 </a>
             </div>
@@ -329,6 +329,23 @@
             });
         }
         updateActiveNavLink();
+        function formatDate(isoDate) {
+            const date = new Date(isoDate);
+            return new Intl.DateTimeFormat('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }).format(date);
+        }
+        function sharePost() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy link:', err);
+                alert('Failed to copy link. Please try again.');
+            });
+        }
         async function loadPost() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -349,9 +366,9 @@
                 document.getElementById('verified-check').src = post.verified_check;
                 document.getElementById('post-image').src = post.post_image;
                 document.getElementById('post-caption').textContent = post.caption;
-                document.getElementById('post-date').textContent = post.date;
+                document.getElementById('post-date').textContent = formatDate(post.date);
                 document.getElementById('post-date').setAttribute('datetime', post.date);
-                document.getElementById('post-date').setAttribute('aria-label', `Posted on ${post.date}`);
+                document.getElementById('post-date').setAttribute('aria-label', `Posted on ${formatDate(post.date)}`);
             } catch (error) {
                 console.error('Error loading post:', error);
                 document.querySelector('.post-card').innerHTML = '<p>Error loading post.</p>';
