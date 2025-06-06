@@ -141,38 +141,7 @@
                 <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Insta Post</h1>
                 <p class="text-lg text-gray-600 mt-4">Informasi menarik dan aktual dalam format konten ala Instagram</p>
             </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card" onclick="window.location='link1.html';">
-                        <img src="image1.jpg" alt="Foto 1">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" onclick="window.location='link2.html';">
-                        <img src="image2.jpg" alt="Foto 2">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" onclick="window.location='link3.html';">
-                        <img src="image3.jpg" alt="Foto 3">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" onclick="window.location='link4.html';">
-                        <img src="image4.jpg" alt="Foto 4">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" onclick="window.location='link5.html';">
-                        <img src="image5.jpg" alt="Foto 5">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" onclick="window.location='link6.html';">
-                        <img src="image6.jpg" alt="Foto 6">
-                    </div>
-                </div>
-            </div>
+            <div class="row" id="post-grid"></div>
         </section>
     </main>
     <footer class="bg-white border-t border-gray-200 mt-12">
@@ -236,6 +205,27 @@
             });
         }
         addFadeInOnScroll();
+        async function loadPosts() {
+            try {
+                const response = await fetch('isi-post.json');
+                const posts = await response.json();
+                const postGrid = document.getElementById('post-grid');
+                postGrid.innerHTML = '';
+                posts.forEach(post => {
+                    const postDiv = document.createElement('div');
+                    postDiv.className = 'col-md-4';
+                    postDiv.innerHTML = `
+                        <div class="card" onclick="window.location='postingan.html?id=${post.id}';">
+                            <img src="${post.post_image}" alt="Foto ${post.id}" loading="lazy">
+                        </div>
+                    `;
+                    postGrid.appendChild(postDiv);
+                });
+            } catch (error) {
+                console.error('Error loading posts:', error);
+            }
+        }
+        loadPosts();
     </script>
 </body>
 </html>
