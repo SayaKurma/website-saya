@@ -74,6 +74,12 @@
             object-fit: cover;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            pointer-events: none; /* Prevents direct interaction with image */
+        }
+        .card a {
+            display: block;
+            width: 100%;
+            height: 100%;
         }
         .row {
             display: flex;
@@ -215,8 +221,10 @@
                     const postDiv = document.createElement('div');
                     postDiv.className = 'col-md-4';
                     postDiv.innerHTML = `
-                        <div class="card" onclick="window.location='postingan.html?id=${post.id}';">
-                            <img src="${post.post_image}" alt="Foto ${post.id}" loading="lazy">
+                        <div class="card">
+                            <a href="postingan.html?id=${post.id}">
+                                <img src="${post.post_image}" alt="Foto ${post.id}" loading="lazy">
+                            </a>
                         </div>
                     `;
                     postGrid.appendChild(postDiv);
@@ -226,14 +234,13 @@
             }
         }
         loadPosts();
-
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('img').forEach(function(img) {
-    img.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
-  });
-});
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('img').forEach(function(img) {
+                img.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                });
+            });
+        });
     </script>
 </body>
 </html>
