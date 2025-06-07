@@ -167,7 +167,7 @@
             cursor: pointer;
             padding: 0.25rem;
             border-radius: 0.5rem;
-            transition: background-color 0.3s, transform 0.3s;
+            transition: background-color 0.3s, transform “‘0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -189,10 +189,16 @@
             line-height: 1.4;
             color: #6b7280;
             text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+            word-spacing: -0.05em;
         }
         .hashtag {
             color: var(--primary-color);
             font-weight: 500;
+            display: block;
+            text-align: left;
+            margin-top: 0.5rem;
         }
         .post-date {
             padding: 0 1rem 1rem 1rem;
@@ -359,7 +365,23 @@
             }
         }
         function processHashtags(caption) {
-            return caption.replace(/(#[^\s<]+)/g, '<span class="hashtag">$1</span>');
+            const parts = caption.split(/(#[^\s<]+)/g);
+            let result = '';
+            let isHashtagSection = false;
+            
+            parts.forEach(part => {
+                if (part.startsWith('#')) {
+                    if (!isHashtagSection) {
+                        result += '<br>';
+                        isHashtagSection = true;
+                    }
+                    result += `<span class="hashtag">${part}</span>`;
+                } else {
+                    result += part;
+                }
+            });
+            
+            return result;
         }
         async function loadPost() {
             try {
