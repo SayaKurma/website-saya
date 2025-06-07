@@ -145,13 +145,14 @@
             color: var(--dark-text);
         }
         .verified-check {
-            width: 16px;
-            height: 16px;
+            width: 1.125rem;
+            height: 1.125rem;
+            vertical-align: middle;
         }
         .post-image {
             width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
+            height: auto;
+            object-fit: contain;
             background-color: #f3f4f6;
             display: block;
         }
@@ -187,6 +188,10 @@
             font-size: 1rem;
             line-height: 1.4;
             color: #6b7280;
+        }
+        .hashtag {
+            color: var(--primary-color);
+            font-weight: 500;
         }
         .post-date {
             padding: 0 1rem 1rem 1rem;
@@ -242,10 +247,10 @@
                     <img id="profile-photo" src="" alt="Profile photo" class="profile-photo" loading="lazy" width="48" height="48" />
                     <div class="user-info">
                         <span id="account-name" class="account-name"></span>
-                        <img id="verified-check" src="" alt="Verified account" class="verified-check" width="16" height="16" />
+                        <img id="verified-check" src="" alt="Verified account" class="verified-check" width="18" height="18" />
                     </div>
                 </header>
-                <img id="post-image" src="" alt="Posted content image" class="post-image slide-in-right" loading="lazy" width="600" height="600" />
+                <img id="post-image" src="" alt="Posted content image" class="post-image slide-in-right" loading="lazy" />
                 <section class="post-actions" aria-label="Post action buttons">
                     <button type="button" class="action-button" aria-label="Share post" onclick="sharePost()">
                         <i class="fas fa-share"></i>
@@ -352,6 +357,9 @@
                 alert('Sharing is not supported on this device or browser.');
             }
         }
+        function processHashtags(caption) {
+            return caption.replace(/(#[^\s<]+)/g, '<span class="hashtag">$1</span>');
+        }
         async function loadPost() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -371,7 +379,7 @@
                 document.getElementById('account-name').textContent = post.account_name;
                 document.getElementById('verified-check').src = post.verified_check;
                 document.getElementById('post-image').src = post.post_image;
-                document.getElementById('post-caption').textContent = post.caption;
+                document.getElementById('post-caption').innerHTML = processHashtags(post.caption);
                 document.getElementById('post-date').textContent = formatDate(post.date);
                 document.getElementById('post-date').setAttribute('datetime', post.date);
                 document.getElementById('post-date').setAttribute('aria-label', `Posted on ${formatDate(post.date)}`);
