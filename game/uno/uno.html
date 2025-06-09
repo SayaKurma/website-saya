@@ -645,12 +645,12 @@
                     throw new Error('Invalid deck data');
                 }
             } catch (error) {
-                console.error('Error loading kartu.json:', error);
+                console.error('Error loading game/uno/kartu.json:', error);
                 announce('Gagal memuat data kartu. Menggunakan data default.');
                 cardData = {
                     deck: [
-                        {"color": "red", "value": "0", "svgUrl": "https://myunocards.com/assets/red-0.svg"},
-                        // ... (default deck with 108 cards, same structure as kartu.json)
+                        {"color": "red", "value": "0", "svgUrl": "https://cdn.creazilla.com/cliparts/75072/red-0-card-clipart-lg.png"},
+                        // ... (default deck with 108 cards, same structure as game/uno/kartu.json)
                         // Omitted for brevity; actual implementation would include a full default deck
                     ]
                 };
