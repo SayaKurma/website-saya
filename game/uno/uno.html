@@ -80,15 +80,9 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.2);
             position: relative;
             border: 2px solid #ffffff;
-            background-color: #ffffff;
-            overflow: hidden;
-        }
-
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            background-size: cover;
+            background-position: center;
         }
 
         .card:focus {
@@ -474,7 +468,7 @@
         <div class="flex-grow flex justify-center items-center p-2">
             <div class="game-center relative" role="region" aria-label="Area tengah permainan">
                 <div class="text-center">
-                    <div id="discard-pile" class="card bg-white" role="img" aria-label="Tumpukan buangan"></div>
+                    <div id="discard-pile" class="card" role="img" aria-label="Tumpukan buangan"></div>
                 </div>
                 <div class="text-center">
                     <div id="draw-pile" class="card draw-pile cursor-pointer" role="button" aria-label="Tumpukan ambil kartu" tabindex="0">
@@ -547,116 +541,65 @@
             }
         });
 
-        let deck = [
-            {"color": "red", "value": "0", "svgUrl": "https://cdn.creazilla.com/cliparts/75072/red-0-card-clipart-lg.png"},
-            {"color": "red", "value": "1", "svgUrl": "https://cdn.creazilla.com/cliparts/75073/red-1-card-clipart-lg.png"},
-            {"color": "red", "value": "1", "svgUrl": "https://cdn.creazilla.com/cliparts/75073/red-1-card-clipart-lg.png"},
-            {"color": "red", "value": "2", "svgUrl": "https://cdn.creazilla.com/cliparts/75074/red-2-card-clipart-lg.png"},
-            {"color": "red", "value": "2", "svgUrl": "https://cdn.creazilla.com/cliparts/75074/red-2-card-clipart-lg.png"},
-            {"color": "red", "value": "3", "svgUrl": "https://cdn.creazilla.com/cliparts/75075/red-3-card-clipart-lg.png"},
-            {"color": "red", "value": "3", "svgUrl": "https://cdn.creazilla.com/cliparts/75075/red-3-card-clipart-lg.png"},
-            {"color": "red", "value": "4", "svgUrl": "https://cdn.creazilla.com/cliparts/75076/red-4-card-clipart-lg.png"},
-            {"color": "red", "value": "4", "svgUrl": "https://cdn.creazilla.com/cliparts/75076/red-4-card-clipart-lg.png"},
-            {"color": "red", "value": "5", "svgUrl": "https://cdn.creazilla.com/cliparts/75077/red-5-card-clipart-lg.png"},
-            {"color": "red", "value": "5", "svgUrl": "https://cdn.creazilla.com/cliparts/75077/red-5-card-clipart-lg.png"},
-            {"color": "red", "value": "6", "svgUrl": "https://cdn.creazilla.com/cliparts/75078/red-6-card-clipart-lg.png"},
-            {"color": "red", "value": "6", "svgUrl": "https://cdn.creazilla.com/cliparts/75078/red-6-card-clipart-lg.png"},
-            {"color": "red", "value": "7", "svgUrl": "https://cdn.creazilla.com/cliparts/75079/red-7-card-clipart-lg.png"},
-            {"color": "red", "value": "7", "svgUrl": "https://cdn.creazilla.com/cliparts/75079/red-7-card-clipart-lg.png"},
-            {"color": "red", "value": "8", "svgUrl": "https://cdn.creazilla.com/cliparts/75080/red-8-card-clipart-lg.png"},
-            {"color": "red", "value": "8", "svgUrl": "https://cdn.creazilla.com/cliparts/75080/red-8-card-clipart-lg.png"},
-            {"color": "red", "value": "9", "svgUrl": "https://cdn.creazilla.com/cliparts/75081/red-9-card-clipart-lg.png"},
-            {"color": "red", "value": "9", "svgUrl": "https://cdn.creazilla.com/cliparts/75081/red-9-card-clipart-lg.png"},
-            {"color": "red", "value": "Skip", "svgUrl": "https://cdn.creazilla.com/cliparts/75082/red-skip-card-clipart-lg.png"},
-            {"color": "red", "value": "Skip", "svgUrl": "https://cdn.creazilla.com/cliparts/75082/red-skip-card-clipart-lg.png"},
-            {"color": "red", "value": "Reverse", "svgUrl": "https://cdn.creazilla.com/cliparts/75083/red-reverse-card-clipart-lg.png"},
-            {"color": "red", "value": "Reverse", "svgUrl": "https://cdn.creazilla.com/cliparts/75083/red-reverse-card-clipart-lg.png"},
-            {"color": "red", "value": "Draw2", "svgUrl": "https://cdn.creazilla.com/cliparts/75084/red-draw-two-card-clipart-lg.png"},
-            {"color": "red", "value": "Draw2", "svgUrl": "https://cdn.creazilla.com/cliparts/75084/red-draw-two-card-clipart-lg.png"},
-            {"color": "blue", "value": "0", "svgUrl": "https://cdn.creazilla.com/cliparts/75046/blue-0-card-clipart-lg.png"},
-            {"color": "blue", "value": "1", "svgUrl": "https://cdn.creazilla.com/cliparts/75047/blue-1-card-clipart-lg.png"},
-            {"color": "blue", "value": "1", "svgUrl": "https://cdn.creazilla.com/cliparts/75047/blue-1-card-clipart-lg.png"},
-            {"color": "blue", "value": "2", "svgUrl": "https://cdn.creazilla.com/cliparts/75048/blue-2-card-clipart-lg.png"},
-            {"color": "blue", "value": "2", "svgUrl": "https://cdn.creazilla.com/cliparts/75048/blue-2-card-clipart-lg.png"},
-            {"color": "blue", "value": "3", "svgUrl": "https://cdn.creazilla.com/cliparts/75049/blue-3-card-clipart-lg.png"},
-            {"color": "blue", "value": "3", "svgUrl": "https://cdn.creazilla.com/cliparts/75049/blue-3-card-clipart-lg.png"},
-            {"color": "blue", "value": "4", "svgUrl": "https://cdn.creazilla.com/cliparts/75050/blue-4-card-clipart-lg.png"},
-            {"color": "blue", "value": "4", "svgUrl": "https://cdn.creazilla.com/cliparts/75050/blue-4-card-clipart-lg.png"},
-            {"color": "blue", "value": "5", "svgUrl": "https://cdn.creazilla.com/cliparts/75051/blue-5-card-clipart-lg.png"},
-            {"color": "blue", "value": "5", "svgUrl": "https://cdn.creazilla.com/cliparts/75051/blue-5-card-clipart-lg.png"},
-            {"color": "blue", "value": "6", "svgUrl": "https://cdn.creazilla.com/cliparts/75052/blue-6-card-clipart-lg.png"},
-            {"color": "blue", "value": "6", "svgUrl": "https://cdn.creazilla.com/cliparts/75052/blue-6-card-clipart-lg.png"},
-            {"color": "blue", "value": "7", "svgUrl": "https://cdn.creazilla.com/cliparts/75053/blue-7-card-clipart-lg.png"},
-            {"color": "blue", "value": "7", "svgUrl": "https://cdn.creazilla.com/cliparts/75053/blue-7-card-clipart-lg.png"},
-            {"color": "blue", "value": "8", "svgUrl": "https://cdn.creazilla.com/cliparts/75054/blue-8-card-clipart-lg.png"},
-            {"color": "blue", "value": "8", "svgUrl": "https://cdn.creazilla.com/cliparts/75054/blue-8-card-clipart-lg.png"},
-            {"color": "blue", "value": "9", "svgUrl": "https://cdn.creazilla.com/cliparts/75055/blue-9-card-clipart-lg.png"},
-            {"color": "blue", "value": "9", "svgUrl": "https://cdn.creazilla.com/cliparts/75055/blue-9-card-clipart-lg.png"},
-            {"color": "blue", "value": "Skip", "svgUrl": "https://cdn.creazilla.com/cliparts/75056/blue-skip-card-clipart-lg.png"},
-            {"color": "blue", "value": "Skip", "svgUrl": "https://cdn.creazilla.com/cliparts/75056/blue-skip-card-clipart-lg.png"},
-            {"color": "blue", "value": "Reverse", "svgUrl": "https://cdn.creazilla.com/cliparts/75057/blue-reverse-card-clipart-lg.png"},
-            {"color": "blue", "value": "Reverse", "svgUrl": "https://cdn.creazilla.com/cliparts/75057/blue-reverse-card-clipart-lg.png"},
-            {"color": "blue", "value": "Draw2", "svgUrl": "https://cdn.creazilla.com/cliparts/75058/blue-draw-two-card-clipart-lg.png"},
-            {"color": "blue", "value": "Draw2", "svgUrl": "https://cdn.creazilla.com/cliparts/75058/blue-draw-two-card-clipart-lg.png"},
-            {"color": "green", "value": "0", "svgUrl": "https://cdn.creazilla.com/cliparts/75059/green-0-card-clipart-lg.png"},
-            {"color": "green", "value": "1", "svgUrl": "https://cdn.creazilla.com/cliparts/75060/green-1-card-clipart-lg.png"},
-            {"color": "green", "value": "1", "svgUrl": "https://cdn.creazilla.com/cliparts/75060/green-1-card-clipart-lg.png"},
-            {"color": "green", "value": "2", "svgUrl": "https://cdn.creazilla.com/cliparts/75061/green-2-card-clipart-lg.png"},
-            {"color": "green", "value": "2", "svgUrl": "https://cdn.creazilla.com/cliparts/75061/green-2-card-clipart-lg.png"},
-            {"color": "green", "value": "3", "svgUrl": "https://cdn.creazilla.com/cliparts/75062/green-3-card-clipart-lg.png"},
-            {"color": "green", "value": "3", "svgUrl": "https://cdn.creazilla.com/cliparts/75062/green-3-card-clipart-lg.png"},
-            {"color": "green", "value": "4", "svgUrl": "https://cdn.creazilla.com/cliparts/75063/green-4-card-clipart-lg.png"},
-            {"color": "green", "value": "4", "svgUrl": "https://cdn.creazilla.com/cliparts/75063/green-4-card-clipart-lg.png"},
-            {"color": "green", "value": "5", "svgUrl": "https://cdn.creazilla.com/cliparts/75064/green-5-card-clipart-lg.png"},
-            {"color": "green", "value": "5", "svgUrl": "https://cdn.creazilla.com/cliparts/75064/green-5-card-clipart-lg.png"},
-            {"color": "green", "value": "6", "svgUrl": "https://cdn.creazilla.com/cliparts/75065/green-6-card-clipart-lg.png"},
-            {"color": "green", "value": "6", "svgUrl": "https://cdn.creazilla.com/cliparts/75065/green-6-card-clipart-lg.png"},
-            {"color": "green", "value": "7", "svgUrl": "https://cdn.creazilla.com/cliparts/75066/green-7-card-clipart-lg.png"},
-            {"color": "green", "value": "7", "svgUrl": "https://cdn.creazilla.com/cliparts/75066/green-7-card-clipart-lg.png"},
-            {"color": "green", "value": "8", "svgUrl": "https://cdn.creazilla.com/cliparts/75067/green-8-card-clipart-lg.png"},
-            {"color": "green", "value": "8", "svgUrl": "https://cdn.creazilla.com/cliparts/75067/green-8-card-clipart-lg.png"},
-            {"color": "green", "value": "9", "svgUrl": "https://cdn.creazilla.com/cliparts/75068/green-9-card-clipart-lg.png"},
-            {"color": "green", "value": "9", "svgUrl": "https://cdn.creazilla.com/cliparts/75068/green-9-card-clipart-lg.png"},
-            {"color": "green", "value": "Skip", "svgUrl": "https://cdn.creazilla.com/cliparts/75069/green-skip-card-clipart-lg.png"},
-            {"color": "green", "value": "Skip", "svgUrl": "https://cdn.creazilla.com/cliparts/75069/green-skip-card-clipart-lg.png"},
-            {"color": "green", "value": "Reverse", "svgUrl": "https://cdn.creazilla.com/cliparts/75070/green-reverse-card-clipart-lg.png"},
-            {"color": "green", "value": "Reverse", "svgUrl": "https://cdn.creazilla.com/cliparts/75070/green-reverse-card-clipart-lg.png"},
-            {"color": "green", "value": "Draw2", "svgUrl": "https://cdn.creazilla.com/cliparts/75071/green-draw-two-card-clipart-lg.png"},
-            {"color": "green", "value": "Draw2", "svgUrl": "https://cdn.creazilla.com/cliparts/75071/green-draw-two-card-clipart-lg.png"},
-            {"color": "yellow", "value": "0", "svgUrl": "game/uno/aset/yellow0.svg"},
-            {"color": "yellow", "value": "1", "svgUrl": "game/uno/aset/yellow1.svg"},
-            {"color": "yellow", "value": "1", "svgUrl": "game/uno/aset/yellow1.svg"},
-            {"color": "yellow", "value": "2", "svgUrl": "game/uno/aset/yellow2.svg"},
-            {"color": "yellow", "value": "2", "svgUrl": "game/uno/aset/yellow2.svg"},
-            {"color": "yellow", "value": "3", "svgUrl": "game/uno/aset/yellow3.svg"},
-            {"color": "yellow", "value": "3", "svgUrl": "game/uno/aset/yellow3.svg"},
-            {"color": "yellow", "value": "4", "svgUrl": "game/uno/aset/yellow4.svg"},
-            {"color": "yellow", "value": "4", "svgUrl": "game/uno/aset/yellow4.svg"},
-            {"color": "yellow", "value": "5", "svgUrl": "game/uno/aset/yellow5.svg"},
-            {"color": "yellow", "value": "5", "svgUrl": "game/uno/aset/yellow5.svg"},
-            {"color": "yellow", "value": "6", "svgUrl": "https://cdn.creazilla.com/cliparts/75091/yellow-6-card-clipart-lg.png"},
-            {"color": "yellow", "value": "6", "svgUrl": "https://cdn.creazilla.com/cliparts/75091/yellow-6-card-clipart-lg.png"},
-            {"color": "yellow", "value": "7", "svgUrl": "https://cdn.creazilla.com/cliparts/75092/yellow-7-card-clipart-lg.png"},
-            {"color": "yellow", "value": "7", "svgUrl": "https://cdn.creazilla.com/cliparts/75092/yellow-7-card-clipart-lg.png"},
-            {"color": "yellow", "value": "8", "svgUrl": "https://cdn.creazilla.com/cliparts/75093/yellow-8-card-clipart-lg.png"},
-            {"color": "yellow", "value": "8", "svgUrl": "https://cdn.creazilla.com/cliparts/75093/yellow-8-card-clipart-lg.png"},
-            {"color": "yellow", "value": "9", "svgUrl": "https://cdn.creazilla.com/cliparts/75094/yellow-9-card-clipart-lg.png"},
-            {"color": "yellow", "value": "9", "svgUrl": "https://cdn.creazilla.com/cliparts/75094/yellow-9-card-clipart-lg.png"},
-            {"color": "yellow", "value": "Skip", "svgUrl": "https://cdn.creazilla.com/cliparts/75095/yellow-skip-card-clipart-lg.png"},
-            {"color": "yellow", "value": "Skip", "svgUrl": "https://cdn.creazilla.com/cliparts/75095/yellow-skip-card-clipart-lg.png"},
-            {"color": "yellow", "value": "Reverse", "svgUrl": "https://cdn.creazilla.com/cliparts/75096/yellow-reverse-card-clipart-lg.png"},
-            {"color": "yellow", "value": "Reverse", "svgUrl": "https://cdn.creazilla.com/cliparts/75096/yellow-reverse-card-clipart-lg.png"},
-            {"color": "yellow", "value": "Draw2", "svgUrl": "https://cdn.creazilla.com/cliparts/75097/yellow-draw-two-card-clipart-lg.png"},
-            {"color": "yellow", "value": "Draw2", "svgUrl": "https://cdn.creazilla.com/cliparts/75097/yellow-draw-two-card-clipart-lg.png"},
-            {"color": "wild", "value": "Wild", "svgUrl": "https://cdn.creazilla.com/cliparts/75098/wild-card-clipart-lg.png"},
-            {"color": "wild", "value": "Wild", "svgUrl": "https://cdn.creazilla.com/cliparts/75098/wild-card-clipart-lg.png"},
-            {"color": "wild", "value": "Wild", "svgUrl": "https://cdn.creazilla.com/cliparts/75098/wild-card-clipart-lg.png"},
-            {"color": "wild", "value": "Wild", "svgUrl": "https://cdn.creazilla.com/cliparts/75098/wild-card-clipart-lg.png"},
-            {"color": "wild", "value": "Wild_Draw4", "svgUrl": "https://cdn.creazilla.com/cliparts/75099/wild-draw-four-card-clipart-lg.png"},
-            {"color": "wild", "value": "Wild_Draw4", "svgUrl": "https://cdn.creazilla.com/cliparts/75099/wild-draw-four-card-clipart-lg.png"},
-            {"color": "wild", "value": "Wild_Draw4", "svgUrl": "https://cdn.creazilla.com/cliparts/75099/wild-draw-four-card-clipart-lg.png"},
-            {"color": "wild", "value": "Wild_Draw4", "svgUrl": "https://cdn.creazilla.com/cliparts/75099/wild-draw-four-card-clipart-lg.png"}
-        ];
+        // Placeholder card image mapping (replace with actual URLs from kartu.json.docx)
+        const cardImages = {
+            'red_0': 'https://picsum.photos/seed/red_0/200/300',
+            'red_1': 'https://picsum.photos/seed/red_1/200/300',
+            'red_2': 'https://picsum.photos/seed/red_2/200/300',
+            'red_3': 'https://picsum.photos/seed/red_3/200/300',
+            'red_4': 'https://picsum.photos/seed/red_4/200/300',
+            'red_5': 'https://picsum.photos/seed/red_5/200/300',
+            'red_6': 'https://picsum.photos/seed/red_6/200/300',
+            'red_7': 'https://picsum.photos/seed/red_7/200/300',
+            'red_8': 'https://picsum.photos/seed/red_8/200/300',
+            'red_9': 'https://picsum.photos/seed/red_9/200/300',
+            'red_Skip': 'https://picsum.photos/seed/red_Skip/200/300',
+            'red_Reverse': 'https://picsum.photos/seed/red_Reverse/200/300',
+            'red_Draw2': 'https://picsum.photos/seed/red_Draw2/200/300',
+            'blue_0': 'https://picsum.photos/seed/blue_0/200/300',
+            'blue_1': 'https://picsum.photos/seed/blue_1/200/300',
+            'blue_2': 'https://picsum.photos/seed/blue_2/200/300',
+            'blue_3': 'https://picsum.photos/seed/blue_3/200/300',
+            'blue_4': 'https://picsum.photos/seed/blue_4/200/300',
+            'blue_5': 'https://picsum.photos/seed/blue_5/200/300',
+            'blue_6': 'https://picsum.photos/seed/blue_6/200/300',
+            'blue_7': 'https://picsum.photos/seed/blue_7/200/300',
+            'blue_8': 'https://picsum.photos/seed/blue_8/200/300',
+            'blue_9': 'https://picsum.photos/seed/blue_9/200/300',
+            'blue_Skip': 'https://picsum.photos/seed/blue_Skip/200/300',
+            'blue_Reverse': 'https://picsum.photos/seed/blue_Reverse/200/300',
+            'blue_Draw2': 'https://picsum.photos/seed/blue_Draw2/200/300',
+            'green_0': 'https://picsum.photos/seed/green_0/200/300',
+            'green_1': 'https://picsum.photos/seed/green_1/200/300',
+            'green_2': 'https://picsum.photos/seed/green_2/200/300',
+            'green_3': 'https://picsum.photos/seed/green_3/200/300',
+            'green_4': 'https://picsum.photos/seed/green_4/200/300',
+            'green_5': 'https://picsum.photos/seed/green_5/200/300',
+            'green_6': 'https://picsum.photos/seed/green_6/200/300',
+            'green_7': 'https://picsum.photos/seed/green_7/200/300',
+            'green_8': 'https://picsum.photos/seed/green_8/200/300',
+            'green_9': 'https://picsum.photos/seed/green_9/200/300',
+            'green_Skip': 'https://picsum.photos/seed/green_Skip/200/300',
+            'green_Reverse': 'https://picsum.photos/seed/green_Reverse/200/300',
+            'green_Draw2': 'https://picsum.photos/seed/green_Draw2/200/300',
+            'yellow_0': 'https://picsum.photos/seed/yellow_0/200/300',
+            'yellow_1': 'https://picsum.photos/seed/yellow_1/200/300',
+            'yellow_2': 'https://picsum.photos/seed/yellow_2/200/300',
+            'yellow_3': 'https://picsum.photos/seed/yellow_3/200/300',
+            'yellow_4': 'https://picsum.photos/seed/yellow_4/200/300',
+            'yellow_5': 'https://picsum.photos/seed/yellow_5/200/300',
+            'yellow_6': 'https://picsum.photos/seed/yellow_6/200/300',
+            'yellow_7': 'https://picsum.photos/seed/yellow_7/200/300',
+            'yellow_8': 'https://picsum.photos/seed/yellow_8/200/300',
+            'yellow_9': 'https://picsum.photos/seed/yellow_9/200/300',
+            'yellow_Skip': 'https://picsum.photos/seed/yellow_Skip/200/300',
+            'yellow_Reverse': 'https://picsum.photos/seed/yellow_Reverse/200/300',
+            'yellow_Draw2': 'https://picsum.photos/seed/yellow_Draw2/200/300',
+            'wild_Wild': 'https://picsum.photos/seed/wild_Wild/200/300',
+            'wild_Wild_Draw4': 'https://picsum.photos/seed/wild_Wild_Draw4/200/300'
+        };
+
+        let deck = [];
         let discardPile = [];
         let playerHand = [];
         let computerHand = [];
@@ -699,6 +642,7 @@
         }
 
         function initGame() {
+            deck = [];
             discardPile = [];
             playerHand = [];
             computerHand = [];
@@ -710,6 +654,7 @@
             isDrawing = false;
             isBluffing = false;
 
+            createDeck();
             shuffleDeck();
             dealCards();
             startFirstTurn();
@@ -743,6 +688,27 @@
             });
 
             document.addEventListener('keydown', handleKeyboardNavigation);
+        }
+
+        function createDeck() {
+            deck = [];
+            for (const color of colors) {
+                deck.push({ color, value: '0' });
+                for (const value of values.slice(1)) {
+                    deck.push({ color, value });
+                    deck.push({ color, value });
+                }
+            }
+            for (const value of wildCards) {
+                for (let i = 0; i < 4; i++) {
+                    deck.push({ color: 'wild', value });
+                }
+            }
+            const expectedCardCount = 108;
+            if (deck.length !== expectedCardCount) {
+                console.error(`Kesalahan: Jumlah kartu ${deck.length}, seharusnya ${expectedCardCount}`);
+                throw new Error(`Jumlah kartu tidak sesuai: ${deck.length} kartu`);
+            }
         }
 
         function shuffleDeck() {
@@ -787,11 +753,9 @@
                 cardEl.className = 'card';
                 cardEl.setAttribute('role', 'button');
                 cardEl.setAttribute('tabindex', '0');
-                cardEl.setAttribute('aria-label', `Kartu ${card.color} ${card.value}`);
-                const img = document.createElement('img');
-                img.src = card.svgUrl;
-                img.alt = `Kartu UNO ${card.color} ${card.value}`;
-                cardEl.appendChild(img);
+                cardEl.setAttribute('aria-label', `Kartu ${card.color} ${card.value.replace('_', ' ')}`);
+                const imageKey = card.color === 'wild' ? `wild_${card.value}` : `${card.color}_${card.value}`;
+                cardEl.style.backgroundImage = `url(${cardImages[imageKey]})`;
                 cardEl.addEventListener('click', () => selectCard(i));
                 cardEl.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -815,11 +779,9 @@
             const card = discardPile[discardPile.length - 1];
             discardPileEl.innerHTML = '';
             discardPileEl.className = 'card';
-            discardPileEl.setAttribute('aria-label', `Kartu di tumpukan buangan: ${card.color} ${card.value}`);
-            const img = document.createElement('img');
-            img.src = card.svgUrl;
-            img.alt = `Kartu UNO ${card.color} ${card.value}`;
-            discardPileEl.appendChild(img);
+            discardPileEl.setAttribute('aria-label', `Kartu di tumpukan buangan: ${card.color} ${card.value.replace('_', ' ')}`);
+            const imageKey = card.color === 'wild' ? `wild_${card.value}` : `${card.color}_${card.value}`;
+            discardPileEl.style.backgroundImage = `url(${cardImages[imageKey]})`;
             announce(`Kartu di tumpukan buangan: ${card.color} ${card.value}`);
         }
 
@@ -1018,10 +980,9 @@
                 const cardIndex = computerHand.findIndex(c => c === card);
                 const tempCardEl = document.createElement('div');
                 tempCardEl.className = 'card';
-                const img = document.createElement('img');
-                img.src = card.svgUrl;
-                img.alt = `Kartu UNO ${card.color} ${card.value}`;
-                tempCardEl.appendChild(img);
+                const imageKey = card.color === 'wild' ? `wild_${card.value}` : `${card.color}_${card.value}`;
+                tempCardEl.style.backgroundImage = `url(${cardImages[imageKey]})`;
+                tempCardEl.setAttribute('aria-label', `Kartu ${card.color} ${card.value.replace('_', ' ')}`);
                 computerHandEl.children[cardIndex].replaceWith(tempCardEl);
                 const discardRect = discardPileEl.getBoundingClientRect();
                 const cardRect = tempCardEl.getBoundingClientRect();
@@ -1080,10 +1041,9 @@
                     const playedCard = computerHand[cardIndex];
                     const tempCardEl = document.createElement('div');
                     tempCardEl.className = 'card';
-                    const img = document.createElement('img');
-                    img.src = playedCard.svgUrl;
-                    img.alt = `Kartu UNO ${playedCard.color} ${playedCard.value}`;
-                    tempCardEl.appendChild(img);
+                    const imageKey = playedCard.color === 'wild' ? `wild_${playedCard.value}` : `${playedCard.color}_${playedCard.value}`;
+                    tempCardEl.style.backgroundImage = `url(${cardImages[imageKey]})`;
+                    tempCardEl.setAttribute('aria-label', `Kartu ${playedCard.color} ${playedCard.value.replace('_', ' ')}`);
                     computerHandEl.appendChild(tempCardEl);
                     const discardRect = discardPileEl.getBoundingClientRect();
                     const cardRect = tempCardEl.getBoundingClientRect();
