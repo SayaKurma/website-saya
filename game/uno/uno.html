@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permainan UNO Modern</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --dark-text: #334155;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
+        }
+
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            color: #334155;
+        }
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .game-container {
+            max-width: 90vw;
+            margin: auto;
+            min-height: calc(100vh - 2rem);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+
+        body.dark .game-container {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .card {
+            width: 70px;
+            height: 100px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            position: relative;
+            border: 2px solid #ffffff;
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .card:focus {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        body.dark .card:focus {
+            outline: 3px solid var(--primary-dark);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.4), transparent);
+            border-radius: 10px;
+            z-index: -1;
+        }
+
+        body.dark .card::before {
+            background: linear-gradient(45deg, rgba(250, 204, 21, 0.4), transparent);
+        }
+
+        .card:hover, .card:focus {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+
+        .card.selected {
+            transform: translateY(-15px) scale(1.1);
+            box-shadow: 0 0 0 3px var(--primary-color), 0 15px 30px rgba(0,0,0,0.3);
+            animation: selectedPulse 2s infinite;
+        }
+
+        body.dark .card.selected {
+            box-shadow: 0 0 0 3px var(--primary-dark), 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        @keyframes selectedPulse {
+            0%, 100% { box-shadow: 0 0 0 3px var(--primary-color), 0 15px 30px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.6), 0 15px 30px rgba(0,0,0,0.3); }
+        }
+
+        body.dark .card.selected {
+            animation: selectedPulseDark 2s infinite;
+        }
+
+        @keyframes selectedPulseDark {
+            0%, 100% { box-shadow: 0 0 0 3px var(--primary-dark), 0 15px 30px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 0 0 6px rgba(250, 204, 21, 0.6), 0 15px 30px rgba(0,0,0,0.3); }
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .card-back {
+            background: linear-gradient(135deg, #d32f2f 0%, #f57c00 100%);
+        }
+
+        .card-back::after {
+            content: 'UNO';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+        }
+
+        .game-center {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4rem;
+            justify-content: center;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        body.dark .game-center {
+            background: rgba(30, 41, 59, 0.25);
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .draw-pile {
+            background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
+            border: 2px dashed rgba(255,255,255,0.7);
+        }
+
+        body.dark .draw-pile {
+            background: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+        }
+
+        .draw-pile:hover, .draw-pile:focus {
+            background: linear-gradient(135deg, #009688 0%, #00796b 100%);
+            transform: scale(1.05);
+        }
+
+        body.dark .draw-pile:hover, body.dark .draw-pile:focus {
+            background: linear-gradient(135deg, #00796b 0%, #005b4f 100%);
+        }
+
+        .game-stats {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        body.dark .game-stats {
+            background: rgba(30, 41, 59, 0.25);
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .player-area {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1rem;
+        }
+
+        body.dark .player-area {
+            background: rgba(30, 41, 59, 0.15);
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 9999px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        body.dark .btn-primary {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover:not(:disabled), .btn-primary:focus {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        body.dark .btn-primary:hover:not(:disabled), body.dark .btn-primary:focus {
+            background-color: var(--primary-dark-hover);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
+        }
+
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
+        }
+
+        .btn-uno {
+            background: linear-gradient(135deg, #d32f2f 0%, #f57c00 100%);
+            color: #ffffff;
+            animation: unoPulse 1.5s infinite;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.5);
+            border-radius: 9999px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        body.dark .btn-uno {
+            background: linear-gradient(135deg, var(--primary-dark), #eab308);
+        }
+
+        @keyframes unoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .message-modal {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .message-content {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        body.dark .message-content {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-dark-hover));
+        }
+
+        .color-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            border: 2px solid #ffffff;
+        }
+
+        .color-btn:hover, .color-btn:focus {
+            transform: scale(1.1);
+            outline: 3px solid var(--primary-color);
+        }
+
+        body.dark .color-btn:hover, body.dark .color-btn:focus {
+            outline: 3px solid var(--primary-dark);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+            border-radius: 9999px;
+            padding: 0.5rem;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tablet Breakpoint */
+        @media (min-width: 641px) {
+            .card {
+                width: 90px;
+                height: 130px;
+                font-size: 1.1rem;
+            }
+
+            .card-back::after {
+                font-size: 1.2rem;
+            }
+
+            .game-center {
+                padding: 2rem;
+                gap: 6rem;
+            }
+
+            .player-area {
+                padding: 1.5rem;
+            }
+
+            .game-stats {
+                padding: 1.5rem;
+            }
+
+            .color-btn {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Laptop Breakpoint */
+        @media (min-width: 1024px) {
+            .card {
+                width: 110px;
+                height: 160px;
+                font-size: 1.3rem;
+            }
+
+            .card-back::after {
+                font-size: 1.5rem;
+            }
+
+            .game-container {
+                max-width: 80vw;
+                min-height: calc(100vh - 4rem);
+            }
+
+            .game-center {
+                padding: 3rem;
+                gap: 8rem;
+            }
+
+            .player-area {
+                padding: 2rem;
+            }
+
+            .game-stats {
+                padding: 2rem;
+            }
+
+            .color-btn {
+                width: 70px;
+                height: 70px;
+            }
+        }
+
+        .card-move {
+            animation: moveToDiscard 0.5s ease-out forwards;
+        }
+
+        @keyframes moveToDiscard {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--discard-x, 0), var(--discard-y, -200px)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .card-move-computer {
+            animation: moveToDiscardComputer 0.5s ease-out forwards;
+        }
+
+        @keyframes moveToDiscardComputer {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--discard-x, 0), var(--discard-y, 200px)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .title-glow {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+        }
+
+        body.dark .title-glow {
+            text-shadow: 0 0 20px rgba(250, 204, 21, 0.6);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-800 transition-colors duration-300">
+    <main class="flex-grow flex flex-col game-container mx-2 my-4 rounded-xl fade-in" role="main" aria-label="Area permainan UNO">
+        <div class="flex justify-end p-4">
+            <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                <i class="fas fa-sun text-yellow-500"></i>
+            </button>
+        </div>
+        <div class="player-area mx-2 my-2 p-2" role="region" aria-label="Tangan komputer">
+            <div id="computer-hand" class="flex justify-center flex-wrap gap-2 min-h-[120px] items-center">
+            </div>
+        </div>
+
+        <div class="flex-grow flex justify-center items-center p-2">
+            <div class="game-center relative" role="region" aria-label="Area tengah permainan">
+                <div class="text-center">
+                    <div id="discard-pile" class="card bg-white" role="img" aria-label="Tumpukan buangan"></div>
+                </div>
+                <div class="text-center">
+                    <div id="draw-pile" class="card draw-pile cursor-pointer" role="button" aria-label="Tumpukan ambil kartu" tabindex="0">
+                        <div class="text-white text-3xl">?</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="player-area mx-2 my-2 p-2" role="region" aria-label="Tangan pemain">
+            <div id="player-hand" class="flex justify-center flex-wrap gap-2 min-h-[120px] items-center">
+            </div>
+        </div>
+    </main>
+
+    <div class="game-stats mx-2 my-2 py-2 px-4 flex flex-wrap justify-center gap-3" role="region" aria-label="Status permainan">
+        <button id="uno-btn" class="btn-uno text-white px-4 py-2 rounded-full font-semibold hidden transition-all" aria-label="Panggil UNO" tabindex="0">
+            🔥 UNO!
+        </button>
+    </div>
+
+    <div id="message" class="message-modal fixed inset-0 flex items-center justify-center z-50 hidden" role="dialog" aria-live="assertive">
+        <div class="message-content text-white px-6 py-4 mx-4 max-w-md w-full text-center">
+            <p id="message-text" class="text-lg md:text-xl mb-4 font-semibold title-glow"></p>
+            <div id="message-buttons" class="flex justify-center gap-3">
+                <button id="play-again-btn" class="btn-primary text-white px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-all hidden" aria-label="Main lagi" tabindex="0">
+                    Main Lagi
+                </button>
+                <button id="back-btn" class="bg-white text-purple-800 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-all hidden" aria-label="Kembali ke menu utama" tabindex="0">
+                    Kembali
+                </button>
+                <button id="close-message" class="bg-white text-purple-800 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-all" aria-label="Lanjutkan permainan" tabindex="0">
+                    Lanjut
+                </button>
+                <button id="bluff-btn" class="bg-yellow-600 text-black px-4 py-2 rounded-full font-semibold hover:bg-yellow-500 transition-all hidden" aria-label="Tuduh komputer bluffing" tabindex="0">
+                    Tuduh BLUFF!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="color-chooser" class="message-modal fixed inset-0 flex items-center justify-center z-50 hidden" role="dialog" aria-label="Pilih warna untuk kartu Wild">
+        <div class="message-content text-white px-6 py-4 mx-4 max-w-md w-full text-center">
+            <p class="text-lg md:text-xl mb-4 font-semibold title-glow">Pilih warna</p>
+            <div class="flex justify-center gap-3">
+                <div class="color-btn bg-red-700" data-color="red" role="button" aria-label="Pilih warna merah" tabindex="0"></div>
+                <div class="color-btn bg-blue-800" data-color="blue" role="button" aria-label="Pilih warna biru" tabindex="0"></div>
+                <div class="color-btn bg-green-800" data-color="green" role="button" aria-label="Pilih warna hijau" tabindex="0"></div>
+                <div class="color-btn bg-yellow-600" data-color="yellow" role="button" aria-label="Pilih warna kuning" tabindex="0"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeIcon.classList.remove('text-yellow-500');
+                themeIcon.classList.add('text-primaryDark');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIcon.classList.remove('text-primaryDark');
+                themeIcon.classList.add('text-yellow-500');
+            }
+        });
+
+        let deck = [];
+        let discardPile = [];
+        let playerHand = [];
+        let computerHand = [];
+        let currentPlayer = 'player';
+        let currentColor = '';
+        let currentValue = '';
+        let selectedCardIndex = -1;
+        let unoCalled = false;
+        let isDrawing = false;
+        let isBluffing = false;
+
+        const computerHandEl = document.getElementById('computer-hand');
+        const playerHandEl = document.getElementById('player-hand');
+        const discardPileEl = document.getElementById('discard-pile');
+        const drawPileEl = document.getElementById('draw-pile');
+        const unoBtn = document.getElementById('uno-btn');
+        const messageEl = document.getElementById('message');
+        const messageTextEl = document.getElementById('message-text');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const backBtn = document.getElementById('back-btn');
+        const closeMessageBtn = document.getElementById('close-message');
+        const bluffBtn = document.getElementById('bluff-btn');
+        const colorChooserEl = document.getElementById('color-chooser');
+        const colorButtons = document.querySelectorAll('.color-btn');
+
+        const colors = ['red', 'blue', 'green', 'yellow'];
+        const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Skip', 'Reverse', 'Draw2'];
+        const wildCards = ['Wild', 'Wild_Draw4'];
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function initGame() {
+            deck = [];
+            discardPile = [];
+            playerHand = [];
+            computerHand = [];
+            currentPlayer = 'player';
+            currentColor = '';
+            currentValue = '';
+            selectedCardIndex = -1;
+            unoCalled = false;
+            isDrawing = false;
+            isBluffing = false;
+
+            createDeck();
+            shuffleDeck();
+            dealCards();
+            startFirstTurn();
+            updateHands();
+
+            unoBtn.classList.add('hidden');
+            colorChooserEl.classList.add('hidden');
+            messageEl.classList.add('hidden');
+            bluffBtn.classList.add('hidden');
+
+            drawPileEl.removeEventListener('click', handleDraw);
+            drawPileEl.removeEventListener('touchstart', handleDraw);
+            drawPileEl.addEventListener('click', handleDraw);
+            drawPileEl.addEventListener('touchstart', handleDraw);
+            drawPileEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleDraw(e);
+                }
+            });
+
+            discardPileEl.removeEventListener('click', handleDiscardClick);
+            discardPileEl.removeEventListener('touchstart', handleDiscardClick);
+            discardPileEl.addEventListener('click', handleDiscardClick);
+            discardPileEl.addEventListener('touchstart', handleDiscardClick);
+            discardPileEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleDiscardClick(e);
+                }
+            });
+
+            document.addEventListener('keydown', handleKeyboardNavigation);
+        }
+
+        function createDeck() {
+            deck = [];
+            for (const color of colors) {
+                deck.push({ color, value: '0' });
+                for (const value of values.slice(1)) {
+                    deck.push({ color, value });
+                    deck.push({ color, value });
+                }
+            }
+            for (const value of wildCards) {
+                for (let i = 0; i < 4; i++) {
+                    deck.push({ color: 'wild', value });
+                }
+            }
+            const expectedCardCount = 108;
+            if (deck.length !== expectedCardCount) {
+                console.error(`Kesalahan: Jumlah kartu ${deck.length}, seharusnya ${expectedCardCount}`);
+                throw new Error(`Jumlah kartu tidak sesuai: ${deck.length} kartu`);
+            }
+        }
+
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function dealCards() {
+            for (let i = 0; i < 7; i++) {
+                playerHand.push(deck.pop());
+                computerHand.push(deck.pop());
+            }
+        }
+
+        function startFirstTurn() {
+            let card;
+            do {
+                card = deck.pop();
+            } while (card.color === 'wild');
+            discardPile.push(card);
+            currentColor = card.color;
+            currentValue = card.value;
+            updateDiscardPile();
+            announce(`Permainan dimulai! Kartu awal: ${card.color} ${card.value}`);
+        }
+
+        function updateHands() {
+            computerHandEl.innerHTML = '';
+            for (let i = 0; i < computerHand.length; i++) {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card card-back';
+                cardEl.setAttribute('aria-hidden', 'true');
+                computerHandEl.appendChild(cardEl);
+            }
+
+            playerHandEl.innerHTML = '';
+            for (let i = 0; i < playerHand.length; i++) {
+                const card = playerHand[i];
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                cardEl.setAttribute('role', 'button');
+                cardEl.setAttribute('tabindex', '0');
+                cardEl.setAttribute('aria-label', `Kartu ${card.color} ${card.value}`);
+                if (card.color === 'wild') {
+                    cardEl.classList.add('bg-gray-900', 'text-white', 'flex-col');
+                    cardEl.innerHTML = `
+                        <div class="text-xs mb-1">${card.value.replace('_', ' ')}</div>
+                        <div class="flex w-full h-4 rounded">
+                            <div class="w-1/4 bg-red-700 rounded-l"></div>
+                            <div class="w-1/4 bg-blue-800"></div>
+                            <div class="w-1/4 bg-green-800"></div>
+                            <div class="w-1/4 bg-yellow-600 rounded-r"></div>
+                        </div>
+                    `;
+                } else {
+                    const bgColor = `bg-${card.color}-700`;
+                    const textColor = 'text-white';
+                    cardEl.className += ` ${bgColor} ${textColor}`;
+                    if (['Skip', 'Reverse', 'Draw2'].includes(card.value)) {
+                        let symbol = '';
+                        switch (card.value) {
+                            case 'Skip': symbol = '⊘'; break;
+                            case 'Reverse': symbol = '↻'; break;
+                            case 'Draw2': symbol = '+2'; break;
+                        }
+                        cardEl.innerHTML = `<div class="text-2xl md:text-3xl">${symbol}</div>`;
+                    } else {
+                        cardEl.textContent = card.value;
+                    }
+                }
+                cardEl.addEventListener('click', () => selectCard(i));
+                cardEl.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectCard(i);
+                    }
+                });
+                playerHandEl.appendChild(cardEl);
+            }
+
+            if (selectedCardIndex >= 0 && selectedCardIndex < playerHand.length) {
+                playerHandEl.children[selectedCardIndex].classList.add('selected');
+                playerHandEl.children[selectedCardIndex].focus();
+            }
+
+            announce(`Tangan Anda: ${playerHand.map(card => `${card.color} ${card.value}`).join(', ')}`);
+        }
+
+        function updateDiscardPile() {
+            if (discardPile.length === 0) return;
+            const card = discardPile[discardPile.length - 1];
+            discardPileEl.innerHTML = '';
+            discardPileEl.className = 'card';
+            discardPileEl.setAttribute('aria-label', `Kartu di tumpukan buangan: ${card.color} ${card.value}`);
+            if (card.color === 'wild') {
+                discardPileEl.classList.add('bg-gray-900', 'text-white', 'flex-col');
+                discardPileEl.innerHTML = `
+                    <div class="text-xs mb-1">${card.value.replace('_', ' ')}</div>
+                    <div class="flex w-full h-4 rounded">
+                        <div class="w-1/4 bg-red-700 rounded-l"></div>
+                        <div class="w-1/4 bg-blue-800"></div>
+                        <div class="w-1/4 bg-green-800"></div>
+                        <div class="w-1/4 bg-yellow-600 rounded-r"></div>
+                    </div>
+                `;
+            } else {
+                const bgColor = `bg-${card.color}-700`;
+                const textColor = 'text-white';
+                discardPileEl.className += ` ${bgColor} ${textColor}`;
+                if (['Skip', 'Reverse', 'Draw2'].includes(card.value)) {
+                    let symbol = '';
+                    switch (card.value) {
+                        case 'Skip': symbol = '⊘'; break;
+                        case 'Reverse': symbol = '↻'; break;
+                        case 'Draw2': symbol = '+2'; break;
+                    }
+                    discardPileEl.innerHTML = `<div class="text-2xl md:text-3xl">${symbol}</div>`;
+                } else {
+                    discardPileEl.textContent = card.value;
+                }
+            }
+            announce(`Kartu di tumpukan buangan: ${card.color} ${card.value}`);
+        }
+
+        function updateCounts() {
+            if (playerHand.length === 1) {
+                unoBtn.classList.remove('hidden');
+                unoBtn.focus();
+                announce('Anda memiliki satu kartu! Tekan U untuk memanggil UNO.');
+            } else {
+                unoBtn.classList.add('hidden');
+                unoCalled = false;
+            }
+        }
+
+        function selectCard(index) {
+            if (currentPlayer !== 'player') {
+                announce('Bukan giliran Anda!');
+                return;
+            }
+            if (selectedCardIndex >= 0 && selectedCardIndex < playerHand.length) {
+                playerHandEl.children[selectedCardIndex].classList.remove('selected');
+            }
+            selectedCardIndex = index;
+            playerHandEl.children[selectedCardIndex].classList.add('selected');
+            playerHandEl.children[selectedCardIndex].focus();
+            announce(`Kartu yang dipilih: ${playerHand[index].color} ${playerHand[index].value}. Tekan Enter untuk memainkan kartu.`);
+        }
+
+        function handleKeyboardNavigation(e) {
+            if (currentPlayer !== 'player') return;
+            if (e.key === 'ArrowRight' && selectedCardIndex < playerHand.length - 1) {
+                selectCard(selectedCardIndex + 1);
+            } else if (e.key === 'ArrowLeft' && selectedCardIndex > 0) {
+                selectCard(selectedCardIndex - 1);
+            } else if (e.key === 'Enter' && selectedCardIndex >= 0) {
+                handleDiscardClick(e);
+            } else if (e.key.toLowerCase() === 'u' && playerHand.length === 1) {
+                callUno();
+            } else if (e.key === 'd') {
+                handleDraw(e);
+            }
+        }
+
+        function canPlayCard(card) {
+            if (card.color === 'wild') {
+                if (card.value === 'Wild_Draw4') {
+                    return !playerHand.some(c => c.color === currentColor && c !== card && canPlayCard(c));
+                }
+                return true;
+            }
+            const topCard = discardPile[discardPile.length - 1];
+            if (topCard.color === 'wild') {
+                return card.color === currentColor;
+            }
+            return card.color === topCard.color || 
+                   card.value === topCard.value || 
+                   (['Skip', 'Reverse', 'Draw2'].includes(card.value) && card.value === topCard.value);
+        }
+
+        function hasValidColorCard(hand) {
+            return hand.some(card => card.color === currentColor && card.color !== 'wild');
+        }
+
+        function handleDiscardClick(e) {
+            e.preventDefault();
+            if (selectedCardIndex === -1 || currentPlayer !== 'player') {
+                announce('Pilih kartu terlebih dahulu atau bukan giliran Anda!');
+                return;
+            }
+            const card = playerHand[selectedCardIndex];
+            if (!canPlayCard(card)) {
+                showMessage('❌ Kartu tidak valid! Pilih warna atau nilai yang cocok.');
+                return;
+            }
+            if (playerHand.length === 1 && !unoCalled) {
+                playerMustDraw();
+                return;
+            }
+            const selectedCardEl = playerHandEl.children[selectedCardIndex];
+            const discardRect = discardPileEl.getBoundingClientRect();
+            const cardRect = selectedCardEl.getBoundingClientRect();
+            const deltaX = discardRect.left - cardRect.left;
+            const deltaY = discardRect.top - cardRect.top;
+            selectedCardEl.style.setProperty('--discard-x', `${deltaX}px`);
+            selectedCardEl.style.setProperty('--discard-y', `${deltaY}px`);
+            selectedCardEl.classList.add('card-move');
+            setTimeout(() => {
+                playerHand.splice(selectedCardIndex, 1);
+                discardPile.push(card);
+                announce(`Anda memainkan kartu ${card.color} ${card.value}`);
+                if (card.value === 'Wild_Draw4') {
+                    isBluffing = hasValidColorCard(playerHand);
+                    showColorChooser();
+                } else if (card.color === 'wild') {
+                    showColorChooser();
+                } else {
+                    updateGameStateAfterPlay(card);
+                    selectedCardIndex = -1;
+                    updateDiscardPile();
+                    updateHands();
+                    updateCounts();
+                    if (playerHand.length === 0) {
+                        endGame();
+                        return;
+                    }
+                    if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
+                        setTimeout(computerTurn, 1000);
+                    }
+                }
+            }, 500);
+        }
+
+        function showColorChooser() {
+            colorChooserEl.classList.remove('hidden');
+            colorButtons[0].focus();
+            announce('Pilih warna untuk kartu Wild. Gunakan panah untuk navigasi, Enter untuk memilih.');
+        }
+
+        function chooseColor(color) {
+            currentColor = color;
+            colorChooserEl.classList.add('hidden');
+            const card = discardPile[discardPile.length - 1];
+            announce(`Warna dipilih: ${color}`);
+            updateGameStateAfterPlay(card);
+            if (card.value === 'Wild_Draw4') {
+                if (currentPlayer === 'player') {
+                    computerDecideBluff(card);
+                } else {
+                    showBluffPrompt();
+                }
+            }
+            selectedCardIndex = -1;
+            updateDiscardPile();
+            updateHands();
+            updateCounts();
+            if (playerHand.length === 0) {
+                endGame();
+                return;
+            }
+            if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
+                setTimeout(computerTurn, 1000);
+            }
+        }
+
+        const handleDraw = debounce((e) => {
+            e.preventDefault();
+            drawCard();
+        }, 500);
+
+        function drawCard() {
+            if (isDrawing || currentPlayer !== 'player') {
+                showMessage('⏳ Bukan giliran Anda atau sedang mengambil kartu!');
+                return;
+            }
+            isDrawing = true;
+            if (deck.length === 0) {
+                reshuffleDeck();
+            }
+            const card = deck.pop();
+            playerHand.push(card);
+            announce(`Anda mengambil kartu: ${card.color} ${card.value}`);
+            updateHands();
+            if (canPlayCard(card)) {
+                const cardIndex = playerHand.length - 1;
+                selectCard(cardIndex);
+                showMessage('🎯 Anda bisa memainkan kartu yang diambil!');
+            } else {
+                currentPlayer = 'computer';
+                updateCounts();
+                setTimeout(computerTurn, 1000);
+            }
+            updateCounts();
+            isDrawing = false;
+        }
+
+        function computerChooseColor() {
+            const colorCounts = colors.reduce((acc, color) => {
+                acc[color] = computerHand.filter(card => card.color === color).length;
+                return acc;
+            }, {});
+            const maxCount = Math.max(...Object.values(colorCounts));
+            const mostFrequentColors = Object.keys(colorCounts).filter(color => colorCounts[color] === maxCount);
+            return mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
+        }
+
+        function computerTurn() {
+            currentPlayer = 'computer';
+            updateCounts();
+            let playableCards = computerHand.filter(card => canPlayCard(card));
+            if (playableCards.some(card => card.value === 'Wild_Draw4') && Math.random() < 0.3) {
+                playableCards = playableCards.filter(card => card.value !== 'Wild_Draw4');
+            }
+            if (playableCards.length > 0) {
+                const randomIndex = Math.floor(Math.random() * playableCards.length);
+                const card = playableCards[randomIndex];
+                const cardIndex = computerHand.findIndex(c => c === card);
+                const tempCardEl = document.createElement('div');
+                tempCardEl.className = 'card';
+                if (card.color === 'wild') {
+                    tempCardEl.classList.add('bg-gray-900', 'text-white', 'flex-col');
+                    tempCardEl.innerHTML = `
+                        <div class="text-xs mb-1">${card.value.replace('_', ' ')}</div>
+                        <div class="flex w-full h-4 rounded">
+                            <div class="w-1/4 bg-red-700 rounded-l"></div>
+                            <div class="w-1/4 bg-blue-800"></div>
+                            <div class="w-1/4 bg-green-800"></div>
+                            <div class="w-1/4 bg-yellow-600 rounded-r"></div>
+                        </div>
+                    `;
+                } else {
+                    const bgColor = `bg-${card.color}-700`;
+                    const textColor = 'text-white';
+                    tempCardEl.className += ` ${bgColor} ${textColor}`;
+                    if (['Skip', 'Reverse', 'Draw2'].includes(card.value)) {
+                        let symbol = '';
+                        switch (card.value) {
+                            case 'Skip': symbol = '⊘'; break;
+                            case 'Reverse': symbol = '↻'; break;
+                            case 'Draw2': symbol = '+2'; break;
+                        }
+                        tempCardEl.innerHTML = `<div class="text-2xl md:text-3xl">${symbol}</div>`;
+                    } else {
+                        tempCardEl.textContent = card.value;
+                    }
+                }
+                computerHandEl.children[cardIndex].replaceWith(tempCardEl);
+                const discardRect = discardPileEl.getBoundingClientRect();
+                const cardRect = tempCardEl.getBoundingClientRect();
+                const deltaX = discardRect.left - cardRect.left;
+                const deltaY = discardRect.top - cardRect.top;
+                tempCardEl.style.setProperty('--discard-x', `${deltaX}px`);
+                tempCardEl.style.setProperty('--discard-y', `${deltaY}px`);
+                tempCardEl.classList.add('card-move-computer');
+                setTimeout(() => {
+                    computerHand.splice(cardIndex, 1);
+                    discardPile.push(card);
+                    announce(`Komputer memainkan kartu ${card.color} ${card.value}`);
+                    if (card.value === 'Wild_Draw4') {
+                        isBluffing = hasValidColorCard(computerHand) && Math.random() < 0.5;
+                        currentColor = computerChooseColor();
+                        showBluffPrompt();
+                    } else if (card.color === 'wild') {
+                        currentColor = computerChooseColor();
+                        showMessage(`🤖 Komputer memainkan ${card.value.replace('_', ' ')} dan memilih warna ${currentColor}!`);
+                        updateGameStateAfterPlay(card);
+                    } else {
+                        updateGameStateAfterPlay(card);
+                    }
+                    updateDiscardPile();
+                    updateCounts();
+                    if (computerHand.length === 1) {
+                        const shouldCallUno = !computerHand.some(card => 
+                            card.color === 'wild' || card.value === 'Draw2');
+                        if (shouldCallUno) {
+                            showMessage('🤖 Komputer memanggil UNO!');
+                        } else {
+                            computerMustDraw();
+                            return;
+                        }
+                    }
+                    if (playerHand.length > 0 && computerHand.length > 0) {
+                        if (currentPlayer === 'player') {
+                            updateCounts();
+                        } else {
+                            setTimeout(computerTurn, 1000);
+                        }
+                    } else {
+                        endGame();
+                    }
+                    updateHands();
+                }, 500);
+            } else {
+                if (deck.length === 0) {
+                    reshuffleDeck();
+                }
+                const card = deck.pop();
+                computerHand.push(card);
+                showMessage('🤖 Komputer mengambil kartu');
+                if (canPlayCard(card)) {
+                    const cardIndex = computerHand.length - 1;
+                    const playedCard = computerHand[cardIndex];
+                    const tempCardEl = document.createElement('div');
+                    tempCardEl.className = 'card';
+                    if (playedCard.color === 'wild') {
+                        tempCardEl.classList.add('bg-gray-900', 'text-white', 'flex-col');
+                        tempCardEl.innerHTML = `
+                            <div class="text-xs mb-1">${playedCard.value.replace('_', ' ')}</div>
+                            <div class="flex w-full h-4 rounded">
+                                <div class="w-1/4 bg-red-700 rounded-l"></div>
+                                <div class="w-1/4 bg-blue-800"></div>
+                                <div class="w-1/4 bg-green-800"></div>
+                                <div class="w-1/4 bg-yellow-600 rounded-r"></div>
+                            </div>
+                        `;
+                    } else {
+                        const bgColor = `bg-${playedCard.color}-700`;
+                        const textColor = 'text-white';
+                        tempCardEl.className += ` ${bgColor} ${textColor}`;
+                        if (['Skip', 'Reverse', 'Draw2'].includes(playedCard.value)) {
+                            let symbol = '';
+                            switch (playedCard.value) {
+                                case 'Skip': symbol = '⊘'; break;
+                                case 'Reverse': symbol = '↻'; break;
+                                case 'Draw2': symbol = '+2'; break;
+                            }
+                            tempCardEl.innerHTML = `<div class="text-2xl md:text-3xl">${symbol}</div>`;
+                        } else {
+                            tempCardEl.textContent = playedCard.value;
+                        }
+                    }
+                    computerHandEl.appendChild(tempCardEl);
+                    const discardRect = discardPileEl.getBoundingClientRect();
+                    const cardRect = tempCardEl.getBoundingClientRect();
+                    const deltaX = discardRect.left - cardRect.left;
+                    const deltaY = discardRect.top - cardRect.top;
+                    tempCardEl.style.setProperty('--discard-x', `${deltaX}px`);
+                    tempCardEl.style.setProperty('--discard-y', `${deltaY}px`);
+                    tempCardEl.classList.add('card-move-computer');
+                    setTimeout(() => {
+                        computerHand.splice(cardIndex, 1);
+                        discardPile.push(playedCard);
+                        announce(`Komputer memainkan kartu ${playedCard.color} ${playedCard.value}`);
+                        if (playedCard.value === 'Wild_Draw4') {
+                            isBluffing = hasValidColorCard(computerHand) && Math.random() < 0.5;
+                            currentColor = computerChooseColor();
+                            showBluffPrompt();
+                        } else if (playedCard.color === 'wild') {
+                            currentColor = computerChooseColor();
+                            showMessage(`🤖 Komputer memainkan ${playedCard.value.replace('_', ' ')} dan memilih warna ${currentColor}!`);
+                            updateGameStateAfterPlay(playedCard);
+                        } else {
+                            updateGameStateAfterPlay(playedCard);
+                        }
+                        updateDiscardPile();
+                        updateCounts();
+                        if (computerHand.length === 1) {
+                            const shouldCallUno = !computerHand.some(card => 
+                                card.color === 'wild' || card.value === 'Draw2');
+                            if (shouldCallUno) {
+                                showMessage('🤖 Komputer memanggil UNO!');
+                            } else {
+                                computerMustDraw();
+                                return;
+                            }
+                        }
+                        if (playerHand.length > 0 && computerHand.length > 0) {
+                            if (currentPlayer === 'player') {
+                                updateCounts();
+                            } else {
+                                setTimeout(computerTurn, 1000);
+                            }
+                        } else {
+                            endGame();
+                        }
+                        updateHands();
+                    }, 500);
+                } else {
+                    if (playerHand.length > 0 && computerHand.length > 0) {
+                        currentPlayer = 'player';
+                        updateCounts();
+                        announce('Giliran Anda!');
+                    } else {
+                        endGame();
+                    }
+                    updateHands();
+                }
+            }
+        }
+
+        function showBluffPrompt() {
+            messageTextEl.textContent = `🤖 Komputer memainkan +4 dan memilih warna ${currentColor}! Tuduh Bluff?`;
+            messageEl.classList.remove('hidden');
+            bluffBtn.classList.remove('hidden');
+            closeMessageBtn.classList.remove('hidden');
+            bluffBtn.focus();
+            announce(`Komputer memainkan +4 dan memilih warna ${currentColor}. Tekan B untuk menuduh bluff, atau Enter untuk melanjutkan.`);
+        }
+
+        function handleBluff() {
+            bluffBtn.classList.add('hidden');
+            if (currentPlayer === 'computer') {
+                if (isBluffing) {
+                    showMessage('✅ Tuduhan benar! Komputer bluffing, mereka ambil 4 kartu!');
+                    computerDrawCards(4);
+                    currentPlayer = 'player';
+                    announce('Tuduhan Anda benar! Komputer mengambil 4 kartu. Giliran Anda.');
+                } else {
+                    showMessage('❌ Tuduhan salah! Anda ambil 6 kartu!');
+                    playerDrawCards(6);
+                    currentPlayer = 'player';
+                    announce('Tuduhan Anda salah! Anda mengambil 6 kartu. Giliran Anda.');
+                }
+            }
+            updateHands();
+            updateCounts();
+            if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
+                setTimeout(computerTurn, 1000);
+            }
+        }
+
+        function computerDecideBluff(card) {
+            const bluffProbability = isBluffing ? 0.7 : 0.3;
+            if (Math.random() < bluffProbability) {
+                showMessage('🕵️ Komputer menuduh Anda bluffing!');
+                if (isBluffing) {
+                    showMessage('❌ Komputer benar! Anda bluffing, ambil 4 kartu!');
+                    playerDrawCards(4);
+                    currentPlayer = 'computer';
+                    announce('Komputer menuduh Anda bluffing dan benar! Anda mengambil 4 kartu.');
+                } else {
+                    showMessage('✅ Komputer salah! Mereka ambil 6 kartu!');
+                    computerDrawCards(6);
+                    currentPlayer = 'computer';
+                    announce('Komputer menuduh Anda bluffing tetapi salah! Mereka mengambil 6 kartu.');
+                }
+                updateHands();
+                updateCounts();
+                if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
+                    setTimeout(computerTurn, 1000);
+                }
+            } else {
+                updateGameStateAfterPlay(card);
+                if (playerHand.length > 0 && computerHand.length > 0) {
+                    setTimeout(computerTurn, 1000);
+                }
+            }
+        }
+
+        function updateGameStateAfterPlay(card) {
+            if (card.color === 'wild') {
+                currentValue = '';
+            } else {
+                currentColor = card.color;
+                currentValue = card.value;
+            }
+            switch (card.value) {
+                case 'Skip':
+                    if (currentPlayer === 'player') {
+                        showMessage('⏭️ Komputer dilewati!');
+                        currentPlayer = 'player';
+                        announce('Anda memainkan Skip. Komputer dilewati. Giliran Anda lagi.');
+                    } else {
+                        showMessage('⏭️ Anda dilewati!');
+                        currentPlayer = 'computer';
+                        announce('Komputer memainkan Skip. Anda dilewati.');
+                    }
+                    break;
+                case 'Reverse':
+                    if (currentPlayer === 'player') {
+                        showMessage('🔄 Komputer dilewati! (Balik)');
+                        currentPlayer = 'player';
+                        announce('Anda memainkan Reverse. Komputer dilewati. Giliran Anda lagi.');
+                    } else {
+                        showMessage('🔄 Anda dilewati! (Balik)');
+                        currentPlayer = 'computer';
+                        announce('Komputer memainkan Reverse. Anda dilewati.');
+                    }
+                    break;
+                case 'Draw2':
+                    if (currentPlayer === 'player') {
+                        computerDrawCards(2);
+                        showMessage('🤖 Komputer mengambil 2 kartu dan melewatkan gilirannya!');
+                        currentPlayer = 'player';
+                        announce('Anda memainkan Draw Two. Komputer mengambil 2 kartu dan dilewati.');
+                    } else {
+                        playerDrawCards(2);
+                        showMessage('😅 Anda mengambil 2 kartu dan melewatkan giliran!');
+                        currentPlayer = 'computer';
+                        announce('Komputer memainkan Draw Two. Anda mengambil 2 kartu dan dilewati.');
+                    }
+                    break;
+                case 'Wild_Draw4':
+                    if (currentPlayer === 'player') {
+                        computerDrawCards(4);
+                        showMessage('🤖 Komputer mengambil 4 kartu dan melewatkan gilirannya!');
+                        currentPlayer = 'player';
+                        announce('Anda memainkan Wild Draw Four. Komputer mengambil 4 kartu dan dilewati.');
+                    } else {
+                        playerDrawCards(4);
+                        showMessage('😰 Anda mengambil 4 kartu dan melewatkan giliran!');
+                        currentPlayer = 'computer';
+                        announce('Komputer memainkan Wild Draw Four. Anda mengambil 4 kartu dan dilewati.');
+                    }
+                    break;
+                default:
+                    currentPlayer = currentPlayer === 'player' ? 'computer' : 'player';
+                    announce(currentPlayer === 'player' ? 'Giliran Anda!' : 'Giliran komputer.');
+                    break;
+            }
+        }
+
+        function callUno() {
+            if (playerHand.length === 1) {
+                unoCalled = true;
+                unoBtn.classList.add('hidden');
+                showMessage('🔥 UNO! Anda memiliki 1 kartu tersisa!');
+                announce('Anda memanggil UNO!');
+            }
+        }
+
+        function playerMustDraw() {
+            playerDrawCards(2);
+            showMessage('😬 Anda lupa memanggil UNO! Ambil 2 kartu.');
+            announce('Anda lupa memanggil UNO! Mengambil 2 kartu.');
+            selectedCardIndex = -1;
+            updateHands();
+            updateCounts();
+            setTimeout(computerTurn, 2000);
+        }
+
+        function computerMustDraw() {
+            computerDrawCards(2);
+            showMessage('🤖 Komputer lupa memanggil UNO! Mengambil 2 kartu.');
+            currentPlayer = 'player';
+            announce('Komputer lupa memanggil UNO! Mengambil 2 kartu. Giliran Anda.');
+            updateCounts();
+        }
+
+        function playerDrawCards(count) {
+            for (let i = 0; i < count; i++) {
+                if (deck.length === 0) {
+                    reshuffleDeck();
+                }
+                playerHand.push(deck.pop());
+            }
+            updateHands();
+            updateCounts();
+        }
+
+        function computerDrawCards(count) {
+            for (let i = 0; i < count; i++) {
+                if (deck.length === 0) {
+                    reshuffleDeck();
+                }
+                computerHand.push(deck.pop());
+            }
+            updateHands();
+            updateCounts();
+        }
+
+        function reshuffleDeck() {
+            if (discardPile.length <= 1) return;
+            const topCard = discardPile.pop();
+            deck = discardPile;
+            shuffleDeck();
+            discardPile = [topCard];
+            showMessage('🔄 Dek telah diacak ulang!');
+            announce('Dek telah diacak ulang!');
+        }
+
+        function launchConfetti() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#b71c1c', '#00695c', '#01579b', '#f57c00']
+            });
+        }
+
+        function showMessage(text) {
+            messageTextEl.textContent = text;
+            messageEl.classList.remove('hidden');
+            if (text.includes('menang')) {
+                playAgainBtn.classList.remove('hidden');
+                backBtn.classList.remove('hidden');
+                closeMessageBtn.classList.add('hidden');
+                bluffBtn.classList.add('hidden');
+                launchConfetti();
+                playAgainBtn.focus();
+            } else {
+                playAgainBtn.classList.add('hidden');
+                backBtn.classList.add('hidden');
+                if (!text.includes('Tuduh Bluff')) {
+                    closeMessageBtn.classList.remove('hidden');
+                    bluffBtn.classList.add('hidden');
+                    closeMessageBtn.focus();
+                }
+            }
+            announce(text);
+        }
+
+        function closeMessage() {
+            messageEl.classList.add('hidden');
+            bluffBtn.classList.add('hidden');
+            if (selectedCardIndex >= 0 && selectedCardIndex < playerHand.length) {
+                playerHandEl.children[selectedCardIndex].focus();
+            } else {
+                drawPileEl.focus();
+            }
+        }
+
+        function endGame() {
+            if (playerHand.length === 0) {
+                showMessage('🎉 Selamat! Anda menang! 🏆');
+            } else if (computerHand.length === 0) {
+                showMessage('🤖 Komputer menang! Coba lagi! 💪');
+            }
+        }
+
+        function announce(text) {
+            const liveRegion = document.createElement('div');
+            liveRegion.setAttribute('aria-live', 'polite');
+            liveRegion.setAttribute('aria-atomic', 'true');
+            liveRegion.setAttribute('style', 'position: absolute; left: -9999px;');
+            liveRegion.textContent = text;
+            document.body.appendChild(liveRegion);
+            setTimeout(() => {
+                document.body.removeChild(liveRegion);
+            }, 1000);
+        }
+
+        colorButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const color = button.getAttribute('data-color');
+                chooseColor(color);
+            });
+            button.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const color = button.getAttribute('data-color');
+                    chooseColor(color);
+                }
+            });
+        });
+
+        unoBtn.addEventListener('click', callUno);
+        unoBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                callUno();
+            }
+        });
+        playAgainBtn.addEventListener('click', initGame);
+        playAgainBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                initGame();
+            }
+        });
+        backBtn.addEventListener('click', () => {
+            window.location.href = '/';
+        });
+        backBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = 'index.html';
+            }
+        });
+        closeMessageBtn.addEventListener('click', closeMessage);
+        closeMessageBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeMessage();
+            }
+        });
+        bluffBtn.addEventListener('click', handleBluff);
+        bluffBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleBluff();
+            }
+        });
+
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+  </html>
