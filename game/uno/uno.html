@@ -22,7 +22,7 @@
                     fontFamily: {
                         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
                         poppins: ['Poppins', 'sans-serif'],
-                    },
+                    }
                 }
             }
         }
@@ -356,24 +356,19 @@
                 width: 90px;
                 height: 130px;
             }
-
             .card-back::after {
                 font-size: 1.2rem;
             }
-
             .game-center {
                 padding: 2rem;
                 gap: 6rem;
             }
-
             .player-area {
                 padding: 1.5rem;
             }
-
             .game-stats {
                 padding: 1.5rem;
             }
-
             .color-btn {
                 width: 60px;
                 height: 60px;
@@ -385,29 +380,23 @@
                 width: 110px;
                 height: 160px;
             }
-
             .card-back::after {
                 font-size: 1.5rem;
             }
-
             .game-container {
                 max-width: 80vw;
                 min-height: calc(100vh - 4rem);
             }
-
             .game-center {
                 padding: 3rem;
                 gap: 8rem;
             }
-
             .player-area {
                 padding: 2rem;
             }
-
             .game-stats {
                 padding: 2rem;
             }
-
             .color-btn {
                 width: 70px;
                 height: 70px;
@@ -461,10 +450,8 @@
             </button>
         </div>
         <div class="player-area mx-2 my-2 p-2" role="region" aria-label="Tangan komputer">
-            <div id="computer-hand" class="flex justify-center flex-wrap gap-2 min-h-[120px] items-center">
-            </div>
+            <div id="computer-hand" class="flex justify-center flex-wrap gap-2 min-h-[120px] items-center"></div>
         </div>
-
         <div class="flex-grow flex justify-center items-center p-2">
             <div class="game-center relative" role="region" aria-label="Area tengah permainan">
                 <div class="text-center">
@@ -477,19 +464,15 @@
                 </div>
             </div>
         </div>
-
         <div class="player-area mx-2 my-2 p-2" role="region" aria-label="Tangan pemain">
-            <div id="player-hand" class="flex justify-center flex-wrap gap-2 min-h-[120px] items-center">
-            </div>
+            <div id="player-hand" class="flex justify-center flex-wrap gap-2 min-h-[120px] items-center"></div>
         </div>
     </main>
-
     <div class="game-stats mx-2 my-2 py-2 px-4 flex flex-wrap justify-center gap-3" role="region" aria-label="Status permainan">
         <button id="uno-btn" class="btn-uno text-white px-4 py-2 rounded-full font-semibold hidden transition-all" aria-label="Panggil UNO" tabindex="0">
             🔥 UNO!
         </button>
     </div>
-
     <div id="message" class="message-modal fixed inset-0 flex items-center justify-center z-50 hidden" role="dialog" aria-live="assertive">
         <div class="message-content text-white px-6 py-4 mx-4 max-w-md w-full text-center">
             <p id="message-text" class="text-lg md:text-xl mb-4 font-semibold title-glow"></p>
@@ -509,7 +492,6 @@
             </div>
         </div>
     </div>
-
     <div id="color-chooser" class="message-modal fixed inset-0 flex items-center justify-center z-50 hidden" role="dialog" aria-label="Pilih warna untuk kartu Wild">
         <div class="message-content text-white px-6 py-4 mx-4 max-w-md w-full text-center">
             <p class="text-lg md:text-xl mb-4 font-semibold title-glow">Pilih warna</p>
@@ -521,7 +503,6 @@
             </div>
         </div>
     </div>
-
     <script>
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle.querySelector('i');
@@ -652,18 +633,15 @@
             unoCalled = false;
             isDrawing = false;
             isBluffing = false;
-
             createDeck();
             shuffleDeck();
             dealCards();
             startFirstTurn();
             updateHands();
-
             unoBtn.classList.add('hidden');
             colorChooserEl.classList.add('hidden');
             messageEl.classList.add('hidden');
             bluffBtn.classList.add('hidden');
-
             drawPileEl.removeEventListener('click', handleDraw);
             drawPileEl.removeEventListener('touchstart', handleDraw);
             drawPileEl.addEventListener('click', handleDraw);
@@ -674,7 +652,6 @@
                     handleDraw(e);
                 }
             });
-
             discardPileEl.removeEventListener('click', handleDiscardClick);
             discardPileEl.removeEventListener('touchstart', handleDiscardClick);
             discardPileEl.addEventListener('click', handleDiscardClick);
@@ -685,7 +662,6 @@
                     handleDiscardClick(e);
                 }
             });
-
             document.addEventListener('keydown', handleKeyboardNavigation);
         }
 
@@ -744,7 +720,6 @@
                 cardEl.setAttribute('aria-hidden', 'true');
                 computerHandEl.appendChild(cardEl);
             }
-
             playerHandEl.innerHTML = '';
             for (let i = 0; i < playerHand.length; i++) {
                 const card = playerHand[i];
@@ -764,12 +739,10 @@
                 });
                 playerHandEl.appendChild(cardEl);
             }
-
             if (selectedCardIndex >= 0 && selectedCardIndex < playerHand.length) {
                 playerHandEl.children[selectedCardIndex].classList.add('selected');
                 playerHandEl.children[selectedCardIndex].focus();
             }
-
             announce(`Tangan Anda: ${playerHand.map(card => `${card.color} ${card.value}`).join(', ')}`);
         }
 
@@ -835,8 +808,8 @@
             if (topCard.color === 'wild') {
                 return card.color === currentColor;
             }
-            return card.color === topCard.color || 
-                   card.value === topCard.value || 
+            return card.color === topCard.color ||
+                   card.value === topCard.value ||
                    (['Skip', 'Reverse', 'Draw2'].includes(card.value) && card.value === topCard.value);
         }
 
@@ -946,7 +919,6 @@
             if (canPlayCard(card)) {
                 const cardIndex = playerHand.length - 1;
                 selectCard(cardIndex);
-                showMessage('🎯 Anda bisa memainkan kartu yang diambil!');
             } else {
                 currentPlayer = 'computer';
                 updateCounts();
@@ -1008,7 +980,7 @@
                     updateDiscardPile();
                     updateCounts();
                     if (computerHand.length === 1) {
-                        const shouldCallUno = !computerHand.some(card => 
+                        const shouldCallUno = !computerHand.some(card =>
                             card.color === 'wild' || card.value === 'Draw2');
                         if (shouldCallUno) {
                             showMessage('🤖 Komputer memanggil UNO!');
@@ -1034,7 +1006,6 @@
                 }
                 const card = deck.pop();
                 computerHand.push(card);
-                showMessage('🤖 Komputer mengambil kartu');
                 if (canPlayCard(card)) {
                     const cardIndex = computerHand.length - 1;
                     const playedCard = computerHand[cardIndex];
@@ -1069,7 +1040,7 @@
                         updateDiscardPile();
                         updateCounts();
                         if (computerHand.length === 1) {
-                            const shouldCallUno = !computerHand.some(card => 
+                            const shouldCallUno = !computerHand.some(card =>
                                 card.color === 'wild' || card.value === 'Draw2');
                             if (shouldCallUno) {
                                 showMessage('🤖 Komputer memanggil UNO!');
@@ -1136,14 +1107,13 @@
         function computerDecideBluff(card) {
             const bluffProbability = isBluffing ? 0.7 : 0.3;
             if (Math.random() < bluffProbability) {
-                showMessage('🕵️ Komputer menuduh Anda bluffing!');
+                showMessage('Komputer menuduh bluff! Tuduhan benar, ambil 4 kartu!');
                 if (isBluffing) {
-                    showMessage('❌ Komputer benar! Anda bluffing, ambil 4 kartu!');
                     playerDrawCards(4);
                     currentPlayer = 'computer';
                     announce('Komputer menuduh Anda bluffing dan benar! Anda mengambil 4 kartu.');
                 } else {
-                    showMessage('✅ Komputer salah! Mereka ambil 6 kartu!');
+                    showMessage('Komputer menuduh bluff! Tuduhan salah, penalti 6 kartu!');
                     computerDrawCards(6);
                     currentPlayer = 'computer';
                     announce('Komputer menuduh Anda bluffing tetapi salah! Mereka mengambil 6 kartu.');
@@ -1171,35 +1141,29 @@
             switch (card.value) {
                 case 'Skip':
                     if (currentPlayer === 'player') {
-                        showMessage('⏭️ Komputer dilewati!');
                         currentPlayer = 'player';
-                        announce('Anda memainkan Skip. Komputer dilewati. Giliran Anda lagi.');
+                        announce('Anda memainkan Skip. Giliran Anda lagi.');
                     } else {
-                        showMessage('⏭️ Anda dilewati!');
                         currentPlayer = 'computer';
-                        announce('Komputer memainkan Skip. Anda dilewati.');
+                        announce('Komputer memainkan Skip.');
                     }
                     break;
                 case 'Reverse':
                     if (currentPlayer === 'player') {
-                        showMessage('🔄 Komputer dilewati! (Balik)');
                         currentPlayer = 'player';
-                        announce('Anda memainkan Reverse. Komputer dilewati. Giliran Anda lagi.');
+                        announce('Anda memainkan Reverse. Giliran Anda lagi.');
                     } else {
-                        showMessage('🔄 Anda dilewati! (Balik)');
                         currentPlayer = 'computer';
-                        announce('Komputer memainkan Reverse. Anda dilewati.');
+                        announce('Komputer memainkan Reverse.');
                     }
                     break;
                 case 'Draw2':
                     if (currentPlayer === 'player') {
                         computerDrawCards(2);
-                        showMessage('🤖 Komputer mengambil 2 kartu dan melewatkan gilirannya!');
                         currentPlayer = 'player';
                         announce('Anda memainkan Draw Two. Komputer mengambil 2 kartu dan dilewati.');
                     } else {
                         playerDrawCards(2);
-                        showMessage('😅 Anda mengambil 2 kartu dan melewatkan giliran!');
                         currentPlayer = 'computer';
                         announce('Komputer memainkan Draw Two. Anda mengambil 2 kartu dan dilewati.');
                     }
@@ -1207,12 +1171,10 @@
                 case 'Wild_Draw4':
                     if (currentPlayer === 'player') {
                         computerDrawCards(4);
-                        showMessage('🤖 Komputer mengambil 4 kartu dan melewatkan gilirannya!');
                         currentPlayer = 'player';
                         announce('Anda memainkan Wild Draw Four. Komputer mengambil 4 kartu dan dilewati.');
                     } else {
                         playerDrawCards(4);
-                        showMessage('😰 Anda mengambil 4 kartu dan melewatkan giliran!');
                         currentPlayer = 'computer';
                         announce('Komputer memainkan Wild Draw Four. Anda mengambil 4 kartu dan dilewati.');
                     }
@@ -1365,6 +1327,7 @@
                 callUno();
             }
         });
+
         playAgainBtn.addEventListener('click', initGame);
         playAgainBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -1372,15 +1335,18 @@
                 initGame();
             }
         });
+
         backBtn.addEventListener('click', () => {
             window.location.href = 'index.html';
         });
+
         backBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 window.location.href = 'index.html';
             }
         });
+
         closeMessageBtn.addEventListener('click', closeMessage);
         closeMessageBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -1388,6 +1354,7 @@
                 closeMessage();
             }
         });
+
         bluffBtn.addEventListener('click', handleBluff);
         bluffBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
