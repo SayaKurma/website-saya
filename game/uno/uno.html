@@ -605,7 +605,6 @@ function initGame() {
   isDrawing = false;
   isBluffing = false;
   playerHasOneCard = false;
-
   createDeck();
   shuffleDeck();
   dealCards();
@@ -625,7 +624,6 @@ function initGame() {
       handleDraw(e);
     }
   });
-
   discardPileEl.removeEventListener('click', handleDiscardClick);
   discardPileEl.removeEventListener('touchstart', handleDiscardClick);
   discardPileEl.addEventListener('click', handleDiscardClick);
@@ -636,7 +634,6 @@ function initGame() {
       handleDiscardClick(e);
     }
   });
-
   document.addEventListener('keydown', handleKeyboardNavigation);
 }
 
@@ -695,7 +692,6 @@ function updateHands(newCardIndex = -1) {
     cardEl.setAttribute('aria-hidden', 'true');
     computerHandEl.appendChild(cardEl);
   }
-
   playerHandEl.innerHTML = '';
   for (let i = 0; i < playerHand.length; i++) {
     const card = playerHand[i];
@@ -729,7 +725,6 @@ function updateHands(newCardIndex = -1) {
     });
     playerHandEl.appendChild(cardEl);
   }
-
   if (selectedCardIndex >= 0 && selectedCardIndex < playerHand.length) {
     playerHandEl.children[selectedCardIndex].classList.add('selected');
     playerHandEl.children[selectedCardIndex].focus();
@@ -799,8 +794,8 @@ function canPlayCard(card) {
     return card.color === currentColor;
   }
   return card.color === topCard.color ||
-    card.value === topCard.value ||
-    (['Skip', 'Reverse', 'Draw2'].includes(card.value) && card.value === topCard.value);
+         card.value === topCard.value ||
+         (['Skip', 'Reverse', 'Draw2'].includes(card.value) && card.value === topCard.value);
 }
 
 function hasValidColorCard(hand) {
@@ -1143,6 +1138,7 @@ function updateGameStateAfterPlay(card) {
     currentColor = card.color;
     currentValue = card.value;
   }
+
   switch (card.value) {
     case 'Skip':
       if (currentPlayer === 'player') {
@@ -1188,6 +1184,13 @@ function updateGameStateAfterPlay(card) {
       currentPlayer = currentPlayer === 'player' ? 'computer' : 'player';
       announce(currentPlayer === 'player' ? 'Giliran Anda!' : 'Giliran komputer.');
       break;
+  }
+
+  // Check if the current player is still the player and has exactly one card left
+  if (currentPlayer === 'player' && playerHand.length === 1) {
+    unoBtn.classList.remove('hidden');
+    unoBtn.focus();
+    announce('Anda memiliki satu kartu! Tekan U untuk memanggil UNO.');
   }
 }
 
