@@ -132,6 +132,7 @@
             50% {
                 box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.6), 0 15px 30px rgba(0, 0, 0, 0.3);
             }
+champions
         }
 
         body.dark .card.selected {
@@ -214,7 +215,7 @@
         }
 
         body.dark .game-stats {
-            background: rgba(30, 41 närmare, 59, 0.25);
+            background: rgba(30, 41, 59, 0.25);
             border: 1px solid rgba(250, 204, 21, 0.2);
         }
 
@@ -366,6 +367,21 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        .card-draw-animation {
+            animation: slideAndFade 0.5s ease-out forwards;
+        }
+
+        @keyframes slideAndFade {
+            0% {
+                transform: translate(var(--draw-x, 0), var(--draw-y, 0)) scale(1);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
             }
         }
 
@@ -728,7 +744,7 @@
             announce(`Permainan dimulai! Kartu awal: ${card.color} ${card.value}`);
         }
 
-        function updateHands() {
+        function updateHands(newCardIndex = -1) {
             computerHandEl.innerHTML = '';
             for (let i = 0; i < computerHand.length; i++) {
                 const cardEl = document.createElement('div');
@@ -746,6 +762,22 @@
                 cardEl.setAttribute('aria-label', `Kartu ${card.color} ${card.value.replace('_', ' ')}`);
                 const imageKey = card.color === 'wild' ? `wild_${card.value}` : `${card.color}_${card.value}`;
                 cardEl.style.backgroundImage = `url(${cardImages[imageKey]})`;
+                
+                if (i === newCardIndex) {
+                    const drawRect = drawPileEl.getBoundingClientRect();
+                    const playerHandRect = playerHandEl.getBoundingClientRect();
+                    const deltaX = drawRect.left - playerHandRect.left;
+                    const deltaY = drawRect.top - playerHandRect.top;
+                    cardEl.style.setProperty('--draw-x', `${deltaX}px`);
+                    cardEl.style.setProperty('--draw-y', `${deltaY}px`);
+                    cardEl.classList.add('card-draw-animation');
+                    setTimeout(() => {
+                        cardEl.classList.remove('card-draw-animation');
+                        cardEl.style.removeProperty('--draw-x');
+                        cardEl.style.removeProperty('--draw-y');
+                    }, 500);
+                }
+
                 cardEl.addEventListener('click', () => selectCard(i));
                 cardEl.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -931,7 +963,7 @@
             const card = deck.pop();
             playerHand.push(card);
             announce(`Anda mengambil kartu: ${card.color} ${card.value}`);
-            updateHands();
+            updateHands(playerHand.length - 1);
             if (canPlayCard(card)) {
                 const cardIndex = playerHand.length - 1;
                 selectCard(cardIndex);
@@ -1235,8 +1267,8 @@
                     reshuffleDeck();
                 }
                 playerHand.push(deck.pop());
+                updateHands(playerHand.length - 1);
             }
-            updateHands();
             updateCounts();
         }
 
