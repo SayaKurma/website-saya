@@ -862,24 +862,25 @@ function chooseColor(color) {
   colorChooserEl.classList.add('hidden');
   const card = discardPile[discardPile.length - 1];
   announce(`Warna dipilih: ${color}`);
-  updateGameStateAfterPlay(card);
+  selectedCardIndex = -1;
+  updateDiscardPile();
+  updateHands();
+  updateCounts();
   if (card.value === 'Wild_Draw4') {
     if (currentPlayer === 'player') {
       computerDecideBluff(card);
     } else {
       showBluffPrompt();
     }
+  } else {
+    updateGameStateAfterPlay(card);
+    if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
+      setTimeout(computerTurn, 1000);
+    }
   }
-  selectedCardIndex = -1;
-  updateDiscardPile();
-  updateHands();
-  updateCounts();
   if (playerHand.length === 0) {
     endGame();
     return;
-  }
-  if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
-    setTimeout(computerTurn, 1000);
   }
 }
 
@@ -1107,27 +1108,30 @@ function handleBluff() {
 function computerDecideBluff(card) {
   const bluffProbability = isBluffing ? 0.7 : 0.3;
   if (Math.random() < bluffProbability) {
-    showMessage('Komputer menuduh bluff! Tuduhan benar, ambil 4 kartu!');
+    showMessage('Komputer menuduh bluff!');
     if (isBluffing) {
+      showMessage('Komputer menuduh bluff! Tuduhan benar, ambil 4 kartu!');
       playerDrawCards(4);
-      currentPlayer = 'computer';
+      currentPlayer = 'player';
       announce('Komputer menuduh Anda bluffing dan benar! Anda mengambil 4 kartu.');
     } else {
       showMessage('Komputer menuduh bluff! Tuduhan salah, penalti 6 kartu!');
       computerDrawCards(6);
-      currentPlayer = 'computer';
+      currentPlayer = 'player';
       announce('Komputer menuduh Anda bluffing tetapi salah! Mereka mengambil 6 kartu.');
     }
     updateHands();
     updateCounts();
-    if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
-      setTimeout(computerTurn, 1000);
+  }
+  if (playerHand.length > 0 && computerHand.length > 0) {
+    updateCounts();
+    if (currentPlayer === 'player' && playerHasOneCard) {
+      unoBtn.classList.remove('hidden');
+      unoBtn.focus();
+      announce('Anda memiliki satu kartu! Tekan U untuk memanggil UNO.');
     }
   } else {
-    updateGameStateAfterPlay(card);
-    if (playerHand.length > 0 && computerHand.length > 0) {
-      setTimeout(computerTurn, 1000);
-    }
+    endGame();
   }
 }
 
@@ -1173,11 +1177,11 @@ function updateGameStateAfterPlay(card) {
       if (currentPlayer === 'player') {
         computerDrawCards(4);
         currentPlayer = 'player';
-        announce('Anda memainkan Wild Draw Four. Komputer mengambil 4 kartu dan dilewati.');
+        announce('Anda memainkan Wild Draw Four. Komputer mengambil 4 kartu. Giliran Anda lagi.');
       } else {
         playerDrawCards(4);
         currentPlayer = 'computer';
-        announce('Komputer memainkan Wild Draw Four. Anda mengambil 4 kartu dan dilewati.');
+        announce('Komputer memainkan Wild Draw Four. Anda mengambil 4 kartu. Giliran komputer lagi.');
       }
       break;
     default:
@@ -1186,7 +1190,6 @@ function updateGameStateAfterPlay(card) {
       break;
   }
 
-  // Check if the current player is still the player and has exactly one card left
   if (currentPlayer === 'player' && playerHand.length === 1) {
     unoBtn.classList.remove('hidden');
     unoBtn.focus();
