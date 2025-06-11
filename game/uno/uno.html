@@ -458,9 +458,6 @@ body.dark .title-glow {
       <button id="close-message" class="bg-white text-purple-800 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-all" aria-label="Lanjutkan permainan" tabindex="0">
         Lanjut
       </button>
-      <button id="bluff-btn" class="bg-yellow-600 text-black px-4 py-2 rounded-full font-semibold hover:bg-yellow-500 transition-all hidden" aria-label="Tuduh komputer bluffing" tabindex="0">
-        Tuduh BLUFF!
-      </button>
     </div>
   </div>
 </div>
@@ -560,7 +557,6 @@ let currentValue = '';
 let selectedCardIndex = -1;
 let unoCalled = false;
 let isDrawing = false;
-let isBluffing = false;
 let playerHasOneCard = false;
 
 const computerHandEl = document.getElementById('computer-hand');
@@ -573,7 +569,6 @@ const messageTextEl = document.getElementById('message-text');
 const playAgainBtn = document.getElementById('play-again-btn');
 const backBtn = document.getElementById('back-btn');
 const closeMessageBtn = document.getElementById('close-message');
-const bluffBtn = document.getElementById('bluff-btn');
 const colorChooserEl = document.getElementById('color-chooser');
 const colorButtons = document.querySelectorAll('.color-btn');
 const colors = ['red', 'blue', 'green', 'yellow'];
@@ -603,7 +598,6 @@ function initGame() {
   selectedCardIndex = -1;
   unoCalled = false;
   isDrawing = false;
-  isBluffing = false;
   playerHasOneCard = false;
   createDeck();
   shuffleDeck();
@@ -613,7 +607,6 @@ function initGame() {
   unoBtn.classList.add('hidden');
   colorChooserEl.classList.add('hidden');
   messageEl.classList.add('hidden');
-  bluffBtn.classList.add('hidden');
   drawPileEl.removeEventListener('click', handleDraw);
   drawPileEl.removeEventListener('touchstart', handleDraw);
   drawPileEl.addEventListener('click', handleDraw);
@@ -784,9 +777,6 @@ function handleKeyboardNavigation(e) {
 
 function canPlayCard(card) {
   if (card.color === 'wild') {
-    if (card.value === 'Wild_Draw4') {
-      return !playerHand.some(c => c.color === currentColor && c !== card && canPlayCard(c));
-    }
     return true;
   }
   const topCard = discardPile[discardPile.length - 1];
@@ -796,10 +786,6 @@ function canPlayCard(card) {
   return card.color === topCard.color ||
          card.value === topCard.value ||
          (['Skip', 'Reverse', 'Draw2'].includes(card.value) && card.value === topCard.value);
-}
-
-function hasValidColorCard(hand) {
-  return hand.some(card => card.color === currentColor && card.color !== 'wild');
 }
 
 function handleDiscardClick(e) {
@@ -829,10 +815,7 @@ function handleDiscardClick(e) {
     playerHand.splice(selectedCardIndex, 1);
     discardPile.push(card);
     announce(`Anda memainkan kartu ${card.color} ${card.value}`);
-    if (card.value === 'Wild_Draw4') {
-      isBluffing = hasValidColorCard(playerHand);
-      showColorChooser();
-    } else if (card.color === 'wild') {
+    if (card.color === 'wild') {
       showColorChooser();
     } else {
       updateGameStateAfterPlay(card);
@@ -866,21 +849,13 @@ function chooseColor(color) {
   updateDiscardPile();
   updateHands();
   updateCounts();
-  if (card.value === 'Wild_Draw4') {
-    if (currentPlayer === 'player') {
-      computerDecideBluff(card);
-    } else {
-      showBluffPrompt();
-    }
-  } else {
-    updateGameStateAfterPlay(card);
-    if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
-      setTimeout(computerTurn, 1000);
-    }
-  }
+  updateGameStateAfterPlay(card);
   if (playerHand.length === 0) {
     endGame();
     return;
+  }
+  if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
+    setTimeout(computerTurn, 1000);
   }
 }
 
@@ -928,9 +903,6 @@ function computerTurn() {
   currentPlayer = 'computer';
   updateCounts();
   let playableCards = computerHand.filter(card => canPlayCard(card));
-  if (playableCards.some(card => card.value === 'Wild_Draw4') && Math.random() < 0.3) {
-    playableCards = playableCards.filter(card => card.value !== 'Wild_Draw4');
-  }
   if (playableCards.length > 0) {
     const randomIndex = Math.floor(Math.random() * playableCards.length);
     const card = playableCards[randomIndex];
@@ -952,11 +924,7 @@ function computerTurn() {
       computerHand.splice(cardIndex, 1);
       discardPile.push(card);
       announce(`Komputer memainkan kartu ${card.color} ${card.value}`);
-      if (card.value === 'Wild_Draw4') {
-        isBluffing = hasValidColorCard(computerHand) && Math.random() < 0.5;
-        currentColor = computerChooseColor();
-        showBluffPrompt();
-      } else if (card.color === 'wild') {
+      if (card.color === 'wild') {
         currentColor = computerChooseColor();
         showMessage(`🤖 Komputer memainkan ${card.value.replace('_', ' ')} dan memilih warna ${currentColor}!`);
         updateGameStateAfterPlay(card);
@@ -1017,11 +985,7 @@ function computerTurn() {
         computerHand.splice(cardIndex, 1);
         discardPile.push(playedCard);
         announce(`Komputer memainkan kartu ${playedCard.color} ${playedCard.value}`);
-        if (playedCard.value === 'Wild_Draw4') {
-          isBluffing = hasValidColorCard(computerHand) && Math.random() < 0.5;
-          currentColor = computerChooseColor();
-          showBluffPrompt();
-        } else if (playedCard.color === 'wild') {
+        if (playedCard.color === 'wild') {
           currentColor = computerChooseColor();
           showMessage(`🤖 Komputer memainkan ${playedCard.value.replace('_', ' ')} dan memilih warna ${currentColor}!`);
           updateGameStateAfterPlay(playedCard);
@@ -1071,67 +1035,6 @@ function computerTurn() {
       }
       updateHands();
     }
-  }
-}
-
-function showBluffPrompt() {
-  messageTextEl.textContent = `🤖 Komputer memainkan +4 dan memilih warna ${currentColor}! Tuduh Bluff?`;
-  messageEl.classList.remove('hidden');
-  bluffBtn.classList.remove('hidden');
-  closeMessageBtn.classList.remove('hidden');
-  bluffBtn.focus();
-  announce(`Komputer memainkan +4 dan memilih warna ${currentColor}. Tekan B untuk menuduh bluff, atau Enter untuk melanjutkan.`);
-}
-
-function handleBluff() {
-  bluffBtn.classList.add('hidden');
-  if (currentPlayer === 'computer') {
-    if (isBluffing) {
-      showMessage('✅ Tuduhan benar! Komputer bluffing, mereka ambil 4 kartu!');
-      computerDrawCards(4);
-      currentPlayer = 'player';
-      announce('Tuduhan Anda benar! Komputer mengambil 4 kartu. Giliran Anda.');
-    } else {
-      showMessage('❌ Tuduhan salah! Anda ambil 6 kartu!');
-      playerDrawCards(6);
-      currentPlayer = 'player';
-      announce('Tuduhan Anda salah! Anda mengambil 6 kartu. Giliran Anda.');
-    }
-  }
-  updateHands();
-  updateCounts();
-  if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
-    setTimeout(computerTurn, 1000);
-  }
-}
-
-function computerDecideBluff(card) {
-  const bluffProbability = isBluffing ? 0.7 : 0.3;
-  if (Math.random() < bluffProbability) {
-    showMessage('Komputer menuduh bluff!');
-    if (isBluffing) {
-      showMessage('Komputer menuduh bluff! Tuduhan benar, ambil 4 kartu!');
-      playerDrawCards(4);
-      currentPlayer = 'player';
-      announce('Komputer menuduh Anda bluffing dan benar! Anda mengambil 4 kartu.');
-    } else {
-      showMessage('Komputer menuduh bluff! Tuduhan salah, penalti 6 kartu!');
-      computerDrawCards(6);
-      currentPlayer = 'player';
-      announce('Komputer menuduh Anda bluffing tetapi salah! Mereka mengambil 6 kartu.');
-    }
-    updateHands();
-    updateCounts();
-  }
-  if (playerHand.length > 0 && computerHand.length > 0) {
-    updateCounts();
-    if (currentPlayer === 'player' && playerHasOneCard) {
-      unoBtn.classList.remove('hidden');
-      unoBtn.focus();
-      announce('Anda memiliki satu kartu! Tekan U untuk memanggil UNO.');
-    }
-  } else {
-    endGame();
   }
 }
 
@@ -1272,24 +1175,19 @@ function showMessage(text) {
     playAgainBtn.classList.remove('hidden');
     backBtn.classList.remove('hidden');
     closeMessageBtn.classList.add('hidden');
-    bluffBtn.classList.add('hidden');
     launchConfetti();
     playAgainBtn.focus();
   } else {
     playAgainBtn.classList.add('hidden');
     backBtn.classList.add('hidden');
-    if (!text.includes('Tuduh Bluff')) {
-      closeMessageBtn.classList.remove('hidden');
-      bluffBtn.classList.add('hidden');
-      closeMessageBtn.focus();
-    }
+    closeMessageBtn.classList.remove('hidden');
+    closeMessageBtn.focus();
   }
   announce(text);
 }
 
 function closeMessage() {
   messageEl.classList.add('hidden');
-  bluffBtn.classList.add('hidden');
   if (selectedCardIndex >= 0 && selectedCardIndex < playerHand.length) {
     playerHandEl.children[selectedCardIndex].focus();
   } else {
@@ -1363,14 +1261,6 @@ closeMessageBtn.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
     closeMessage();
-  }
-});
-
-bluffBtn.addEventListener('click', handleBluff);
-bluffBtn.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault();
-    handleBluff();
   }
 });
 
