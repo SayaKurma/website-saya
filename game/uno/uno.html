@@ -558,6 +558,7 @@ let selectedCardIndex = -1;
 let unoCalled = false;
 let isDrawing = false;
 let playerHasOneCard = false;
+let waitingForPlayerConfirmation = false;
 
 const computerHandEl = document.getElementById('computer-hand');
 const playerHandEl = document.getElementById('player-hand');
@@ -599,6 +600,7 @@ function initGame() {
   unoCalled = false;
   isDrawing = false;
   playerHasOneCard = false;
+  waitingForPlayerConfirmation = false;
   createDeck();
   shuffleDeck();
   dealCards();
@@ -900,6 +902,9 @@ function computerChooseColor() {
 }
 
 function computerTurn() {
+  if (waitingForPlayerConfirmation) {
+    return;
+  }
   currentPlayer = 'computer';
   updateCounts();
   let playableCards = computerHand.filter(card => canPlayCard(card));
@@ -951,7 +956,7 @@ function computerTurn() {
             unoBtn.focus();
             announce('Anda memiliki satu kartu! Tekan U untuk memanggil UNO.');
           }
-        } else {
+        } else if (!waitingForPlayerConfirmation) {
           setTimeout(computerTurn, 1000);
         }
       } else {
@@ -1012,7 +1017,7 @@ function computerTurn() {
               unoBtn.focus();
               announce('Anda memiliki satu kartu! Tekan U untuk memanggil UNO.');
             }
-          } else {
+          } else if (!waitingForPlayerConfirmation) {
             setTimeout(computerTurn, 1000);
           }
         } else {
@@ -1084,7 +1089,9 @@ function updateGameStateAfterPlay(card) {
       } else {
         playerDrawCards(4);
         currentPlayer = 'computer';
-        announce('Komputer memainkan Wild Draw Four. Anda mengambil 4 kartu. Giliran komputer lagi.');
+        waitingForPlayerConfirmation = true;
+        showMessage(`🤖 Komputer memainkan Wild Draw Four dan memilih warna ${currentColor}. Anda mengambil 4 kartu.`);
+        announce(`Komputer memainkan Wild Draw Four. Anda mengambil 4 kartu. Klik Lanjut untuk melanjutkan.`);
       }
       break;
     default:
@@ -1188,6 +1195,10 @@ function showMessage(text) {
 
 function closeMessage() {
   messageEl.classList.add('hidden');
+  if (waitingForPlayerConfirmation && currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
+    waitingForPlayerConfirmation = false;
+    setTimeout(computerTurn, 1000);
+  }
   if (selectedCardIndex >= 0 && selectedCardIndex < playerHand.length) {
     playerHandEl.children[selectedCardIndex].focus();
   } else {
