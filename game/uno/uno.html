@@ -741,12 +741,19 @@ function updateDiscardPile() {
 function updateCounts() {
   if (playerHand.length === 1) {
     playerHasOneCard = true;
-    unoBtn.classList.remove('hidden');
-    unoBtn.focus();
-    announce('Anda memiliki satu kartu! Tekan U untuk memanggil UNO ketika giliran Anda kembali.');
   } else {
     playerHasOneCard = false;
     unoCalled = false;
+    unoBtn.classList.add('hidden');
+  }
+}
+
+function showUnoButton() {
+  if (playerHasOneCard && currentPlayer === 'player') {
+    unoBtn.classList.remove('hidden');
+    unoBtn.focus();
+    announce('Anda memiliki satu kartu! Tekan U untuk memanggil UNO.');
+  } else {
     unoBtn.classList.add('hidden');
   }
 }
@@ -828,6 +835,9 @@ function handleDiscardClick(e) {
       updateDiscardPile();
       updateHands();
       updateCounts();
+      if (['Skip', 'Reverse', 'Draw2', 'Wild_Draw4'].includes(card.value)) {
+        showUnoButton();
+      }
       if (playerHand.length === 0) {
         endGame();
         return;
@@ -855,6 +865,7 @@ function chooseColor(color) {
   updateHands();
   updateCounts();
   updateGameStateAfterPlay(card);
+  showUnoButton();
   if (playerHand.length === 0) {
     endGame();
     return;
@@ -957,6 +968,7 @@ function computerTurn() {
       if (playerHand.length > 0 && computerHand.length > 0) {
         if (currentPlayer === 'player') {
           updateCounts();
+          showUnoButton();
         } else if (!waitingForPlayerConfirmation) {
           setTimeout(computerTurn, 1000);
         }
@@ -1013,6 +1025,7 @@ function computerTurn() {
         if (playerHand.length > 0 && computerHand.length > 0) {
           if (currentPlayer === 'player') {
             updateCounts();
+            showUnoButton();
           } else if (!waitingForPlayerConfirmation) {
             setTimeout(computerTurn, 1000);
           }
@@ -1025,6 +1038,7 @@ function computerTurn() {
       if (playerHand.length > 0 && computerHand.length > 0) {
         currentPlayer = 'player';
         updateCounts();
+        showUnoButton();
         announce('Giliran Anda!');
       } else {
         endGame();
@@ -1090,12 +1104,6 @@ function updateGameStateAfterPlay(card) {
       announce(currentPlayer === 'player' ? 'Giliran Anda!' : 'Giliran komputer.');
       break;
   }
-
-  if (currentPlayer === 'player' && playerHand.length === 1) {
-    unoBtn.classList.remove('hidden');
-    unoBtn.focus();
-    announce('Anda memiliki satu kartu! Tekan U untuk memanggil UNO.');
-  }
 }
 
 function callUno() {
@@ -1124,6 +1132,7 @@ function computerMustDraw() {
   currentPlayer = 'player';
   announce('Komputer lupa memanggil UNO! Mengambil 2 kartu. Giliran Anda.');
   updateCounts();
+  showUnoButton();
 }
 
 function playerDrawCards(count) {
