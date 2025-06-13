@@ -572,6 +572,7 @@ let isDrawing = false;
 let playerHasOneCard = false;
 let waitingForPlayerConfirmation = false;
 let opponentActionCardCount = 0;
+let playerColorChoices = { red: 0, blue: 0, green: 0, yellow: 0 };
 
 const computerHandEl = document.getElementById('computer-hand');
 const playerHandEl = document.getElementById('player-hand');
@@ -589,7 +590,17 @@ const colors = ['red', 'blue', 'green', 'yellow'];
 const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Skip', 'Reverse', 'Draw2'];
 const wildCards = ['Wild', 'Wild_Draw4'];
 
-const memoCache = new Map();
+class MCTSNode {
+  constructor(state, parent = null, move = null) {
+    this.state = state;
+    this.parent = parent;
+    this.move = move;
+    this.children = [];
+    this.visits = 0;
+    this.wins = 0;
+    this.untriedMoves = getPossibleMoves(state.computerHand);
+  }
+}
 
 function debounce(func, wait) {
   let timeout;
@@ -617,7 +628,7 @@ function initGame() {
   playerHasOneCard = false;
   waitingForPlayerConfirmation = false;
   opponentActionCardCount = 0;
-  memoCache.clear();
+  playerColorChoices = { red: 0, blue: 0, green: 0, yellow: 0 };
   createDeck();
   shuffleDeck();
   dealCards();
@@ -876,6 +887,7 @@ function showColorChooser() {
 }
 
 function chooseColor(color) {
+  playerColorChoices[color]++;
   currentColor = color;
   colorChooserEl.classList.add('hidden');
   const card = discardPile[discardPile.length - 1];
@@ -929,61 +941,39 @@ function drawCard() {
 }
 
 function computerChooseColor() {
-  // Hitung distribusi warna di discard pile
-  const discardColorCounts = colors.reduce((acc, color) => {
-    acc[color] = discardPile.filter(card => card.color === color).length;
-    return acc;
-  }, { red: 0, blue: 0, green: 0, yellow: 0 });
-
-  // Hitung distribusi warna di tangan komputer
   const computerColorCounts = colors.reduce((acc, color) => {
     acc[color] = computerHand.filter(card => card.color === color).length;
     return acc;
   }, { red: 0, blue: 0, green: 0, yellow: 0 });
 
-  // Cari warna dengan jumlah terkecil di discard pile
-  let minDiscardCount = Infinity;
-  let leastFrequentColors = [];
-  for (const color of colors) {
-    if (discardColorCounts[color] < minDiscardCount) {
-      minDiscardCount = discardColorCounts[color];
-      leastFrequentColors = [color];
-    } else if (discardColorCounts[color] === minDiscardCount) {
-      leastFrequentColors.push(color);
+  const totalChoices = Object.values(playerColorChoices).reduce((sum, count) => sum + count, 0);
+  const colorPreferences = colors.reduce((acc, color) => {
+    acc[color] = totalChoices > 0 ? playerColorChoices[color] / totalChoices : 0.25;
+    return acc;
+  }, {});
+
+  const minPreference = Math.min(...Object.values(colorPreferences));
+  const leastPreferredColors = colors.filter(color => colorPreferences[color] === minPreference);
+
+  let maxComputerCount = -1;
+  let bestColor = leastPreferredColors[0];
+  for (const color of leastPreferredColors) {
+    if (computerColorCounts[color] > maxComputerCount) {
+      maxComputerCount = computerColorCounts[color];
+      bestColor = color;
     }
   }
 
-  // Jika ada warna yang jarang muncul di discard pile, pilih yang paling banyak di tangan komputer
-  if (leastFrequentColors.length > 0) {
-    let maxComputerCount = -1;
-    let bestColor = leastFrequentColors[0];
-    for (const color of leastFrequentColors) {
-      if (computerColorCounts[color] > maxComputerCount) {
-        maxComputerCount = computerColorCounts[color];
-        bestColor = color;
-      }
-    }
-    return bestColor;
+  if (maxComputerCount === 0) {
+    const maxCount = Math.max(...Object.values(computerColorCounts));
+    const mostFrequentColors = Object.keys(computerColorCounts).filter(color => computerColorCounts[color] === maxCount);
+    bestColor = mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
   }
 
-  // Jika semua warna memiliki distribusi seragam di discard pile, pilih warna terbanyak di tangan komputer
-  const maxCount = Math.max(...Object.values(computerColorCounts));
-  const mostFrequentColors = Object.keys(computerColorCounts).filter(color => computerColorCounts[color] === maxCount);
-  return mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
+  return bestColor;
 }
 
 function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
-  const stateKey = JSON.stringify({
-    computerHand: computerHand.map(c => `${c.color}_${c.value}`),
-    playerHandLength: playerHand.length,
-    currentColor,
-    currentValue,
-    opponentActionCardCount
-  });
-  if (memoCache.has(stateKey)) {
-    return memoCache.get(stateKey);
-  }
-
   if (computerHand.length === 0) return 10000;
   if (playerHand.length === 0) return -10000;
 
@@ -991,11 +981,11 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   score += (playerHand.length - computerHand.length) * 100;
 
   const actionCardWeights = {
-    'Wild_Draw4': 200,
-    'Wild': 150,
-    'Draw2': 100,
-    'Skip': 90,
-    'Reverse': 80
+    'Wild_Draw4': 300,
+    'Wild': 200,
+    'Draw2': 150,
+    'Skip': 120,
+    'Reverse': 100
   };
 
   const computerColorCounts = colors.reduce((acc, color) => {
@@ -1010,25 +1000,25 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   for (const card of computerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
     if (card.color === currentColor || card.value === currentValue) {
-      cardScore *= 1.5;
+      cardScore *= 1.8;
     }
     if (card.color === dominantColor && card.color !== 'wild') {
-      cardScore *= 1.2;
+      cardScore *= 1.5;
     }
     if (card.color === 'wild') {
       const hasPlayableNonWild = computerHand.some(c => canPlayCard(c) && c.color !== 'wild');
-      if (hasPlayableNonWild && computerHand.length > 3) {
-        cardScore *= 0.7;
+      if (hasPlayableNonWild && computerHand.length > 4) {
+        cardScore *= 0.5;
       }
       if (playerHand.length <= 2) {
-        cardScore *= 1.5;
+        cardScore *= 2.0;
       }
     }
-    if (playerHand.length <= 3 && ['Skip', 'Reverse'].includes(card.value)) {
-      cardScore *= 1.8;
+    if (playerHand.length <= 2 && ['Skip', 'Reverse', 'Draw2', 'Wild_Draw4'].includes(card.value)) {
+      cardScore *= 2.5;
     }
-    if (opponentActionCardCount > 3 && ['Wild_Draw4', 'Draw2'].includes(card.value)) {
-      cardScore *= 1.3;
+    if (opponentActionCardCount > 4 && ['Wild_Draw4', 'Draw2'].includes(card.value)) {
+      cardScore *= 1.5;
     }
     score += cardScore;
   }
@@ -1036,31 +1026,30 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   for (const card of playerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
     if (card.color === currentColor || card.value === currentValue) {
+      cardScore *= 1.8;
+    }
+    if (playerHand.length <= 2 && ['Draw2', 'Wild_Draw4', 'Skip', 'Reverse'].includes(card.value)) {
+      cardScore *= 2.5;
+    }
+    if (opponentActionCardCount > 4) {
       cardScore *= 1.5;
     }
-    if (playerHand.length <= 3 && ['Draw2', 'Wild_Draw4', 'Skip', 'Reverse'].includes(card.value)) {
-      cardScore *= 2;
-    }
-    if (opponentActionCardCount > 3) {
-      cardScore *= 1.2;
-    }
-    score -= cardScore * 0.9;
+    score -= cardScore * 0.95;
   }
 
-  if (computerHand.length === 1) score += 500;
-  if (playerHand.length === 1) score -= 500;
+  if (computerHand.length === 1) score += 800;
+  if (playerHand.length === 1) score -= 800;
 
   if (playerHand.length <= 2 && computerHand.some(card => card.value === 'Wild_Draw4')) {
-    score += 250;
+    score += 400;
   }
   if (computerHand.length <= 2 && computerHand.some(card => card.color === 'wild')) {
-    score -= 150;
+    score += 200;
   }
-  if (computerColorCounts[dominantColor] >= 3) {
-    score += 100;
+  if (computerColorCounts[dominantColor] >= 4) {
+    score += 150;
   }
 
-  memoCache.set(stateKey, score);
   return score;
 }
 
@@ -1182,51 +1171,89 @@ function applyMove(state, move, isComputer) {
   return newState;
 }
 
-function minimax(state, depth, alpha, beta, isMaximizing) {
-  const stateKey = JSON.stringify({
-    computerHand: state.computerHand.map(c => `${c.color}_${c.value}`),
-    playerHandLength: state.playerHand.length,
+function simulateRandomGame(state) {
+  let simState = {
+    computerHand: [...state.computerHand],
+    playerHand: [...state.playerHand],
+    discardPile: [...state.discardPile],
+    deck: [...state.deck],
     currentColor: state.currentColor,
     currentValue: state.currentValue,
-    opponentActionCardCount,
-    depth,
-    isMaximizing
-  });
-  if (memoCache.has(stateKey)) {
-    return memoCache.get(stateKey);
+    currentPlayer: state.currentPlayer
+  };
+
+  let maxSimSteps = 100;
+  while (simState.computerHand.length > 0 && simState.playerHand.length > 0 && maxSimSteps > 0) {
+    const isComputer = simState.currentPlayer === 'computer';
+    const moves = getPossibleMoves(isComputer ? simState.computerHand : simState.playerHand);
+    const move = moves[Math.floor(Math.random() * moves.length)];
+    simState = applyMove(simState, move, isComputer);
+    maxSimSteps--;
   }
 
-  if (depth === 0 || state.computerHand.length === 0 || state.playerHand.length === 0) {
-    const score = evaluateBoard(state.computerHand, state.playerHand, state.currentColor, state.currentValue);
-    memoCache.set(stateKey, score);
-    return score;
-  }
+  if (simState.computerHand.length === 0) return 1;
+  if (simState.playerHand.length === 0) return -1;
+  return evaluateBoard(simState.computerHand, simState.playerHand, simState.currentColor, simState.currentValue) / 10000;
+}
 
-  const moves = getPossibleMoves(isMaximizing ? state.computerHand : state.playerHand);
+function mcts(rootState, iterations) {
+  const root = new MCTSNode(rootState);
+  const explorationConstant = Math.sqrt(2);
 
-  if (isMaximizing) {
-    let maxEval = -Infinity;
-    for (const move of moves) {
-      const newState = applyMove(state, move, true);
-      const evalScore = minimax(newState, depth - 1, alpha, beta, false);
-      maxEval = Math.max(maxEval, evalScore);
-      alpha = Math.max(alpha, evalScore);
-      if (beta <= alpha) break;
+  for (let i = 0; i < iterations; i++) {
+    let node = root;
+
+    // Selection
+    while (node.untriedMoves.length === 0 && node.children.length > 0) {
+      node = selectChild(node, explorationConstant);
     }
-    memoCache.set(stateKey, maxEval);
-    return maxEval;
-  } else {
-    let minEval = Infinity;
-    for (const move of moves) {
-      const newState = applyMove(state, move, false);
-      const evalScore = minimax(newState, depth - 1, alpha, beta, true);
-      minEval = Math.min(minEval, evalScore);
-      beta = Math.min(beta, evalScore);
-      if (beta <= alpha) break;
+
+    // Expansion
+    if (node.untriedMoves.length > 0) {
+      const move = node.untriedMoves.splice(Math.floor(Math.random() * node.untriedMoves.length), 1)[0];
+      const newState = applyMove(node.state, move, true);
+      const childNode = new MCTSNode(newState, node, move);
+      node.children.push(childNode);
+      node = childNode;
     }
-    memoCache.set(stateKey, minEval);
-    return minEval;
+
+    // Simulation
+    let result = simulateRandomGame(node.state);
+
+    // Backpropagation
+    while (node !== null) {
+      node.visits++;
+      node.wins += result;
+      node = node.parent;
+    }
   }
+
+  let bestChild = null;
+  let bestVisits = -1;
+  for (const child of root.children) {
+    if (child.visits > bestVisits) {
+      bestVisits = child.visits;
+      bestChild = child;
+    }
+  }
+
+  return bestChild ? bestChild.move : null;
+}
+
+function selectChild(node, explorationConstant) {
+  let bestScore = -Infinity;
+  let bestChild = null;
+
+  for (const child of node.children) {
+    const score = (child.wins / child.visits) +
+                  explorationConstant * Math.sqrt(Math.log(node.visits) / child.visits);
+    if (score > bestScore) {
+      bestScore = score;
+      bestChild = child;
+    }
+  }
+
+  return bestChild;
 }
 
 function findBestMove() {
@@ -1240,25 +1267,12 @@ function findBestMove() {
     currentPlayer: 'computer'
   };
 
-  const moves = getPossibleMoves(computerHand);
-  let bestMove = moves[0];
-  let bestScore = -Infinity;
-  let maxDepth;
-  if (computerHand.length <= 3) {
-    maxDepth = 6;
-  } else if (computerHand.length <= 5) {
-    maxDepth = 4;
-  } else {
-    maxDepth = 2;
-  }
+  const iterations = computerHand.length <= 3 ? 10000 : computerHand.length <= 5 ? 5000 : 2000;
+  const bestMove = mcts(state, iterations);
 
-  for (const move of moves) {
-    const newState = applyMove(state, move, true);
-    const score = minimax(newState, maxDepth - 1, -Infinity, Infinity, false);
-    if (score > bestScore) {
-      bestScore = score;
-      bestMove = move;
-    }
+  if (!bestMove) {
+    const moves = getPossibleMoves(computerHand);
+    return moves[Math.floor(Math.random() * moves.length)];
   }
 
   return bestMove;
