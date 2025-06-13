@@ -1463,7 +1463,9 @@ function findBestMove() {
   };
 
   let iterations;
-  if (computerHand.length <= 3) {
+  if (computerHand.length === 1) {
+    iterations = 20000; // Lebih brutal di fase akhir
+  } else if (computerHand.length <= 3) {
     iterations = 15000;
   } else if (computerHand.length <= 5) {
     iterations = 7500;
@@ -1473,14 +1475,12 @@ function findBestMove() {
     iterations = 1500;
   }
 
+  const start = performance.now();
   const bestMove = mcts(state, iterations);
+  const end = performance.now();
+  console.log(`MCTS took ${Math.round(end - start)}ms with ${iterations} iterations`);
 
-  if (!bestMove) {
-    const moves = getPossibleMoves(computerHand);
-    return moves[Math.floor(Math.random() * moves.length)];
-  }
-
-  return bestMove;
+  return bestMove || getPossibleMoves(computerHand)[Math.floor(Math.random() * getPossibleMoves(computerHand).length)];
 }
 
 function computerTurn() {
