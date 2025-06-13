@@ -974,20 +974,20 @@ function computerChooseColor() {
   return bestColor;
 }
 
+const actionCardWeights = {
+  'Wild_Draw4': 600, // Increased from 400
+  'Wild': 300,   // Increased from 250
+  'Draw2': 400,  // Increased from 200
+  'Skip': 250,   // Increased from 150
+  'Reverse': 180 // Increased from 120
+};
+
 function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   if (computerHand.length === 0) return 10000;
   if (playerHand.length === 0) return -10000;
 
   let score = 0;
-  score += (playerHand.length - computerHand.length) * 150;
-
-  const actionCardWeights = {
-    'Wild_Draw4': 400,
-    'Wild': 250,
-    'Draw2': 200,
-    'Skip': 150,
-    'Reverse': 120
-  };
+  score += (playerHand.length - computerHand.length) * 200; // Increased from 150
 
   const computerColorCounts = colors.reduce((acc, color) => {
     acc[color] = computerHand.filter(card => card.color === color).length;
@@ -1005,7 +1005,7 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   }, {});
 
   if (computerColorCounts[dominantColor] > 0 && playerHand.some(c => c.color === dominantColor)) {
-    score -= 50;
+    score -= 80; // Increased from 50
   }
 
   const chainPotential = colors.reduce((acc, color) => {
@@ -1014,56 +1014,60 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   }, { red: 0, blue: 0, green: 0, yellow: 0 });
 
   for (const card of computerHand) {
-    let cardScore = actionCardWeights[card.value] || 20;
+    let cardScore = actionCardWeights[card.value] || 30; // Increased base score from 20
 
     if (card.color === currentColor || card.value === currentValue) {
-      cardScore *= 2.0;
+      cardScore *= 2.5; // Increased from 2.0
     }
 
     if (card.color === dominantColor && card.color !== 'wild') {
-      cardScore *= 1.7;
+      cardScore *= 1.8; // Increased from 1.7
     }
 
     if (computerHand.length <= 5 && card.color !== 'wild') {
       const sameColorCount = computerHand.filter(c => c.color === card.color && c !== card).length;
       if (sameColorCount >= 1) {
-        cardScore += 80 * sameColorCount;
+        cardScore += 100 * sameColorCount; // Increased from 80
       }
     }
 
     if (card.color === 'wild') {
       const hasPlayableNonWild = computerHand.some(c => canPlayCard(c) && c.color !== 'wild');
       if (hasPlayableNonWild && computerHand.length > 4) {
-        cardScore *= 0.3;
+        cardScore *= 0.2; // Decreased from 0.3
       }
       if (playerHand.length <= 2) {
-        cardScore *= 3.0;
+        cardScore *= 5.0; // Increased from 3.0
       }
       if (computerHand.length <= 3) {
-        cardScore *= 2.5;
+        cardScore *= 3.0; // Increased from 2.5
       }
     }
 
-    if (playerHand.length <= 2 && ['Skip', 'Reverse', 'Draw2', 'Wild_Draw4'].includes(card.value)) {
-      cardScore *= 3.5;
+    // Aggressive action card prioritization when player has 2 or fewer cards
+    if (playerHand.length <= 2 && ['Draw2', 'Wild_Draw4'].includes(card.value)) {
+      cardScore *= 6.0; // Significantly increased from 3.5
+      if (card.value === 'Wild_Draw4') {
+        cardScore += 800; // Additional bonus for Wild_Draw4
+      } else {
+        cardScore += 400; // Additional bonus for Draw2
+      }
+    } else if (playerHand.length <= 2 && ['Skip', 'Reverse'].includes(card.value)) {
+      cardScore *= 4.0; // Increased from 3.5
     }
 
     if (card.value === 'Reverse' && playerHand.length <= 2 && computerHand.length <= 3) {
-      cardScore *= 1.8;
+      cardScore *= 2.2; // Increased from 1.8
     }
 
     if (opponentActionCardCount > 4 && ['Wild_Draw4', 'Draw2'].includes(card.value)) {
-      cardScore *= 2.0;
+      cardScore *= 2.5; // Increased from 2.0
     }
 
     if (card.color === 'wild') {
       colors.forEach(color => {
         if (colorPreferences[color] > 0.3) {
-          if (card.value === 'Wild_Draw4') {
-            cardScore -= 20 * colorPreferences[color];
-          } else {
-            cardScore -= 50 * colorPreferences[color];
-          }
+          cardScore -= 30 * colorPreferences[color]; // Adjusted from 20/50
         }
       });
     }
@@ -1072,45 +1076,44 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   }
 
   for (const card of playerHand) {
-    let cardScore = actionCardWeights[card.value] || 20;
+    let cardScore = actionCardWeights[card.value] || 30; // Increased from 20
     if (card.color === currentColor || card.value === currentValue) {
-      cardScore *= 2.0;
+      cardScore *= 2.5; // Increased from 2.0
     }
     if (playerHand.length <= 2 && ['Draw2', 'Wild_Draw4', 'Skip', 'Reverse'].includes(card.value)) {
-      cardScore *= 3.0;
+      cardScore *= 3.5; // Increased from 3.0
     }
     if (opponentActionCardCount > 4) {
-      cardScore *= 1.7;
+      cardScore *= 2.0; // Increased from 1.7
     }
-    score -= cardScore * 1.1;
+    score -= cardScore * 1.2; // Increased penalty from 1.1
   }
 
   if (computerHand.length <= 5) {
     Object.keys(chainPotential).forEach(color => {
       if (chainPotential[color] >= 2) {
-        score += 150 * (chainPotential[color] - 1);
+        score += 200 * (chainPotential[color] - 1); // Increased from 150
       }
     });
   }
 
-  if (computerHand.length === 1) score += 1000;
-  if (playerHand.length === 1) score -= 1000;
+  if (computerHand.length === 1) score += 1500; // Increased from 1000
+  if (playerHand.length === 1) score -= 1500; // Increased from 1000
   if (playerHand.length <= 2 && computerHand.some(card => card.value === 'Wild_Draw4')) {
-    score += 600;
+    score += 1000; // Increased from 600
   }
   if (computerHand.length <= 2 && computerHand.some(card => card.color === 'wild')) {
-    score += 300;
+    score += 500; // Increased from 300
   }
   if (computerColorCounts[dominantColor] >= 4) {
-    score += 200;
+    score += 300; // Increased from 200
   }
   if (totalChoices > 0 && computerColorCounts[dominantColor] > 0) {
-    score -= 100 * colorPreferences[dominantColor];
+    score -= 150 * colorPreferences[dominantColor]; // Increased from 100
   }
 
-  // Penalti jika pemain draw terlalu banyak
   if (playerHand.length > 10) {
-    score += 50 * (playerHand.length - 10);
+    score += 80 * (playerHand.length - 10); // Increased from 50
   }
 
   return score;
