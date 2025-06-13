@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Permainan UNO Modern</title>
+<title>Permainan UNO Modern dengan AlphaZero</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -485,23 +485,21 @@ body.dark .title-glow {
   </div>
 </div>
 <script>
+// Theme toggle functionality
 const themeToggle = document.getElementById('themeToggle');
 const themeIcon = themeToggle.querySelector('i');
 themeToggle.addEventListener('click', () => {
   document.body.classList.toggle('dark');
   if (document.body.classList.contains('dark')) {
-    themeIcon.classList.remove('fa-sun');
-    themeIcon.classList.add('fa-moon');
-    themeIcon.classList.remove('text-yellow-500');
-    themeIcon.classList.add('text-primaryDark');
+    themeIcon.classList.remove('fa-sun', 'text-yellow-500');
+    themeIcon.classList.add('fa-moon', 'text-primaryDark');
   } else {
-    themeIcon.classList.remove('fa-moon');
-    themeIcon.classList.add('fa-sun');
-    themeIcon.classList.remove('text-primaryDark');
-    themeIcon.classList.add('text-yellow-500');
+    themeIcon.classList.remove('fa-moon', 'text-primaryDark');
+    themeIcon.classList.add('fa-sun', 'text-yellow-500');
   }
 });
 
+// Card image mappings
 const cardImages = {
   'red_0': 'https://unocardinfo.victorhomedia.com/graphics/uno_card-red0.png',
   'red_1': 'https://unocardinfo.victorhomedia.com/graphics/uno_card-red1.png',
@@ -559,6 +557,7 @@ const cardImages = {
   'wild_Wild_Draw4': 'https://unocardinfo.victorhomedia.com/graphics/uno_card-wilddraw4.png'
 };
 
+// Game state variables
 let deck = [];
 let discardPile = [];
 let playerHand = [];
@@ -590,18 +589,109 @@ const colors = ['red', 'blue', 'green', 'yellow'];
 const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Skip', 'Reverse', 'Draw2'];
 const wildCards = ['Wild', 'Wild_Draw4'];
 
-class MCTSNode {
-  constructor(state, parent = null, move = null) {
+// Neural Network Implementation
+class NeuralNetwork {
+  constructor() {
+    this.weights = [];
+    this.biases = [];
+    this.layers = [108 + 108 + 4 + 13, 128, 64, 1 + 112]; // Input: deck + hands + color + value, Output: value + policy
+    this.initWeights();
+  }
+
+  initWeights() {
+    for (let i = 0; i < this.layers.length - 1; i++) {
+      const w = [];
+      for (let j = 0; j < this.layers[i]; j++) {
+        const row = [];
+        for (let k = 0; k < this.layers[i + 1]; k++) {
+          row.push(Math.random() * 0.1 - 0.05);
+        }
+        w.push(row);
+      }
+      this.weights.push(w);
+      this.biases.push(new Array(this.layers[i + 1]).fill(0));
+    }
+  }
+
+  relu(x) {
+    return Math.max(0, x);
+  }
+
+  softmax(x) {
+    const max = Math.max(...x);
+    const exp = x.map(v => Math.exp(v - max));
+    const sum = exp.reduce((a, b) => a + b, 0);
+    return exp.map(v => v / sum);
+  }
+
+  forward(input) {
+    let x = input;
+    for (let i = 0; i < this.weights.length; i++) {
+      const next = new Array(this.layers[i + 1]).fill(0);
+      for (let j = 0; j < this.layers[i]; j++) {
+        for (let k = 0; k < this.layers[i + 1]; k++) {
+          next[k] += x[j] * this.weights[i][j][k];
+        }
+      }
+      for (let k = 0; k < this.layers[i + 1]; k++) {
+        next[k] += this.biases[i][k];
+        if (i < this.weights.length - 1) {
+          next[k] = this.relu(next[k]);
+        }
+      }
+      x = next;
+    }
+    const value = x[0];
+    const policy = this.softmax(x.slice(1));
+    return { value, policy };
+  }
+
+  encodeState(state) {
+    const input = new Array(this.layers[0]).fill(0);
+    const cardMap = {};
+    let idx = 0;
+    for (const c of colors) {
+      for (const v of [...values, ...wildCards]) {
+        cardMap[`${c}_${v}`] = idx++;
+      }
+    }
+    for (const card of state.deck) {
+      input[cardMap[`${card.color}_${card.value}`]]++;
+    }
+    for (const card of state.computerHand) {
+      input[108 + cardMap[`${card.color}_${card.value}`]]++;
+    }
+    for (const card of state.playerHand) {
+      input[108 + cardMap[`${card.color}_${card.value}`]]++;
+    }
+    if (state.currentColor) {
+      input[216 + colors.indexOf(state.currentColor)] = 1;
+    }
+    if (state.currentValue) {
+      const valIdx = [...values, ...wildCards].indexOf(state.currentValue);
+      input[220 + valIdx] = 1;
+    }
+    return input;
+  }
+}
+
+const nn = new NeuralNetwork();
+
+// AlphaZero Node
+class AlphaZeroNode {
+  constructor(state, parent = null, move = null, prior = 0) {
     this.state = state;
     this.parent = parent;
     this.move = move;
     this.children = [];
     this.visits = 0;
-    this.wins = 0;
+    this.valueSum = 0;
+    this.prior = prior;
     this.untriedMoves = getPossibleMoves(state.computerHand);
   }
 }
 
+// Utility Functions
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -673,11 +763,6 @@ function createDeck() {
     for (let i = 0; i < 4; i++) {
       deck.push({ color: 'wild', value });
     }
-  }
-  const expectedCardCount = 108;
-  if (deck.length !== expectedCardCount) {
-    console.error(`Kesalahan: Jumlah kartu ${deck.length}, seharusnya ${expectedCardCount}`);
-    throw new Error(`Jumlah kartu tidak sesuai: ${deck.length} kartu`);
   }
 }
 
@@ -819,16 +904,10 @@ function handleKeyboardNavigation(e) {
 }
 
 function canPlayCard(card) {
-  if (card.color === 'wild') {
-    return true;
-  }
+  if (card.color === 'wild') return true;
   const topCard = discardPile[discardPile.length - 1];
-  if (topCard.color === 'wild') {
-    return card.color === currentColor;
-  }
-  return card.color === topCard.color ||
-         card.value === topCard.value ||
-         (['Skip', 'Reverse', 'Draw2'].includes(card.value) && card.value === topCard.value);
+  if (topCard.color === 'wild') return card.color === currentColor;
+  return card.color === topCard.color || card.value === topCard.value;
 }
 
 function handleDiscardClick(e) {
@@ -873,7 +952,7 @@ function handleDiscardClick(e) {
         endGame();
         return;
       }
-      if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
+      if (currentPlayer === 'computer') {
         setTimeout(computerTurn, 1000);
       }
     }
@@ -883,7 +962,7 @@ function handleDiscardClick(e) {
 function showColorChooser() {
   colorChooserEl.classList.remove('hidden');
   colorButtons[0].focus();
-  announce('Pilih warna untuk kartu Wild. Gunakan panah untuk navigasi, Enter untuk memilih.');
+  announce('Pilih warna untuk kartu Wild.');
 }
 
 function chooseColor(color) {
@@ -902,7 +981,7 @@ function chooseColor(color) {
     endGame();
     return;
   }
-  if (currentPlayer === 'computer' && playerHand.length > 0 && computerHand.length > 0) {
+  if (currentPlayer === 'computer') {
     setTimeout(computerTurn, 1000);
   }
 }
@@ -930,8 +1009,7 @@ function drawCard() {
   announce(`Anda mengambil kartu: ${card.color} ${card.value}`);
   updateHands(playerHand.length - 1);
   if (canPlayCard(card)) {
-    const cardIndex = playerHand.length - 1;
-    selectCard(cardIndex);
+    selectCard(playerHand.length - 1);
   } else {
     currentPlayer = 'computer';
     updateCounts();
@@ -941,123 +1019,33 @@ function drawCard() {
 }
 
 function computerChooseColor() {
-  const computerColorCounts = colors.reduce((acc, color) => {
-    acc[color] = computerHand.filter(card => card.color === color).length;
-    return acc;
-  }, { red: 0, blue: 0, green: 0, yellow: 0 });
-
-  const totalChoices = Object.values(playerColorChoices).reduce((sum, count) => sum + count, 0);
-  const colorPreferences = colors.reduce((acc, color) => {
-    acc[color] = totalChoices > 0 ? playerColorChoices[color] / totalChoices : 0.25;
-    return acc;
-  }, {});
-
-  const minPreference = Math.min(...Object.values(colorPreferences));
-  const leastPreferredColors = colors.filter(color => colorPreferences[color] === minPreference);
-
-  let maxComputerCount = -1;
-  let bestColor = leastPreferredColors[0];
-  for (const color of leastPreferredColors) {
-    if (computerColorCounts[color] > maxComputerCount) {
-      maxComputerCount = computerColorCounts[color];
+  const state = {
+    computerHand: [...computerHand],
+    playerHand: [...playerHand],
+    discardPile: [...discardPile],
+    deck: [...deck],
+    currentColor,
+    currentValue,
+    currentPlayer: 'computer'
+  };
+  const input = nn.encodeState(state);
+  const { policy } = nn.forward(input);
+  const colorProbs = policy.slice(108, 112);
+  let maxProb = -1;
+  let bestColor = colors[0];
+  colors.forEach((color, i) => {
+    if (colorProbs[i] > maxProb) {
+      maxProb = colorProbs[i];
       bestColor = color;
     }
-  }
-
-  if (maxComputerCount === 0) {
-    const maxCount = Math.max(...Object.values(computerColorCounts));
-    const mostFrequentColors = Object.keys(computerColorCounts).filter(color => computerColorCounts[color] === maxCount);
-    bestColor = mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
-  }
-
+  });
   return bestColor;
-}
-
-function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
-  if (computerHand.length === 0) return 10000;
-  if (playerHand.length === 0) return -10000;
-
-  let score = 0;
-  score += (playerHand.length - computerHand.length) * 100;
-
-  const actionCardWeights = {
-    'Wild_Draw4': 300,
-    'Wild': 200,
-    'Draw2': 150,
-    'Skip': 120,
-    'Reverse': 100
-  };
-
-  const computerColorCounts = colors.reduce((acc, color) => {
-    acc[color] = computerHand.filter(card => card.color === color).length;
-    return acc;
-  }, {});
-
-  const dominantColor = Object.keys(computerColorCounts).reduce((a, b) =>
-    computerColorCounts[a] > computerColorCounts[b] ? a : b
-  );
-
-  for (const card of computerHand) {
-    let cardScore = actionCardWeights[card.value] || 20;
-    if (card.color === currentColor || card.value === currentValue) {
-      cardScore *= 1.8;
-    }
-    if (card.color === dominantColor && card.color !== 'wild') {
-      cardScore *= 1.5;
-    }
-    if (card.color === 'wild') {
-      const hasPlayableNonWild = computerHand.some(c => canPlayCard(c) && c.color !== 'wild');
-      if (hasPlayableNonWild && computerHand.length > 4) {
-        cardScore *= 0.5;
-      }
-      if (playerHand.length <= 2) {
-        cardScore *= 2.0;
-      }
-    }
-    if (playerHand.length <= 2 && ['Skip', 'Reverse', 'Draw2', 'Wild_Draw4'].includes(card.value)) {
-      cardScore *= 2.5;
-    }
-    if (opponentActionCardCount > 4 && ['Wild_Draw4', 'Draw2'].includes(card.value)) {
-      cardScore *= 1.5;
-    }
-    score += cardScore;
-  }
-
-  for (const card of playerHand) {
-    let cardScore = actionCardWeights[card.value] || 20;
-    if (card.color === currentColor || card.value === currentValue) {
-      cardScore *= 1.8;
-    }
-    if (playerHand.length <= 2 && ['Draw2', 'Wild_Draw4', 'Skip', 'Reverse'].includes(card.value)) {
-      cardScore *= 2.5;
-    }
-    if (opponentActionCardCount > 4) {
-      cardScore *= 1.5;
-    }
-    score -= cardScore * 0.95;
-  }
-
-  if (computerHand.length === 1) score += 800;
-  if (playerHand.length === 1) score -= 800;
-
-  if (playerHand.length <= 2 && computerHand.some(card => card.value === 'Wild_Draw4')) {
-    score += 400;
-  }
-  if (computerHand.length <= 2 && computerHand.some(card => card.color === 'wild')) {
-    score += 200;
-  }
-  if (computerColorCounts[dominantColor] >= 4) {
-    score += 150;
-  }
-
-  return score;
 }
 
 function getPossibleMoves(hand) {
   const moves = [];
   const topCard = discardPile[discardPile.length - 1];
   const currentTopColor = topCard.color === 'wild' ? currentColor : topCard.color;
-
   for (let i = 0; i < hand.length; i++) {
     const card = hand[i];
     if (canPlayCard(card)) {
@@ -1070,11 +1058,9 @@ function getPossibleMoves(hand) {
       }
     }
   }
-
   if (moves.length === 0) {
     moves.push({ type: 'draw' });
   }
-
   return moves;
 }
 
@@ -1088,32 +1074,22 @@ function applyMove(state, move, isComputer) {
     currentValue: state.currentValue,
     currentPlayer: state.currentPlayer
   };
-
   if (move.type === 'draw') {
     if (newState.deck.length === 0) {
       const topCard = newState.discardPile.pop();
       newState.deck = [...newState.discardPile];
-      for (let i = newState.deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newState.deck[i], newState.deck[j]] = [newState.deck[j], newState.deck[i]];
-      }
+      shuffleDeck();
       newState.discardPile = [topCard];
     }
     const drawnCard = newState.deck.pop();
-    if (isComputer) {
-      newState.computerHand.push(drawnCard);
-    } else {
-      newState.playerHand.push(drawnCard);
-    }
+    (isComputer ? newState.computerHand : newState.playerHand).push(drawnCard);
     newState.currentPlayer = isComputer ? 'player' : 'computer';
     return newState;
   }
-
   const hand = isComputer ? newState.computerHand : newState.playerHand;
   const card = hand[move.cardIndex];
   newState.discardPile.push(card);
   hand.splice(move.cardIndex, 1);
-
   if (card.color === 'wild') {
     newState.currentColor = move.colorChoice;
     newState.currentValue = '';
@@ -1121,7 +1097,6 @@ function applyMove(state, move, isComputer) {
     newState.currentColor = card.color;
     newState.currentValue = card.value;
   }
-
   switch (card.value) {
     case 'Skip':
     case 'Reverse':
@@ -1133,10 +1108,7 @@ function applyMove(state, move, isComputer) {
         if (newState.deck.length === 0) {
           const topCard = newState.discardPile.pop();
           newState.deck = [...newState.discardPile];
-          for (let j = newState.deck.length - 1; j > 0; j--) {
-            const k = Math.floor(Math.random() * (j + 1));
-            [newState.deck[j], newState.deck[k]] = [newState.deck[k], newState.deck[j]];
-          }
+          shuffleDeck();
           newState.discardPile = [topCard];
         }
         if (newState.deck.length > 0) {
@@ -1151,10 +1123,7 @@ function applyMove(state, move, isComputer) {
         if (newState.deck.length === 0) {
           const topCard = newState.discardPile.pop();
           newState.deck = [...newState.discardPile];
-          for (let j = newState.deck.length - 1; j > 0; j--) {
-            const k = Math.floor(Math.random() * (j + 1));
-            [newState.deck[j], newState.deck[k]] = [newState.deck[k], newState.deck[j]];
-          }
+          shuffleDeck();
           newState.discardPile = [topCard];
         }
         if (newState.deck.length > 0) {
@@ -1167,67 +1136,43 @@ function applyMove(state, move, isComputer) {
       newState.currentPlayer = isComputer ? 'player' : 'computer';
       break;
   }
-
   return newState;
 }
 
-function simulateRandomGame(state) {
-  let simState = {
-    computerHand: [...state.computerHand],
-    playerHand: [...state.playerHand],
-    discardPile: [...state.discardPile],
-    deck: [...state.deck],
-    currentColor: state.currentColor,
-    currentValue: state.currentValue,
-    currentPlayer: state.currentPlayer
-  };
-
-  let maxSimSteps = 100;
-  while (simState.computerHand.length > 0 && simState.playerHand.length > 0 && maxSimSteps > 0) {
-    const isComputer = simState.currentPlayer === 'computer';
-    const moves = getPossibleMoves(isComputer ? simState.computerHand : simState.playerHand);
-    const move = moves[Math.floor(Math.random() * moves.length)];
-    simState = applyMove(simState, move, isComputer);
-    maxSimSteps--;
-  }
-
-  if (simState.computerHand.length === 0) return 1;
-  if (simState.playerHand.length === 0) return -1;
-  return evaluateBoard(simState.computerHand, simState.playerHand, simState.currentColor, simState.currentValue) / 10000;
-}
-
-function mcts(rootState, iterations) {
-  const root = new MCTSNode(rootState);
-  const explorationConstant = Math.sqrt(2);
-
+function alphaZeroSearch(rootState, iterations) {
+  const root = new AlphaZeroNode(rootState);
+  const input = nn.encodeState(rootState);
+  const { policy } = nn.forward(input);
+  const moveMap = {};
+  let policyIdx = 0;
+  const possibleMoves = getPossibleMoves(rootState.computerHand);
+  possibleMoves.forEach((move, i) => {
+    if (move.type === 'play') {
+      const cardKey = `${move.card.color}_${move.card.value}`;
+      moveMap[i] = policyIdx++;
+      if (move.card.color === 'wild') {
+        colors.forEach(() => policyIdx++);
+      }
+    } else {
+      moveMap[i] = 108;
+    }
+  });
+  possibleMoves.forEach((move, i) => {
+    root.children.push(new AlphaZeroNode(applyMove(rootState, move, true), root, move, policy[moveMap[i]]));
+  });
+  const explorationConstant = 1.0;
   for (let i = 0; i < iterations; i++) {
     let node = root;
-
-    // Selection
-    while (node.untriedMoves.length === 0 && node.children.length > 0) {
+    while (node.children.length > 0) {
       node = selectChild(node, explorationConstant);
     }
-
-    // Expansion
-    if (node.untriedMoves.length > 0) {
-      const move = node.untriedMoves.splice(Math.floor(Math.random() * node.untriedMoves.length), 1)[0];
-      const newState = applyMove(node.state, move, true);
-      const childNode = new MCTSNode(newState, node, move);
-      node.children.push(childNode);
-      node = childNode;
-    }
-
-    // Simulation
-    let result = simulateRandomGame(node.state);
-
-    // Backpropagation
+    const { value } = nn.forward(nn.encodeState(node.state));
     while (node !== null) {
       node.visits++;
-      node.wins += result;
+      node.valueSum += value;
       node = node.parent;
     }
   }
-
   let bestChild = null;
   let bestVisits = -1;
   for (const child of root.children) {
@@ -1236,24 +1181,113 @@ function mcts(rootState, iterations) {
       bestChild = child;
     }
   }
-
-  return bestChild ? bestChild.move : null;
+  return bestChild ? bestChild.move : possibleMoves[0];
 }
 
-function selectChild(node, explorationConstant) {
+function selectChild(node, c) {
   let bestScore = -Infinity;
   let bestChild = null;
-
+  const parentVisits = Math.log(node.visits + 1);
   for (const child of node.children) {
-    const score = (child.wins / child.visits) +
-                  explorationConstant * Math.sqrt(Math.log(node.visits) / child.visits);
+    const q = child.visits > 0 ? child.valueSum / child.visits : 0;
+    const u = c * child.prior * Math.sqrt(parentVisits) / (1 + child.visits);
+    const score = q + u;
     if (score > bestScore) {
       bestScore = score;
       bestChild = child;
     }
   }
-
   return bestChild;
+}
+
+function selfPlay() {
+  const gameStates = [];
+  const policies = [];
+  const outcomes = [];
+  let state = {
+    computerHand: [],
+    playerHand: [],
+    discardPile: [],
+    deck: [],
+    currentColor: '',
+    currentValue: '',
+    currentPlayer: 'player'
+  };
+  initGame();
+  while (playerHand.length > 0 && computerHand.length > 0) {
+    state = {
+      computerHand: [...computerHand],
+      playerHand: [...playerHand],
+      discardPile: [...discardPile],
+      deck: [...deck],
+      currentColor,
+      currentValue,
+      currentPlayer
+    };
+    const input = nn.encodeState(state);
+    const { policy } = nn.forward(input);
+    const moveProbs = new Array(112).fill(0);
+    const possibleMoves = getPossibleMoves(state.computerHand);
+    const moveMap = {};
+    let policyIdx = 0;
+    possibleMoves.forEach((move, i) => {
+      if (move.type === 'play') {
+        moveMap[i] = policyIdx++;
+        if (move.card.color === 'wild') {
+          colors.forEach(() => moveProbs[policyIdx++] = policy[policyIdx]);
+        }
+      } else {
+        moveMap[i] = 108;
+      }
+      moveProbs[moveMap[i]] = policy[moveMap[i]];
+    });
+    const moveIdx = possibleMoves.reduce((maxIdx, move, i) =>
+      moveProbs[moveMap[i]] > moveProbs[moveMap[maxIdx]] ? i : maxIdx, 0);
+    const move = possibleMoves[moveIdx];
+    gameStates.push(input);
+    policies.push(moveProbs);
+    state = applyMove(state, move, state.currentPlayer === 'computer');
+    computerHand = state.computerHand;
+    playerHand = state.playerHand;
+    discardPile = state.discardPile;
+    deck = state.deck;
+    currentColor = state.currentColor;
+    currentValue = state.currentValue;
+    currentPlayer = state.currentPlayer;
+  }
+  const outcome = computerHand.length === 0 ? 1 : -1;
+  outcomes.push(outcome);
+  return { gameStates, policies, outcomes };
+}
+
+function trainNeuralNetwork() {
+  const { gameStates, policies, outcomes } = selfPlay();
+  const learningRate = 0.01;
+  for (let i = 0; i < gameStates.length; i++) {
+    const input = gameStates[i];
+    const targetPolicy = policies[i];
+    const targetValue = outcomes[0];
+    const { value, policy } = nn.forward(input);
+    const valueError = targetValue - value;
+    const policyError = targetPolicy.map((t, j) => t - policy[j]);
+    let delta = new Array(nn.layers[nn.layers.length - 1]).fill(0);
+    delta[0] = valueError;
+    for (let j = 0; j < policyError.length; j++) {
+      delta[j + 1] = policyError[j];
+    }
+    for (let l = nn.weights.length - 1; l >= 0; l--) {
+      const prevDelta = new Array(nn.layers[l]).fill(0);
+      for (let j = 0; j < nn.layers[l]; j++) {
+        for (let k = 0; k < nn.layers[l + 1]; k++) {
+          nn.weights[l][j][k] += learningRate * input[j] * delta[k];
+          nn.biases[l][k] += learningRate * delta[k];
+          prevDelta[j] += delta[k] * nn.weights[l][j][k];
+        }
+      }
+      delta = prevDelta.map(d => d > 0 ? d : 0);
+      input = nn.forward(input).value > 0 ? input.map(x => x > 0 ? x : 0) : input;
+    }
+  }
 }
 
 function findBestMove() {
@@ -1266,30 +1300,17 @@ function findBestMove() {
     currentValue,
     currentPlayer: 'computer'
   };
-
-  const iterations = computerHand.length <= 3 ? 10000 : computerHand.length <= 5 ? 5000 : 2000;
-  const bestMove = mcts(state, iterations);
-
-  if (!bestMove) {
-    const moves = getPossibleMoves(computerHand);
-    return moves[Math.floor(Math.random() * moves.length)];
-  }
-
-  return bestMove;
+  const iterations = computerHand.length <= 3 ? 800 : 400;
+  return alphaZeroSearch(state, iterations);
 }
 
 function computerTurn() {
-  if (waitingForPlayerConfirmation) {
-    return;
-  }
+  if (waitingForPlayerConfirmation) return;
   currentPlayer = 'computer';
   updateCounts();
   const bestMove = findBestMove();
-
   if (bestMove.type === 'draw') {
-    if (deck.length === 0) {
-      reshuffleDeck();
-    }
+    if (deck.length === 0) reshuffleDeck();
     const card = deck.pop();
     computerHand.push(card);
     if (canPlayCard(card)) {
@@ -1413,48 +1434,34 @@ function updateGameStateAfterPlay(card) {
     currentColor = card.color;
     currentValue = card.value;
   }
-
   switch (card.value) {
     case 'Skip':
-      if (currentPlayer === 'player') {
-        currentPlayer = 'player';
-        announce('Anda memainkan Skip. Giliran Anda lagi.');
-      } else {
-        currentPlayer = 'computer';
-        announce('Komputer memainkan Skip.');
-      }
-      break;
     case 'Reverse':
-      if (currentPlayer === 'player') {
-        currentPlayer = 'player';
-        announce('Anda memainkan Reverse. Giliran Anda lagi.');
-      } else {
-        currentPlayer = 'computer';
-        announce('Komputer memainkan Reverse.');
-      }
+      currentPlayer = currentPlayer === 'player' ? 'player' : 'computer';
+      announce(currentPlayer === 'player' ? 'Anda memainkan kartu aksi. Giliran Anda lagi.' : 'Komputer memainkan kartu aksi.');
       break;
     case 'Draw2':
       if (currentPlayer === 'player') {
         computerDrawCards(2);
         currentPlayer = 'player';
-        announce('Anda memainkan Draw Two. Komputer mengambil 2 kartu dan dilewati.');
+        announce('Anda memainkan Draw Two. Komputer mengambil 2 kartu.');
       } else {
         playerDrawCards(2);
         currentPlayer = 'computer';
-        announce('Komputer memainkan Draw Two. Anda mengambil 2 kartu dan dilewati.');
+        announce('Komputer memainkan Draw Two. Anda mengambil 2 kartu.');
       }
       break;
     case 'Wild_Draw4':
       if (currentPlayer === 'player') {
         computerDrawCards(4);
         currentPlayer = 'player';
-        announce('Anda memainkan Wild Draw Four. Komputer mengambil 4 kartu. Giliran Anda lagi.');
+        announce('Anda memainkan Wild Draw Four. Komputer mengambil 4 kartu.');
       } else {
         playerDrawCards(4);
         currentPlayer = 'computer';
         waitingForPlayerConfirmation = true;
         showMessage(`🤖 Komputer memainkan Wild Draw Four dan memilih warna ${currentColor}. Anda mengambil 4 kartu.`);
-        announce(`Komputer memainkan Wild Draw Four. Anda mengambil 4 kartu. Klik Lanjut untuk melanjutkan.`);
+        announce(`Komputer memainkan Wild Draw Four. Klik Lanjut.`);
       }
       break;
     default:
@@ -1468,7 +1475,7 @@ function callUno() {
   if (playerHand.length === 1) {
     unoCalled = true;
     unoBtn.classList.add('hidden');
-    showMessage('🔥 UNO! Kartu yang kamu punya tersisa 1!');
+    showMessage('🔥 UNO! Kartu tersisa 1!');
     announce('Anda memanggil UNO!');
   }
 }
@@ -1488,16 +1495,14 @@ function computerMustDraw() {
   computerDrawCards(2);
   showMessage('🤖 Komputer lupa memanggil UNO! Mengambil 2 kartu.');
   currentPlayer = 'player';
-  announce('Komputer lupa memanggil UNO! Mengambil 2 kartu. Giliran Anda.');
+  announce('Komputer lupa memanggil UNO! Giliran Anda.');
   updateCounts();
   showUnoButton();
 }
 
 function playerDrawCards(count) {
   for (let i = 0; i < count; i++) {
-    if (deck.length === 0) {
-      reshuffleDeck();
-    }
+    if (deck.length === 0) reshuffleDeck();
     playerHand.push(deck.pop());
     updateHands(playerHand.length - 1);
   }
@@ -1506,9 +1511,7 @@ function playerDrawCards(count) {
 
 function computerDrawCards(count) {
   for (let i = 0; i < count; i++) {
-    if (deck.length === 0) {
-      reshuffleDeck();
-    }
+    if (deck.length === 0) reshuffleDeck();
     computerHand.push(deck.pop());
   }
   updateHands();
@@ -1633,6 +1636,11 @@ closeMessageBtn.addEventListener('keydown', (e) => {
     closeMessage();
   }
 });
+
+// Pre-train neural network
+for (let i = 0; i < 10; i++) {
+  trainNeuralNetwork();
+}
 
 window.addEventListener('load', initGame);
 </script>
