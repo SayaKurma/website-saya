@@ -954,9 +954,15 @@ function computerChooseColor() {
 
   // Calculate scores for each color
   const colorScores = colors.map(color => {
-    let score = computerColorCounts[color] * 10 - (colorPreferences[color] * 50);
+    let score = computerColorCounts[color] * 10; // Prioritize colors AI has
+    // Penalize colors frequently chosen by player, prioritize least chosen
+    score -= colorPreferences[color] * 100; // Strong penalty for player's preferred colors
     if (computerHand.length <= 2 && computerColorCounts[color] > 0) {
-      score *= 1.5; // Prioritize dominant color when hand is small
+      score *= 2; // Increase priority for AI's colors when hand is small
+    }
+    // Bonus for colors the player rarely chooses
+    if (colorPreferences[color] < 0.15 && totalChoices > 0) {
+      score += 50; // Bonus for colors player rarely picks
     }
     return { color, score };
   });
@@ -965,9 +971,9 @@ function computerChooseColor() {
   colorScores.sort((a, b) => b.score - a.score);
   let bestColor = colorScores[0].color;
 
-  // If scores are close, add randomness to avoid predictability
-  if (colorScores[0].score - colorScores[1].score < 5) {
-    const topColors = colorScores.filter(cs => cs.score >= colorScores[0].score - 5);
+  // Add randomness among top colors if scores are close
+  if (colorScores[0].score - colorScores[1].score < 10) {
+    const topColors = colorScores.filter(cs => cs.score >= colorScores[0].score - 10);
     bestColor = topColors[Math.floor(Math.random() * topColors.length)].color;
   }
 
