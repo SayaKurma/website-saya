@@ -930,66 +930,239 @@ function computerChooseColor() {
   return mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
 }
 
+// New Minimax-related functions
+function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
+  if (computerHand.length === 0) return 1000;
+  if (playerHand.length === 0) return -1000;
+
+  let score = 0;
+
+  // Hand size difference
+  score += (playerHand.length - computerHand.length) * 50;
+
+  // Card value evaluation
+  const actionCardWeights = {
+    'Wild_Draw4': 100,
+    'Wild': 80,
+    'Draw2': 60,
+    'Skip': 50,
+    'Reverse': 40
+  };
+
+  // Evaluate computer's hand
+  for (const card of computerHand) {
+    if (card.color === 'wild') {
+      score += actionCardWeights[card.value] || 30;
+    } else if (card.color === currentColor || card.value === currentValue) {
+      score += actionCardWeights[card.value] || 20;
+    } else {
+      score += actionCardWeights[card.value] || 10;
+    }
+  }
+
+  // Estimate player's hand
+  for (const card of playerHand) {
+    if (card.color === currentColor || card.value === currentValue) {
+      score -= (actionCardWeights[card.value] || 20) * 0.8;
+    } else {
+      score -= (actionCardWeights[card.value] || 10) * 0.8;
+    }
+  }
+
+  // UNO status
+  if (computerHand.length === 1) score += 200;
+  if (playerHand.length === 1) score -= 200;
+
+  return score;
+}
+
+function getPossibleMoves(hand) {
+  const moves = [];
+  const topCard = discardPile[discardPile.length - 1];
+  const currentTopColor = topCard.color === 'wild' ? currentColor : topCard.color;
+
+  // Add playable cards
+  for (let i = 0; i < hand.length; i++) {
+    const card = hand[i];
+    if (canPlayCard(card)) {
+      if (card.color === 'wild') {
+        colors.forEach(color => {
+          moves.push({ type: 'play', cardIndex: i, card, colorChoice: color });
+        });
+      } else {
+        moves.push({ type: 'play', cardIndex: i, card });
+      }
+    }
+  }
+
+  // Add draw action if no playable cards
+  if (moves.length === 0) {
+    moves.push({ type: 'draw' });
+  }
+
+  return moves;
+}
+
+function applyMove(state, move, isComputer) {
+  const newState = {
+    computerHand: [...state.computerHand],
+    playerHand: [...state.playerHand],
+    discardPile: [...state.discardPile],
+    deck: [...state.deck],
+    currentColor: state.currentColor,
+    currentValue: state.currentValue,
+    currentPlayer: state.currentPlayer
+  };
+
+  if (move.type === 'draw') {
+    if (newState.deck.length === 0) {
+      const topCard = newState.discardPile.pop();
+      newState.deck = [...newState.discardPile];
+      for (let i = newState.deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newState.deck[i], newState.deck[j]] = [newState.deck[j], newState.deck[i]];
+      }
+      newState.discardPile = [topCard];
+    }
+    const drawnCard = newState.deck.pop();
+    if (isComputer) {
+      newState.computerHand.push(drawnCard);
+    } else {
+      newState.playerHand.push(drawnCard);
+    }
+    newState.currentPlayer = isComputer ? 'player' : 'computer';
+    return newState;
+  }
+
+  const hand = isComputer ? newState.computerHand : newState.playerHand;
+  const card = hand[move.cardIndex];
+  newState.discardPile.push(card);
+  hand.splice(move.cardIndex, 1);
+
+  if (card.color === 'wild') {
+    newState.currentColor = move.colorChoice;
+    newState.currentValue = '';
+  } else {
+    newState.currentColor = card.color;
+    newState.currentValue = card.value;
+  }
+
+  switch (card.value) {
+    case 'Skip':
+    case 'Reverse':
+      newState.currentPlayer = isComputer ? 'computer' : 'player';
+      break;
+    case 'Draw2':
+      const opponentHand = isComputer ? newState.playerHand : newState.computerHand;
+      for (let i = 0; i < 2; i++) {
+        if (newState.deck.length === 0) {
+          const topCard = newState.discardPile.pop();
+          newState.deck = [...newState.discardPile];
+          for (let j = newState.deck.length - 1; j > 0; j--) {
+            const k = Math.floor(Math.random() * (j + 1));
+            [newState.deck[j], newState.deck[k]] = [newState.deck[k], newState.deck[j]];
+          }
+          newState.discardPile = [topCard];
+        }
+        if (newState.deck.length > 0) {
+          opponentHand.push(newState.deck.pop());
+        }
+      }
+      newState.currentPlayer = isComputer ? 'computer' : 'player';
+      break;
+    case 'Wild_Draw4':
+      const opponentHandWild = isComputer ? newState.playerHand : newState.computerHand;
+      for (let i = 0; i < 4; i++) {
+        if (newState.deck.length === 0) {
+          const topCard = newState.discardPile.pop();
+          newState.deck = [...newState.discardPile];
+          for (let j = newState.deck.length - 1; j > 0; j--) {
+            const k = Math.floor(Math.random() * (j + 1));
+            [newState.deck[j], newState.deck[k]] = [newState.deck[k], newState.deck[j]];
+          }
+          newState.discardPile = [topCard];
+        }
+        if (newState.deck.length > 0) {
+          opponentHandWild.push(newState.deck.pop());
+        }
+      }
+      newState.currentPlayer = isComputer ? 'computer' : 'player';
+      break;
+    default:
+      newState.currentPlayer = isComputer ? 'player' : 'computer';
+      break;
+  }
+
+  return newState;
+}
+
+function minimax(state, depth, alpha, beta, isMaximizing) {
+  if (depth === 0 || state.computerHand.length === 0 || state.playerHand.length === 0) {
+    return evaluateBoard(state.computerHand, state.playerHand, state.currentColor, state.currentValue);
+  }
+
+  const moves = getPossibleMoves(isMaximizing ? state.computerHand : state.playerHand);
+
+  if (isMaximizing) {
+    let maxEval = -Infinity;
+    for (const move of moves) {
+      const newState = applyMove(state, move, true);
+      const evalScore = minimax(newState, depth - 1, alpha, beta, false);
+      maxEval = Math.max(maxEval, evalScore);
+      alpha = Math.max(alpha, evalScore);
+      if (beta <= alpha) break;
+    }
+    return maxEval;
+  } else {
+    let minEval = Infinity;
+    for (const move of moves) {
+      const newState = applyMove(state, move, false);
+      const evalScore = minimax(newState, depth - 1, alpha, beta, true);
+      minEval = Math.min(minEval, evalScore);
+      beta = Math.min(beta, evalScore);
+      if (beta <= alpha) break;
+    }
+    return minEval;
+  }
+}
+
+function findBestMove() {
+  const state = {
+    computerHand: [...computerHand],
+    playerHand: [...playerHand],
+    discardPile: [...discardPile],
+    deck: [...deck],
+    currentColor,
+    currentValue,
+    currentPlayer: 'computer'
+  };
+
+  const moves = getPossibleMoves(computerHand);
+  let bestMove = moves[0];
+  let bestScore = -Infinity;
+  const maxDepth = computerHand.length <= 3 ? 4 : 3; // Dynamic depth based on hand size
+
+  for (const move of moves) {
+    const newState = applyMove(state, move, true);
+    const score = minimax(newState, maxDepth - 1, -Infinity, Infinity, false);
+    if (score > bestScore) {
+      bestScore = score;
+      bestMove = move;
+    }
+  }
+
+  return bestMove;
+}
+
 function computerTurn() {
   if (waitingForPlayerConfirmation) {
     return;
   }
   currentPlayer = 'computer';
   updateCounts();
-  let playableCards = computerHand.filter(card => canPlayCard(card));
-  if (playableCards.length > 0) {
-    const randomIndex = Math.floor(Math.random() * playableCards.length);
-    const card = playableCards[randomIndex];
-    const cardIndex = computerHand.findIndex(c => c === card);
-    const tempCardEl = document.createElement('div');
-    tempCardEl.className = 'card';
-    const imageKey = card.color === 'wild' ? `wild_${card.value}` : `${card.color}_${card.value}`;
-    tempCardEl.style.backgroundImage = `url(${cardImages[imageKey]})`;
-    tempCardEl.setAttribute('aria-label', `Kartu ${card.color} ${card.value.replace('_', ' ')}`);
-    computerHandEl.children[cardIndex].replaceWith(tempCardEl);
-    const discardRect = discardPileEl.getBoundingClientRect();
-    const cardRect = tempCardEl.getBoundingClientRect();
-    const deltaX = discardRect.left - cardRect.left;
-    const deltaY = discardRect.top - cardRect.top;
-    tempCardEl.style.setProperty('--discard-x', `${deltaX}px`);
-    tempCardEl.style.setProperty('--discard-y', `${deltaY}px`);
-    tempCardEl.classList.add('card-move-computer');
-    setTimeout(() => {
-      computerHand.splice(cardIndex, 1);
-      discardPile.push(card);
-      announce(`Komputer memainkan kartu ${card.color} ${card.value}`);
-      if (card.color === 'wild') {
-        currentColor = computerChooseColor();
-        showMessage(`🤖 Komputer memainkan ${card.value.replace('_', ' ')} dan memilih warna ${currentColor}!`);
-        updateGameStateAfterPlay(card);
-      } else {
-        updateGameStateAfterPlay(card);
-      }
-      updateDiscardPile();
-      updateCounts();
-      if (computerHand.length === 1) {
-        const shouldCallUno = !computerHand.some(card =>
-          card.color === 'wild' || card.value === 'Draw2');
-        if (shouldCallUno) {
-          showMessage('🤖 Komputer memanggil UNO!');
-        } else {
-          computerMustDraw();
-          return;
-        }
-      }
-      if (playerHand.length > 0 && computerHand.length > 0) {
-        if (currentPlayer === 'player') {
-          updateCounts();
-          showUnoButton();
-        } else if (!waitingForPlayerConfirmation) {
-          setTimeout(computerTurn, 1000);
-        }
-      } else {
-        endGame();
-      }
-      updateHands();
-    }, 500);
-  } else {
+  const bestMove = findBestMove();
+
+  if (bestMove.type === 'draw') {
     if (deck.length === 0) {
       reshuffleDeck();
     }
@@ -1025,8 +1198,7 @@ function computerTurn() {
         updateDiscardPile();
         updateCounts();
         if (computerHand.length === 1) {
-          const shouldCallUno = !computerHand.some(card =>
-            card.color === 'wild' || card.value === 'Draw2');
+          const shouldCallUno = !computerHand.some(card => card.color === 'wild' || card.value === 'Draw2');
           if (shouldCallUno) {
             showMessage('🤖 Komputer memanggil UNO!');
           } else {
@@ -1057,6 +1229,56 @@ function computerTurn() {
       }
       updateHands();
     }
+  } else {
+    const card = bestMove.card;
+    const cardIndex = bestMove.cardIndex;
+    const tempCardEl = document.createElement('div');
+    tempCardEl.className = 'card';
+    const imageKey = card.color === 'wild' ? `wild_${card.value}` : `${card.color}_${card.value}`;
+    tempCardEl.style.backgroundImage = `url(${cardImages[imageKey]})`;
+    tempCardEl.setAttribute('aria-label', `Kartu ${card.color} ${card.value.replace('_', ' ')}`);
+    computerHandEl.children[cardIndex].replaceWith(tempCardEl);
+    const discardRect = discardPileEl.getBoundingClientRect();
+    const cardRect = tempCardEl.getBoundingClientRect();
+    const deltaX = discardRect.left - cardRect.left;
+    const deltaY = discardRect.top - cardRect.top;
+    tempCardEl.style.setProperty('--discard-x', `${deltaX}px`);
+    tempCardEl.style.setProperty('--discard-y', `${deltaY}px`);
+    tempCardEl.classList.add('card-move-computer');
+    setTimeout(() => {
+      computerHand.splice(cardIndex, 1);
+      discardPile.push(card);
+      announce(`Komputer memainkan kartu ${card.color} ${card.value}`);
+      if (card.color === 'wild') {
+        currentColor = bestMove.colorChoice || computerChooseColor();
+        showMessage(`🤖 Komputer memainkan ${card.value.replace('_', ' ')} dan memilih warna ${currentColor}!`);
+        updateGameStateAfterPlay(card);
+      } else {
+        updateGameStateAfterPlay(card);
+      }
+      updateDiscardPile();
+      updateCounts();
+      if (computerHand.length === 1) {
+        const shouldCallUno = !computerHand.some(card => card.color === 'wild' || card.value === 'Draw2');
+        if (shouldCallUno) {
+          showMessage('🤖 Komputer memanggil UNO!');
+        } else {
+          computerMustDraw();
+          return;
+        }
+      }
+      if (playerHand.length > 0 && computerHand.length > 0) {
+        if (currentPlayer === 'player') {
+          updateCounts();
+          showUnoButton();
+        } else if (!waitingForPlayerConfirmation) {
+          setTimeout(computerTurn, 1000);
+        }
+      } else {
+        endGame();
+      }
+      updateHands();
+    }, 500);
   }
 }
 
