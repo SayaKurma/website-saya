@@ -953,10 +953,13 @@ function computerChooseColor() {
   }, {});
 
   // Calculate scores for each color
-  const colorScores = colors.map(color => ({
-    color,
-    score: computerColorCounts[color] * 10 - (colorPreferences[color] * 50) // Reward card count, penalize player preference
-  }));
+  const colorScores = colors.map(color => {
+    let score = computerColorCounts[color] * 10 - (colorPreferences[color] * 50);
+    if (computerHand.length <= 2 && computerColorCounts[color] > 0) {
+      score *= 1.5; // Prioritize dominant color when hand is small
+    }
+    return { color, score };
+  });
 
   // Sort by score and select the best
   colorScores.sort((a, b) => b.score - a.score);
@@ -976,10 +979,10 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   if (playerHand.length === 0) return -10000;
 
   let score = 0;
-  score += (playerHand.length - computerHand.length) * 150; // Increased weight for hand size difference
+  score += (playerHand.length - computerHand.length) * 150;
 
   const actionCardWeights = {
-    'Wild_Draw4': 400, // Higher weight for maximum disruption
+    'Wild_Draw4': 400,
     'Wild': 250,
     'Draw2': 200,
     'Skip': 150,
@@ -995,55 +998,62 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     computerColorCounts[a] > computerColorCounts[b] ? a : b
   );
 
-  // Player color preference penalty
   const totalChoices = Object.values(playerColorChoices).reduce((sum, count) => sum + count, 0);
   const colorPreferences = colors.reduce((acc, color) => {
     acc[color] = totalChoices > 0 ? playerColorChoices[color] / totalChoices : 0.25;
     return acc;
   }, {});
 
+  // Preemptive penalty for shared dominant color
+  if (computerColorCounts[dominantColor] > 0 && playerHand.some(c => c.color === dominantColor)) {
+    score -= 50;
+  }
+
   for (const card of computerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
     
-    // Boost score for matching current board state
     if (card.color === currentColor || card.value === currentValue) {
       cardScore *= 2.0;
     }
     
-    // Boost for dominant color
     if (card.color === dominantColor && card.color !== 'wild') {
       cardScore *= 1.7;
     }
     
-    // Wild card strategy
     if (card.color === 'wild') {
       const hasPlayableNonWild = computerHand.some(c => canPlayCard(c) && c.color !== 'wild');
       if (hasPlayableNonWild && computerHand.length > 4) {
-        cardScore *= 0.3; // Penalize using Wild when other options exist and hand is large
+        cardScore *= 0.3;
       }
       if (playerHand.length <= 2) {
-        cardScore *= 3.0; // Encourage saving Wild for critical moments
+        cardScore *= 3.0;
       }
       if (computerHand.length <= 3) {
-        cardScore *= 2.5; // Encourage using Wild when hand is small
+        cardScore *= 2.5;
       }
     }
     
-    // Boost action cards when opponent is close to winning
     if (playerHand.length <= 2 && ['Skip', 'Reverse', 'Draw2', 'Wild_Draw4'].includes(card.value)) {
-      cardScore *= 3.5; // Strong incentive to disrupt opponent
+      cardScore *= 3.5;
     }
     
-    // Boost disruptive cards when opponent has played many action cards
+    if (card.value === 'Reverse' && playerHand.length <= 2 && computerHand.length <= 3) {
+      cardScore *= 1.8; // Boost Reverse in 1v1 endgame
+    }
+    
     if (opponentActionCardCount > 4 && ['Wild_Draw4', 'Draw2'].includes(card.value)) {
       cardScore *= 2.0;
     }
     
-    // Penalize Wild card colors based on player preferences
+    // Adjusted Wild card color penalty
     if (card.color === 'wild') {
       colors.forEach(color => {
-        if (colorPreferences[color] > 0.3) { // Penalize colors chosen >30% of the time
-          cardScore -= 50 * colorPreferences[color];
+        if (colorPreferences[color] > 0.3) {
+          if (card.value === 'Wild_Draw4') {
+            cardScore -= 20 * colorPreferences[color]; // Reduced penalty for Wild_Draw4
+          } else {
+            cardScore -= 50 * colorPreferences[color]; // Standard penalty for Wild
+          }
         }
       });
     }
@@ -1051,7 +1061,6 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     score += cardScore;
   }
 
-  // Evaluate opponent's hand
   for (const card of playerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
     if (card.color === currentColor || card.value === currentValue) {
@@ -1063,23 +1072,22 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     if (opponentActionCardCount > 4) {
       cardScore *= 1.7;
     }
-    score -= cardScore * 1.1; // Slightly higher penalty for opponent's cards
+    score -= cardScore * 1.1;
   }
 
-  // Additional strategic scores
-  if (computerHand.length === 1) score += 1000; // Strong incentive to win
-  if (playerHand.length === 1) score -= 1000; // Strong penalty to prevent opponent win
+  if (computerHand.length === 1) score += 1000;
+  if (playerHand.length === 1) score -= 1000;
   if (playerHand.length <= 2 && computerHand.some(card => card.value === 'Wild_Draw4')) {
-    score += 600; // Encourage Wild_Draw4 when opponent is close to winning
+    score += 600;
   }
   if (computerHand.length <= 2 && computerHand.some(card => card.color === 'wild')) {
-    score += 300; // Encourage Wild usage when close to winning
+    score += 300;
   }
   if (computerColorCounts[dominantColor] >= 4) {
-    score += 200; // Reward color dominance
+    score += 200;
   }
   if (totalChoices > 0 && computerColorCounts[dominantColor] > 0) {
-    score -= 100 * colorPreferences[dominantColor]; // Penalize choosing player's preferred color
+    score -= 100 * colorPreferences[dominantColor];
   }
 
   return score;
