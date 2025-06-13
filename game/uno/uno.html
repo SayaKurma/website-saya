@@ -571,7 +571,7 @@ let unoCalled = false;
 let isDrawing = false;
 let playerHasOneCard = false;
 let waitingForPlayerConfirmation = false;
-let opponentActionCardCount = 0; // Track opponent's action card plays
+let opponentActionCardCount = 0;
 
 const computerHandEl = document.getElementById('computer-hand');
 const playerHandEl = document.getElementById('player-hand');
@@ -589,7 +589,6 @@ const colors = ['red', 'blue', 'green', 'yellow'];
 const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Skip', 'Reverse', 'Draw2'];
 const wildCards = ['Wild', 'Wild_Draw4'];
 
-// Memoization cache
 const memoCache = new Map();
 
 function debounce(func, wait) {
@@ -617,7 +616,7 @@ function initGame() {
   isDrawing = false;
   playerHasOneCard = false;
   waitingForPlayerConfirmation = false;
-  opponentActionCardCount = 0; // Reset action card counter
+  opponentActionCardCount = 0;
   memoCache.clear();
   createDeck();
   shuffleDeck();
@@ -753,7 +752,6 @@ function updateDiscardPile() {
   discardPileEl.setAttribute('aria-label', `Kartu di tumpukan buangan: ${card.color} ${card.value.replace('_', ' ')}`);
   const imageKey = card.color === 'wild' ? `wild_${card.value}` : `${card.color}_${card.value}`;
   discardPileEl.style.backgroundImage = `url(${cardImages[imageKey]})`;
-  // Track player's action cards
   if (currentPlayer === 'player' && ['Skip', 'Reverse', 'Draw2', 'Wild', 'Wild_Draw4'].includes(card.value)) {
     opponentActionCardCount++;
   }
@@ -931,18 +929,50 @@ function drawCard() {
 }
 
 function computerChooseColor() {
-  const colorCounts = colors.reduce((acc, color) => {
+  // Hitung distribusi warna di discard pile
+  const discardColorCounts = colors.reduce((acc, color) => {
+    acc[color] = discardPile.filter(card => card.color === color).length;
+    return acc;
+  }, { red: 0, blue: 0, green: 0, yellow: 0 });
+
+  // Hitung distribusi warna di tangan komputer
+  const computerColorCounts = colors.reduce((acc, color) => {
     acc[color] = computerHand.filter(card => card.color === color).length;
     return acc;
-  }, {});
-  const maxCount = Math.max(...Object.values(colorCounts));
-  const mostFrequentColors = Object.keys(colorCounts).filter(color => colorCounts[color] === maxCount);
+  }, { red: 0, blue: 0, green: 0, yellow: 0 });
+
+  // Cari warna dengan jumlah terkecil di discard pile
+  let minDiscardCount = Infinity;
+  let leastFrequentColors = [];
+  for (const color of colors) {
+    if (discardColorCounts[color] < minDiscardCount) {
+      minDiscardCount = discardColorCounts[color];
+      leastFrequentColors = [color];
+    } else if (discardColorCounts[color] === minDiscardCount) {
+      leastFrequentColors.push(color);
+    }
+  }
+
+  // Jika ada warna yang jarang muncul di discard pile, pilih yang paling banyak di tangan komputer
+  if (leastFrequentColors.length > 0) {
+    let maxComputerCount = -1;
+    let bestColor = leastFrequentColors[0];
+    for (const color of leastFrequentColors) {
+      if (computerColorCounts[color] > maxComputerCount) {
+        maxComputerCount = computerColorCounts[color];
+        bestColor = color;
+      }
+    }
+    return bestColor;
+  }
+
+  // Jika semua warna memiliki distribusi seragam di discard pile, pilih warna terbanyak di tangan komputer
+  const maxCount = Math.max(...Object.values(computerColorCounts));
+  const mostFrequentColors = Object.keys(computerColorCounts).filter(color => computerColorCounts[color] === maxCount);
   return mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
 }
 
-// Enhanced evaluation function
 function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
-  // More precise memoization key
   const stateKey = JSON.stringify({
     computerHand: computerHand.map(c => `${c.color}_${c.value}`),
     playerHandLength: playerHand.length,
@@ -958,71 +988,51 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   if (playerHand.length === 0) return -10000;
 
   let score = 0;
-
-  // Hand size difference
   score += (playerHand.length - computerHand.length) * 100;
 
-  // Card value evaluation
   const actionCardWeights = {
-    'Wild_Draw4': 200, // High value for critical disruption
-    'Wild': 150,       // Flexible but strategic
-    'Draw2': 100,      // Disruptive
-    'Skip': 90,        // Control flow
-    'Reverse': 80      // Control flow
+    'Wild_Draw4': 200,
+    'Wild': 150,
+    'Draw2': 100,
+    'Skip': 90,
+    'Reverse': 80
   };
 
-  // Count colors in computer's hand
   const computerColorCounts = colors.reduce((acc, color) => {
     acc[color] = computerHand.filter(card => card.color === color).length;
     return acc;
   }, {});
 
-  // Find dominant color
   const dominantColor = Object.keys(computerColorCounts).reduce((a, b) =>
     computerColorCounts[a] > computerColorCounts[b] ? a : b
   );
 
-  // Evaluate computer's hand
   for (const card of computerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
-
-    // Bonus for matching current color/value
     if (card.color === currentColor || card.value === currentValue) {
       cardScore *= 1.5;
     }
-
-    // Bonus for matching dominant color
     if (card.color === dominantColor && card.color !== 'wild') {
-      cardScore *= 1.2; // Encourage playing dominant color to maintain flexibility
+      cardScore *= 1.2;
     }
-
-    // Strategic Wild card retention
     if (card.color === 'wild') {
-      // Penalty for playing Wild early if other playable cards exist
       const hasPlayableNonWild = computerHand.some(c => canPlayCard(c) && c.color !== 'wild');
       if (hasPlayableNonWild && computerHand.length > 3) {
-        cardScore *= 0.7; // Discourage early Wild play
+        cardScore *= 0.7;
       }
-      // Bonus for holding Wild when player is close to winning
       if (playerHand.length <= 2) {
-        cardScore *= 1.5; // Retain Wild for emergencies
+        cardScore *= 1.5;
       }
     }
-
-    // Bonus for control cards (Skip, Reverse) when opponent has few cards
     if (playerHand.length <= 3 && ['Skip', 'Reverse'].includes(card.value)) {
-      cardScore *= 1.8; // Prioritize control
+      cardScore *= 1.8;
     }
-
-    // Adjust score based on opponent aggression
     if (opponentActionCardCount > 3 && ['Wild_Draw4', 'Draw2'].includes(card.value)) {
-      cardScore *= 1.3; // Save disruptive cards to counter aggressive opponent
+      cardScore *= 1.3;
     }
-
     score += cardScore;
   }
 
-  // Estimate player's hand
   for (const card of playerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
     if (card.color === currentColor || card.value === currentValue) {
@@ -1031,29 +1041,25 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     if (playerHand.length <= 3 && ['Draw2', 'Wild_Draw4', 'Skip', 'Reverse'].includes(card.value)) {
       cardScore *= 2;
     }
-    // Penalize based on opponent's action card frequency
     if (opponentActionCardCount > 3) {
-      cardScore *= 1.2; // Assume player is aggressive
+      cardScore *= 1.2;
     }
     score -= cardScore * 0.9;
   }
 
-  // UNO status
   if (computerHand.length === 1) score += 500;
   if (playerHand.length === 1) score -= 500;
 
-  // Strategic adjustments
   if (playerHand.length <= 2 && computerHand.some(card => card.value === 'Wild_Draw4')) {
-    score += 250; // Strong bonus for holding Wild_Draw4
+    score += 250;
   }
   if (computerHand.length <= 2 && computerHand.some(card => card.color === 'wild')) {
-    score -= 150; // Penalty for holding Wild too long
+    score -= 150;
   }
   if (computerColorCounts[dominantColor] >= 3) {
-    score += 100; // Bonus for strong color dominance
+    score += 100;
   }
 
-  // Cache the result
   memoCache.set(stateKey, score);
   return score;
 }
@@ -1063,7 +1069,6 @@ function getPossibleMoves(hand) {
   const topCard = discardPile[discardPile.length - 1];
   const currentTopColor = topCard.color === 'wild' ? currentColor : topCard.color;
 
-  // Add playable cards
   for (let i = 0; i < hand.length; i++) {
     const card = hand[i];
     if (canPlayCard(card)) {
@@ -1077,7 +1082,6 @@ function getPossibleMoves(hand) {
     }
   }
 
-  // Add draw action if no playable cards
   if (moves.length === 0) {
     moves.push({ type: 'draw' });
   }
@@ -1179,7 +1183,6 @@ function applyMove(state, move, isComputer) {
 }
 
 function minimax(state, depth, alpha, beta, isMaximizing) {
-  // Check memoization cache
   const stateKey = JSON.stringify({
     computerHand: state.computerHand.map(c => `${c.color}_${c.value}`),
     playerHandLength: state.playerHand.length,
@@ -1240,14 +1243,13 @@ function findBestMove() {
   const moves = getPossibleMoves(computerHand);
   let bestMove = moves[0];
   let bestScore = -Infinity;
-  // Dynamic depth based on hand size
   let maxDepth;
   if (computerHand.length <= 3) {
-    maxDepth = 6; // Deeper search when few cards
+    maxDepth = 6;
   } else if (computerHand.length <= 5) {
     maxDepth = 4;
   } else {
-    maxDepth = 2; // Shallower search when many cards
+    maxDepth = 2;
   }
 
   for (const move of moves) {
@@ -1452,15 +1454,15 @@ function callUno() {
   if (playerHand.length === 1) {
     unoCalled = true;
     unoBtn.classList.add('hidden');
-    showMessage('🔥 UNO! Anda memiliki 1 kartu tersisa!');
+    showMessage('🔥 UNO! Kartu yang kamu punya tersisa 1!');
     announce('Anda memanggil UNO!');
   }
 }
 
 function playerMustDraw() {
   playerDrawCards(2);
-  showMessage('😬 Anda lupa memanggil UNO! Ambil 2 kartu.');
-  announce('Anda lupa memanggil UNO! Mengambil 2 kartu.');
+  showMessage('Kamu lupa menyebut UNO! Ambil 2 kartu.');
+  announce('Kamu lupa menyebut UNO! Mengambil 2 kartu.');
   selectedCardIndex = -1;
   updateHands();
   updateCounts();
