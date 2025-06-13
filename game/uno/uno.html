@@ -1011,12 +1011,12 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
 
   // Bonus jika AI punya warna dominan yang tidak dimiliki pemain
   if (playerColorCounts[dominantColor] === 0 && computerColorCounts[dominantColor] >= 3) {
-    score += 200; // Color-lock advantage
+    score += 200;
   }
 
   // Penalti jika warna dominan AI juga kuat di tangan pemain
   if (playerColorCounts[dominantColor] >= 2 && computerColorCounts[dominantColor] >= 2) {
-    score -= 100; // Risiko clash warna
+    score -= 100;
   }
 
   // Penalti jika pemain punya warna dominan, kecuali AI punya kartu aksi
@@ -1044,6 +1044,9 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     acc[color] = computerHand.filter(c => c.color === color && !['Wild', 'Wild_Draw4'].includes(c.value)).length;
     return acc;
   }, { red: 0, blue: 0, green: 0, yellow: 0 });
+
+  // Estimasi perilaku pasif pemain
+  const passivePlayer = opponentActionCardCount < 3 && playerHand.length > 7;
 
   for (const card of computerHand) {
     let cardScore = actionCardWeights[card.value] || 30;
@@ -1073,6 +1076,23 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
       }
       if (computerHand.length <= 3) {
         cardScore *= 3.0;
+      }
+    }
+
+    // Delay kartu kuat saat AI unggul
+    if (card.value === 'Wild_Draw4' && playerHand.length > 6 && computerHand.length < 3) {
+      cardScore *= 0.4;
+    }
+
+    // Pasif-agresif: Lebih agresif jika pemain pasif
+    if (passivePlayer && ['Draw2', 'Wild_Draw4', 'Skip'].includes(card.value)) {
+      cardScore *= 2.0;
+    }
+
+    // Brute-force finish saat AI unggul dan pemain pasif
+    if (passivePlayer && computerHand.length <= 3 && playerHand.length >= 6) {
+      if (!['Wild_Draw4', 'Draw2'].includes(card.value)) {
+        cardScore *= 2.5; // Prioritaskan kartu biasa untuk cepat habis
       }
     }
 
@@ -1126,7 +1146,7 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     });
   }
 
-  // Panic indicator: Pemain dekat menang, AI dalam posisi sulit
+  // Panic indicator
   if (playerHand.length <= 2 && computerHand.length > 5 && !computerHand.some(c => ['Draw2', 'Wild_Draw4'].includes(c.value))) {
     score -= 1000;
   }
