@@ -994,6 +994,11 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     return acc;
   }, { red: 0, blue: 0, green: 0, yellow: 0 });
 
+  const playerColorCounts = colors.reduce((acc, color) => {
+    acc[color] = playerHand.filter(card => card.color === color).length;
+    return acc;
+  }, { red: 0, blue: 0, green: 0, yellow: 0 });
+
   const dominantColor = Object.keys(computerColorCounts).reduce((a, b) =>
     computerColorCounts[a] > computerColorCounts[b] ? a : b
   );
@@ -1004,9 +1009,36 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     return acc;
   }, {});
 
-  if (computerColorCounts[dominantColor] > 0 && playerHand.some(c => c.color === dominantColor)) {
-    score -= 80;
+  // Bonus jika AI punya warna dominan yang tidak dimiliki pemain
+  if (playerColorCounts[dominantColor] === 0 && computerColorCounts[dominantColor] >= 3) {
+    score += 200; // Color-lock advantage
   }
+
+  // Penalti jika warna dominan AI juga kuat di tangan pemain
+  if (playerColorCounts[dominantColor] >= 2 && computerColorCounts[dominantColor] >= 2) {
+    score -= 100; // Risiko clash warna
+  }
+
+  // Penalti jika pemain punya warna dominan, kecuali AI punya kartu aksi
+  if (computerColorCounts[dominantColor] > 0 && playerHand.some(c => c.color === dominantColor)) {
+    if (!computerHand.some(c => c.color === dominantColor && ['Draw2', 'Skip'].includes(c.value))) {
+      score -= 80;
+    }
+  }
+
+  // Penalti untuk potensi chain pemain
+  Object.keys(playerColorCounts).forEach(color => {
+    if (playerColorCounts[color] >= 3) {
+      score -= 100 * playerColorCounts[color];
+    }
+  });
+
+  // Bonus jika pemain kekurangan warna tertentu
+  Object.keys(colorPreferences).forEach(color => {
+    if (colorPreferences[color] > 0.3 && playerColorCounts[color] === 0) {
+      score += 150;
+    }
+  });
 
   const chainPotential = colors.reduce((acc, color) => {
     acc[color] = computerHand.filter(c => c.color === color && !['Wild', 'Wild_Draw4'].includes(c.value)).length;
@@ -1045,8 +1077,9 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     }
 
     if (playerHand.length <= 2 && ['Draw2', 'Wild_Draw4'].includes(card.value)) {
-      cardScore *= (Math.random() < 0.85 ? 6.0 : 2.0); // Variasi agresivitas
+      cardScore *= (Math.random() < 0.85 ? 6.0 : 2.0);
       cardScore += (card.value === 'Wild_Draw4' ? 800 : 400);
+      cardScore = Math.min(cardScore, 1500);
     } else if (playerHand.length <= 2 && ['Skip', 'Reverse'].includes(card.value)) {
       cardScore *= 4.0;
     }
@@ -1061,7 +1094,7 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
 
     if (card.color === 'wild') {
       colors.forEach(color => {
-        if (colorPreferences[color] > 0.4) { // Threshold lebih ketat
+        if (colorPreferences[color] > 0.4) {
           cardScore -= 30 * colorPreferences[color];
         }
       });
@@ -1091,6 +1124,11 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
         score += 200 * (chainPotential[color] - 1);
       }
     });
+  }
+
+  // Panic indicator: Pemain dekat menang, AI dalam posisi sulit
+  if (playerHand.length <= 2 && computerHand.length > 5 && !computerHand.some(c => ['Draw2', 'Wild_Draw4'].includes(c.value))) {
+    score -= 1000;
   }
 
   if (computerHand.length === 1) score += 1500;
