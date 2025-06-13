@@ -1004,12 +1004,10 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     return acc;
   }, {});
 
-  // Preemptive penalty for shared dominant color
   if (computerColorCounts[dominantColor] > 0 && playerHand.some(c => c.color === dominantColor)) {
     score -= 50;
   }
 
-  // Track chain play potential
   const chainPotential = colors.reduce((acc, color) => {
     acc[color] = computerHand.filter(c => c.color === color && !['Wild', 'Wild_Draw4'].includes(c.value)).length;
     return acc;
@@ -1017,23 +1015,22 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
 
   for (const card of computerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
-    
+
     if (card.color === currentColor || card.value === currentValue) {
       cardScore *= 2.0;
     }
-    
+
     if (card.color === dominantColor && card.color !== 'wild') {
       cardScore *= 1.7;
     }
-    
-    // Chain play bonus for same color/value
+
     if (computerHand.length <= 5 && card.color !== 'wild') {
       const sameColorCount = computerHand.filter(c => c.color === card.color && c !== card).length;
       if (sameColorCount >= 1) {
-        cardScore += 80 * sameColorCount; // Bonus for potential chain
+        cardScore += 80 * sameColorCount;
       }
     }
-    
+
     if (card.color === 'wild') {
       const hasPlayableNonWild = computerHand.some(c => canPlayCard(c) && c.color !== 'wild');
       if (hasPlayableNonWild && computerHand.length > 4) {
@@ -1046,20 +1043,19 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
         cardScore *= 2.5;
       }
     }
-    
+
     if (playerHand.length <= 2 && ['Skip', 'Reverse', 'Draw2', 'Wild_Draw4'].includes(card.value)) {
       cardScore *= 3.5;
     }
-    
+
     if (card.value === 'Reverse' && playerHand.length <= 2 && computerHand.length <= 3) {
       cardScore *= 1.8;
     }
-    
+
     if (opponentActionCardCount > 4 && ['Wild_Draw4', 'Draw2'].includes(card.value)) {
       cardScore *= 2.0;
     }
-    
-    // Adjusted Wild card color penalty
+
     if (card.color === 'wild') {
       colors.forEach(color => {
         if (colorPreferences[color] > 0.3) {
@@ -1071,7 +1067,7 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
         }
       });
     }
-    
+
     score += cardScore;
   }
 
@@ -1089,11 +1085,10 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     score -= cardScore * 1.1;
   }
 
-  // Additional chain play bonus for high chain potential
   if (computerHand.length <= 5) {
     Object.keys(chainPotential).forEach(color => {
       if (chainPotential[color] >= 2) {
-        score += 150 * (chainPotential[color] - 1); // Bonus for multiple chainable cards
+        score += 150 * (chainPotential[color] - 1);
       }
     });
   }
@@ -1111,6 +1106,11 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   }
   if (totalChoices > 0 && computerColorCounts[dominantColor] > 0) {
     score -= 100 * colorPreferences[dominantColor];
+  }
+
+  // Penalti jika pemain draw terlalu banyak
+  if (playerHand.length > 10) {
+    score += 50 * (playerHand.length - 10);
   }
 
   return score;
@@ -1245,9 +1245,9 @@ function simulateRandomGame(state) {
     currentPlayer: state.currentPlayer
   };
 
-  let maxSimSteps = 100;
+  let maxSimSteps = 80;
   let playerUnoCalled = false;
-  const playerMistakeProbability = 0.3; // 30% kemungkinan pemain melakukan kesalahan
+  const playerMistakeProbability = 0.3;
   const actionCardValues = ['Skip', 'Reverse', 'Draw2', 'Wild', 'Wild_Draw4'];
 
   while (simState.computerHand.length > 0 && simState.playerHand.length > 0 && maxSimSteps > 0) {
@@ -1257,20 +1257,16 @@ function simulateRandomGame(state) {
     let move;
 
     if (isComputer) {
-      // Komputer memilih kartu secara strategis
       const playableActionCards = moves.filter(m => m.type === 'play' && actionCardValues.includes(m.card.value));
       const playableWildCards = moves.filter(m => m.type === 'play' && m.card.color === 'wild');
       const playableNumberCards = moves.filter(m => m.type === 'play' && !actionCardValues.includes(m.card.value) && m.card.color !== 'wild');
 
-      // Prioritaskan kartu aksi jika pemain punya sedikit kartu
       if (simState.playerHand.length <= 3 && playableActionCards.length > 0) {
         move = playableActionCards[Math.floor(Math.random() * playableActionCards.length)];
       } else if (playableWildCards.length > 0 && simState.playerHand.length <= 2) {
-        // Gunakan wild card untuk mengganggu pemain yang hampir menang
         move = playableWildCards[Math.floor(Math.random() * playableWildCards.length)];
-        move.colorChoice = computerChooseColor(); // Pilih warna yang menguntungkan komputer
+        move.colorChoice = computerChooseColor();
       } else if (playableNumberCards.length > 0) {
-        // Mainkan kartu nomor yang sesuai dengan warna dominan komputer
         const colorCounts = colors.reduce((acc, color) => {
           acc[color] = hand.filter(c => c.color === color).length;
           return acc;
@@ -1284,9 +1280,7 @@ function simulateRandomGame(state) {
         move = moves[Math.floor(Math.random() * moves.length)];
       }
     } else {
-      // Pemain manusia dengan kemungkinan kesalahan
       if (simState.playerHand.length === 1 && !playerUnoCalled && Math.random() < playerMistakeProbability) {
-        // Pemain lupa memanggil UNO, tambah 2 kartu
         for (let i = 0; i < 2; i++) {
           if (simState.deck.length === 0) {
             const topCard = simState.discardPile.pop();
@@ -1308,32 +1302,27 @@ function simulateRandomGame(state) {
         playerUnoCalled = true;
       }
 
-      // Pemain mungkin menarik kartu meskipun punya kartu yang bisa dimainkan
       if (moves.some(m => m.type === 'play') && Math.random() < playerMistakeProbability * 0.5) {
         move = { type: 'draw' };
       } else if (moves.some(m => m.type === 'play')) {
-        // Pemain memilih kartu acak dari yang bisa dimainkan
         const playableMoves = moves.filter(m => m.type === 'play');
         move = playableMoves[Math.floor(Math.random() * playableMoves.length)];
-        if (move.card.color === 'wild') {
-          // Pemain memilih warna secara acak, tapi hindari warna yang terlalu menguntungkan
+        if (move.card?.color === 'wild') {
           const colorCounts = colors.reduce((acc, color) => {
             acc[color] = simState.playerHand.filter(c => c.color === color).length;
             return acc;
           }, { red: 0, blue: 0, green: 0, yellow: 0 });
-          const sortedColors = colors.sort((a, b) => colorCounts[b] - colorCounts[a]);
-          move.colorChoice = sortedColors[Math.floor(Math.random() * 2) + 1] || sortedColors[0]; // Hindari warna dominan
+          const sortedColors = colors.slice().sort((a, b) => colorCounts[b] - colorCounts[a]);
+          move.colorChoice = sortedColors[Math.floor(Math.random() * 2) + 1] || sortedColors[0];
         }
       } else {
         move = { type: 'draw' };
       }
     }
 
-    // Terapkan langkah
     simState = applyMove(simState, move, isComputer);
 
-    // Tambahan logika untuk wild card
-    if (move.type === 'play' && move.card.color === 'wild' && !move.colorChoice) {
+    if (move.type === 'play' && move.card?.color === 'wild' && !move.colorChoice) {
       simState.currentColor = isComputer ? computerChooseColor() : colors[Math.floor(Math.random() * colors.length)];
     }
 
