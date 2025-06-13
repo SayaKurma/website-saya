@@ -571,6 +571,7 @@ let unoCalled = false;
 let isDrawing = false;
 let playerHasOneCard = false;
 let waitingForPlayerConfirmation = false;
+let opponentActionCardCount = 0; // Track opponent's action card plays
 
 const computerHandEl = document.getElementById('computer-hand');
 const playerHandEl = document.getElementById('player-hand');
@@ -616,7 +617,8 @@ function initGame() {
   isDrawing = false;
   playerHasOneCard = false;
   waitingForPlayerConfirmation = false;
-  memoCache.clear(); // Clear memoization cache
+  opponentActionCardCount = 0; // Reset action card counter
+  memoCache.clear();
   createDeck();
   shuffleDeck();
   dealCards();
@@ -751,6 +753,10 @@ function updateDiscardPile() {
   discardPileEl.setAttribute('aria-label', `Kartu di tumpukan buangan: ${card.color} ${card.value.replace('_', ' ')}`);
   const imageKey = card.color === 'wild' ? `wild_${card.value}` : `${card.color}_${card.value}`;
   discardPileEl.style.backgroundImage = `url(${cardImages[imageKey]})`;
+  // Track player's action cards
+  if (currentPlayer === 'player' && ['Skip', 'Reverse', 'Draw2', 'Wild', 'Wild_Draw4'].includes(card.value)) {
+    opponentActionCardCount++;
+  }
   announce(`Kartu di tumpukan buangan: ${card.color} ${card.value}`);
 }
 
@@ -936,12 +942,13 @@ function computerChooseColor() {
 
 // Enhanced evaluation function
 function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
-  // Check memoization cache
+  // More precise memoization key
   const stateKey = JSON.stringify({
     computerHand: computerHand.map(c => `${c.color}_${c.value}`),
     playerHandLength: playerHand.length,
     currentColor,
-    currentValue
+    currentValue,
+    opponentActionCardCount
   });
   if (memoCache.has(stateKey)) {
     return memoCache.get(stateKey);
@@ -957,57 +964,93 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
 
   // Card value evaluation
   const actionCardWeights = {
-    'Wild_Draw4': 150, // Increased weight for critical card
-    'Wild': 120,
-    'Draw2': 80,
-    'Skip': 60,
-    'Reverse': 50
+    'Wild_Draw4': 200, // High value for critical disruption
+    'Wild': 150,       // Flexible but strategic
+    'Draw2': 100,      // Disruptive
+    'Skip': 90,        // Control flow
+    'Reverse': 80      // Control flow
   };
+
+  // Count colors in computer's hand
+  const computerColorCounts = colors.reduce((acc, color) => {
+    acc[color] = computerHand.filter(card => card.color === color).length;
+    return acc;
+  }, {});
+
+  // Find dominant color
+  const dominantColor = Object.keys(computerColorCounts).reduce((a, b) =>
+    computerColorCounts[a] > computerColorCounts[b] ? a : b
+  );
 
   // Evaluate computer's hand
   for (const card of computerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
-    
+
     // Bonus for matching current color/value
     if (card.color === currentColor || card.value === currentValue) {
       cardScore *= 1.5;
     }
 
-    // Penalty for holding Wild cards late in the game
-    if (card.color === 'wild' && computerHand.length <= 3) {
-      cardScore *= 0.8; // Encourage using Wild cards strategically
+    // Bonus for matching dominant color
+    if (card.color === dominantColor && card.color !== 'wild') {
+      cardScore *= 1.2; // Encourage playing dominant color to maintain flexibility
     }
 
-    // Bonus for action cards when opponent has few cards
-    if (playerHand.length <= 3 && ['Draw2', 'Wild_Draw4', 'Skip', 'Reverse'].includes(card.value)) {
-      cardScore *= 2; // Prioritize disruptive cards
+    // Strategic Wild card retention
+    if (card.color === 'wild') {
+      // Penalty for playing Wild early if other playable cards exist
+      const hasPlayableNonWild = computerHand.some(c => canPlayCard(c) && c.color !== 'wild');
+      if (hasPlayableNonWild && computerHand.length > 3) {
+        cardScore *= 0.7; // Discourage early Wild play
+      }
+      // Bonus for holding Wild when player is close to winning
+      if (playerHand.length <= 2) {
+        cardScore *= 1.5; // Retain Wild for emergencies
+      }
+    }
+
+    // Bonus for control cards (Skip, Reverse) when opponent has few cards
+    if (playerHand.length <= 3 && ['Skip', 'Reverse'].includes(card.value)) {
+      cardScore *= 1.8; // Prioritize control
+    }
+
+    // Adjust score based on opponent aggression
+    if (opponentActionCardCount > 3 && ['Wild_Draw4', 'Draw2'].includes(card.value)) {
+      cardScore *= 1.3; // Save disruptive cards to counter aggressive opponent
     }
 
     score += cardScore;
   }
 
-  // Estimate player's hand (penalize potential threats)
+  // Estimate player's hand
   for (const card of playerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
     if (card.color === currentColor || card.value === currentValue) {
       cardScore *= 1.5;
     }
     if (playerHand.length <= 3 && ['Draw2', 'Wild_Draw4', 'Skip', 'Reverse'].includes(card.value)) {
-      cardScore *= 2; // Penalize player's strong cards
+      cardScore *= 2;
     }
-    score -= cardScore * 0.9; // Slightly less weight for estimated player cards
+    // Penalize based on opponent's action card frequency
+    if (opponentActionCardCount > 3) {
+      cardScore *= 1.2; // Assume player is aggressive
+    }
+    score -= cardScore * 0.9;
   }
 
   // UNO status
   if (computerHand.length === 1) score += 500;
   if (playerHand.length === 1) score -= 500;
 
-  // Additional strategic factors
+  // Strategic adjustments
   if (playerHand.length <= 2 && computerHand.some(card => card.value === 'Wild_Draw4')) {
-    score += 200; // Bonus for holding Wild_Draw4 when opponent is close to winning
+    score += 250; // Strong bonus for holding Wild_Draw4
   }
   if (computerHand.length <= 2 && computerHand.some(card => card.color === 'wild')) {
-    score -= 100; // Penalty for holding Wild cards too long
+    score -= 150; // Penalty for holding Wild too long
+  }
+  if (computerColorCounts[dominantColor] >= 3) {
+    score += 100; // Bonus for strong color dominance
   }
 
   // Cache the result
@@ -1142,6 +1185,7 @@ function minimax(state, depth, alpha, beta, isMaximizing) {
     playerHandLength: state.playerHand.length,
     currentColor: state.currentColor,
     currentValue: state.currentValue,
+    opponentActionCardCount,
     depth,
     isMaximizing
   });
