@@ -1009,6 +1009,12 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     score -= 50;
   }
 
+  // Track chain play potential
+  const chainPotential = colors.reduce((acc, color) => {
+    acc[color] = computerHand.filter(c => c.color === color && !['Wild', 'Wild_Draw4'].includes(c.value)).length;
+    return acc;
+  }, { red: 0, blue: 0, green: 0, yellow: 0 });
+
   for (const card of computerHand) {
     let cardScore = actionCardWeights[card.value] || 20;
     
@@ -1018,6 +1024,14 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     
     if (card.color === dominantColor && card.color !== 'wild') {
       cardScore *= 1.7;
+    }
+    
+    // Chain play bonus for same color/value
+    if (computerHand.length <= 5 && card.color !== 'wild') {
+      const sameColorCount = computerHand.filter(c => c.color === card.color && c !== card).length;
+      if (sameColorCount >= 1) {
+        cardScore += 80 * sameColorCount; // Bonus for potential chain
+      }
     }
     
     if (card.color === 'wild') {
@@ -1038,7 +1052,7 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     }
     
     if (card.value === 'Reverse' && playerHand.length <= 2 && computerHand.length <= 3) {
-      cardScore *= 1.8; // Boost Reverse in 1v1 endgame
+      cardScore *= 1.8;
     }
     
     if (opponentActionCardCount > 4 && ['Wild_Draw4', 'Draw2'].includes(card.value)) {
@@ -1050,9 +1064,9 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
       colors.forEach(color => {
         if (colorPreferences[color] > 0.3) {
           if (card.value === 'Wild_Draw4') {
-            cardScore -= 20 * colorPreferences[color]; // Reduced penalty for Wild_Draw4
+            cardScore -= 20 * colorPreferences[color];
           } else {
-            cardScore -= 50 * colorPreferences[color]; // Standard penalty for Wild
+            cardScore -= 50 * colorPreferences[color];
           }
         }
       });
@@ -1073,6 +1087,15 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
       cardScore *= 1.7;
     }
     score -= cardScore * 1.1;
+  }
+
+  // Additional chain play bonus for high chain potential
+  if (computerHand.length <= 5) {
+    Object.keys(chainPotential).forEach(color => {
+      if (chainPotential[color] >= 2) {
+        score += 150 * (chainPotential[color] - 1); // Bonus for multiple chainable cards
+      }
+    });
   }
 
   if (computerHand.length === 1) score += 1000;
