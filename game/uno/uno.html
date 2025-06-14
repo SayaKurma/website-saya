@@ -1071,6 +1071,7 @@
                 acc[color] = totalChoices > 0 ? playerColorChoices[color] / totalChoices : 0.25;
                 return acc;
             }, {});
+
             if (playerColorCounts[dominantColor] === 0 && computerColorCounts[dominantColor] >= 3) {
                 score += 200;
             }
@@ -1097,6 +1098,7 @@
                 return acc;
             }, { red: 0, blue: 0, green: 0, yellow: 0 });
             const passivePlayer = opponentActionCardCount < 3 && playerHand.length > 7;
+
             for (const card of computerHand) {
                 let cardScore = actionCardWeights[card.value] || 30;
                 if (card.color === currentColor || card.value === currentValue) {
@@ -1762,7 +1764,8 @@
             console.log('Showing message:', text);
             messageTextEl.textContent = text;
             messageEl.classList.remove('hidden');
-            if (text.includes('menang')) {
+
+            if (text.includes('menang') || text.includes('Congratulations') || text.includes('Computer wins')) {
                 playAgainBtn.classList.remove('hidden');
                 backBtn.classList.remove('hidden');
                 closeMessageBtn.classList.add('hidden');
@@ -1774,6 +1777,7 @@
                 closeMessageBtn.classList.remove('hidden');
                 closeMessageBtn.focus();
             }
+
             announce(text);
         }
 
