@@ -949,6 +949,12 @@ function computerChooseColor() {
     }
   }
   
+  const nonDominantColors = playerColorScores.slice(0, 3).map(s => s.color);
+  const availableNonDominant = mostFrequentColors.filter(c => nonDominantColors.includes(c));
+  if (availableNonDominant.length > 0) {
+    return availableNonDominant[Math.floor(Math.random() * availableNonDominant.length)];
+  }
+  
   return mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
 }
 
@@ -1011,15 +1017,13 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
 
   const disruptiveSet = ['Draw2', 'Skip', 'Reverse'];
   const comboCount = computerHand.filter(c => disruptiveSet.includes(c.value)).length;
-  if (comboCount >= 2) {
-    score += comboCount * 50;
-    const playableComboCount = computerHand.filter(
-      c => disruptiveSet.includes(c.value) && (c.color === currentColor || c.color === 'wild')
-    ).length;
-    if (playableComboCount >= 2) {
-      score += 100;
-    }
-  }
+  const comboScore = comboCount >= 2 ? comboCount * 50 : 0;
+  score += comboScore;
+  const playableComboCount = computerHand.filter(
+    c => disruptiveSet.includes(c.value) && (c.color === currentColor || c.color === 'wild')
+  ).length;
+  const playableComboScore = playableComboCount >= 2 ? 100 : 0;
+  score += playableComboScore;
 
   const assumedPlayerCards = estimatePlayerHand(playerHand.length);
   for (const card of assumedPlayerCards) {
@@ -1060,6 +1064,10 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     if (computerHand.some(card => card.color === 'wild')) {
       score += 150;
     }
+    const highNumberCount = computerHand.filter(
+      c => !isNaN(parseInt(c.value, 10)) && parseInt(c.value, 10) >= 8
+    ).length;
+    score -= highNumberCount * 50;
   }
 
   if (currentValue === 'Draw2' || currentValue === 'Wild_Draw4') {
