@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
         :root {
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
@@ -16,17 +17,20 @@
             --primary-dark: #facc15;
             --primary-dark-hover: #eab308;
         }
+
         body {
             transition: background-color 0.5s ease, color 0.5s ease;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #f3f4f6;
             color: #334155;
         }
+
         body.dark {
             font-family: 'Poppins', sans-serif;
             background-color: #0f172a;
             color: #e2e8f0;
         }
+
         .game-container {
             max-width: 90vw;
             margin: auto;
@@ -38,10 +42,12 @@
             padding: 1.5rem;
             transition: background-color 0.5s ease, border-color 0.5s ease;
         }
+
         body.dark .game-container {
             background: rgba(30, 41, 59, 0.9);
             border: 1px solid rgba(250, 204, 21, 0.2);
         }
+
         .card {
             width: 70px;
             height: 100px;
@@ -58,13 +64,16 @@
             background-size: cover;
             background-position: center;
         }
+
         .card:focus {
             outline: 3px solid var(--primary-color);
             outline-offset: 2px;
         }
+
         body.dark .card:focus {
             outline: 3px solid var(--primary-dark);
         }
+
         .card::before {
             content: '';
             position: absolute;
@@ -76,21 +85,26 @@
             border-radius: 10px;
             z-index: -1;
         }
+
         body.dark .card::before {
             background: linear-gradient(45deg, rgba(250, 204, 21, 0.4), transparent);
         }
+
         .card:hover, .card:focus {
             transform: translateY(-10px) scale(1.05);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
         }
+
         .card.selected {
             transform: translateY(-15px) scale(1.1);
             box-shadow: 0 0 0 3px var(--primary-color), 0 15px 30px rgba(0, 0, 0, 0.3);
             animation: selectedPulse 2s infinite;
         }
+
         body.dark .card.selected {
             box-shadow: 0 0 0 3px var(--primary-dark), 0 15px 30px rgba(0, 0, 0, 0.3);
         }
+
         @keyframes selectedPulse {
             0%, 100% {
                 box-shadow: 0 0 0 3px var(--primary-color), 0 15px 30px rgba(0, 0, 0, 0.3);
@@ -99,9 +113,11 @@
                 box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.6), 0 15px 30px rgba(0, 0, 0, 0.3);
             }
         }
+
         body.dark .card.selected {
             animation: selectedPulseDark 2s infinite;
         }
+
         @keyframes selectedPulseDark {
             0%, 100% {
                 box-shadow: 0 0 0 3px var(--primary-dark), 0 15px 30px rgba(0, 0, 0, 0.3);
@@ -110,14 +126,17 @@
                 box-shadow: 0 0 0 6px rgba(250, 204, 21, 0.6), 0 15px 30px rgba(0, 0, 0, 0.3);
             }
         }
+
         .card-back {
             background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%);
             position: relative;
             overflow: hidden;
         }
+
         body.dark .card-back {
             background: linear-gradient(135deg, #d32f2f 0%, #f57c00 100%);
         }
+
         .card-back::after {
             content: 'UNO';
             position: absolute;
@@ -129,6 +148,7 @@
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
         }
+
         .game-center {
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
@@ -141,24 +161,30 @@
             justify-content: center;
             border: 1px solid rgba(59, 130, 246, 0.2);
         }
+
         body.dark .game-center {
             background: rgba(30, 41, 59, 0.25);
             border: 1px solid rgba(250, 204, 21, 0.2);
         }
+
         .draw-pile {
             background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
             border: 2px dashed rgba(255, 255, 255, 0.7);
         }
+
         body.dark .draw-pile {
             background: linear-gradient(135deg, #00695c 0%, #004d40 100%);
         }
+
         .draw-pile:hover, .draw-pile:focus {
             background: linear-gradient(135deg, #009688 0%, #00796b 100%);
             transform: scale(1.05);
         }
+
         body.dark .draw-pile:hover, body.dark .draw-pile:focus {
             background: linear-gradient(135deg, #00796b 0%, #005b4f 100%);
         }
+
         .game-stats {
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
@@ -166,10 +192,12 @@
             padding: 1rem;
             border: 1px solid rgba(59, 130, 246, 0.2);
         }
+
         body.dark .game-stats {
             background: rgba(30, 41, 59, 0.25);
             border: 1px solid rgba(250, 204, 21, 0.2);
         }
+
         .player-area {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
@@ -177,10 +205,12 @@
             border: 1px solid rgba(59, 130, 246, 0.2);
             padding: 1rem;
         }
+
         body.dark .player-area {
             background: rgba(30, 41, 59, 0.15);
             border: 1px solid rgba(250, 204, 21, 0.2);
         }
+
         .btn-primary {
             background-color: var(--primary-color);
             color: white;
@@ -191,19 +221,23 @@
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
         }
+
         body.dark .btn-primary {
             background-color: var(--primary-dark);
             color: #0f172a;
         }
+
         .btn-primary:hover:not(:disabled), .btn-primary:focus {
             background-color: var(--primary-hover);
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
+
         body.dark .btn-primary:hover:not(:disabled), body.dark .btn-primary:focus {
             background-color: var(--primary-dark-hover);
             box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
         }
+
         .btn-primary::after {
             content: '';
             position: absolute;
@@ -216,10 +250,12 @@
             transform: translate(-50%, -50%) scale(0);
             transition: transform 0.5s;
         }
+
         .btn-primary:active::after {
             transform: translate(-50%, -50%) scale(1);
             transition: 0s;
         }
+
         .btn-uno {
             background: linear-gradient(135deg, #d32f2f 0%, #f57c00 100%);
             color: #ffffff;
@@ -229,9 +265,11 @@
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
         }
+
         body.dark .btn-uno {
             background: linear-gradient(135deg, var(--primary-dark), #eab308);
         }
+
         @keyframes unoPulse {
             0%, 100% {
                 transform: scale(1);
@@ -240,18 +278,22 @@
                 transform: scale(1.1);
             }
         }
+
         .message-modal {
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(5px);
         }
+
         .message-content {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
             border-radius: 15px;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
+
         body.dark .message-content {
             background: linear-gradient(135deg, var(--primary-dark), var(--primary-dark-hover));
         }
+
         .color-btn {
             width: 50px;
             height: 50px;
@@ -260,45 +302,58 @@
             transition: transform 0.2s ease;
             border: 2px solid #ffffff;
         }
+
         .color-btn[data-color="red"] {
             background-color: #D40000;
         }
+
         .color-btn[data-color="yellow"] {
             background-color: #FFCC00;
         }
+
         .color-btn[data-color="green"] {
             background-color: #2CA05A;
         }
+
         .color-btn[data-color="blue"] {
             background-color: #2A7FFF;
         }
+
         .color-btn:hover, .color-btn:focus {
             transform: scale(1.1);
             outline: 3px solid var(--primary-color);
         }
+
         body.dark .color-btn:hover, body.dark .color-btn:focus {
             outline: 3px solid var(--primary-dark);
         }
+
         .theme-toggle {
             transition: all 0.3s ease;
             border-radius: 9999px;
             padding: 0.5rem;
         }
+
         .theme-toggle:hover {
             transform: scale(1.2);
         }
+
         body.dark .theme-toggle {
             background-color: #020617;
         }
+
         body.dark .theme-toggle:hover {
             background-color: #1e293b;
         }
+
         body.dark .theme-toggle i {
             color: var(--primary-dark);
         }
+
         .fade-in {
             animation: fadeIn 0.8s ease-in;
         }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -309,9 +364,11 @@
                 transform: translateY(0);
             }
         }
+
         .card-draw-animation {
             animation: slideAndFade 0.5s ease-out forwards;
         }
+
         @keyframes slideAndFade {
             0% {
                 transform: translate(var(--draw-x, 0), var(--draw-y, 0)) scale(1);
@@ -322,6 +379,7 @@
                 opacity: 1;
             }
         }
+
         @media (min-width: 641px) {
             .card {
                 width: 90px;
@@ -345,6 +403,7 @@
                 height: 60px;
             }
         }
+
         @media (min-width: 1024px) {
             .card {
                 width: 110px;
@@ -372,9 +431,11 @@
                 height: 70px;
             }
         }
+
         .card-move {
             animation: moveToDiscard 0.5s ease-out forwards;
         }
+
         @keyframes moveToDiscard {
             0% {
                 transform: translate(0, 0) scale(1);
@@ -385,9 +446,11 @@
                 opacity: 0;
             }
         }
+
         .card-move-computer {
             animation: moveToDiscardComputer 0.5s ease-out forwards;
         }
+
         @keyframes moveToDiscardComputer {
             0% {
                 transform: translate(0, 0) scale(1);
@@ -398,9 +461,11 @@
                 opacity: 0;
             }
         }
+
         .title-glow {
             text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
         }
+
         body.dark .title-glow {
             text-shadow: 0 0 20px rgba(250, 204, 21, 0.6);
         }
@@ -486,6 +551,7 @@
 
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle.querySelector('i');
+
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark');
             if (document.body.classList.contains('dark')) {
@@ -1335,10 +1401,12 @@
             return evaluateBoard(simState.computerHand, simState.playerHand, simState.currentColor, simState.currentValue) / 10000;
         }
 
-        function mcts(rootState, iterations) {
+        function mcts(rootState, maxTimeMs = 5000, maxIterations = 10000) {
             const root = new MCTSNode(rootState);
-            const explorationConstant = Math.sqrt(2);
-            for (let i = 0; i < iterations; i++) {
+            const explorationConstant = 1.0;
+            const startTime = performance.now();
+            let iterations = 0;
+            while (performance.now() - startTime < maxTimeMs && iterations < maxIterations) {
                 let node = root;
                 while (node.untriedMoves.length === 0 && node.children.length > 0) {
                     node = selectChild(node, explorationConstant);
@@ -1356,15 +1424,18 @@
                     node.wins += result;
                     node = node.parent;
                 }
+                iterations++;
             }
             let bestChild = null;
-            let bestVisits = -1;
+            let bestScore = -Infinity;
             for (const child of root.children) {
-                if (child.visits > bestVisits) {
-                    bestVisits = child.visits;
+                const score = child.visits > 0 ? child.wins / child.visits : -Infinity;
+                if (score > bestScore) {
+                    bestScore = score;
                     bestChild = child;
                 }
             }
+            console.log(`MCTS ran ${iterations} iterations in ${Math.round(performance.now() - startTime)}ms`);
             return bestChild ? bestChild.move : null;
         }
 
@@ -1392,22 +1463,20 @@
                 currentValue,
                 currentPlayer: 'computer'
             };
-            let iterations;
+            let maxIterations;
             if (computerHand.length === 1) {
-                iterations = 20000;
+                maxIterations = 15000;
             } else if (computerHand.length <= 3) {
-                iterations = 15000;
+                maxIterations = 10000;
             } else if (computerHand.length <= 5) {
-                iterations = 7500;
-            } else if (computerHand.length <= 8) {
-                iterations = 3000;
+                maxIterations = 5000;
             } else {
-                iterations = 1500;
+                maxIterations = 2000;
             }
             const start = performance.now();
-            const bestMove = mcts(state, iterations);
+            const bestMove = mcts(state, 5000, maxIterations);
             const end = performance.now();
-            console.log(`MCTS took ${Math.round(end - start)}ms with ${iterations} iterations`);
+            console.log(`MCTS took ${Math.round(end - start)}ms with ${maxIterations} max iterations`);
             console.log('Best move:', bestMove);
             if (!bestMove) {
                 console.warn('MCTS returned no move, falling back to random move');
