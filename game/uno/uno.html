@@ -947,20 +947,25 @@ function computerChooseColor() {
   }, { red: 0, blue: 0, green: 0, yellow: 0 });
 
   const totalChoices = Object.values(playerColorChoices).reduce((sum, count) => sum + count, 0);
-  const colorPreferences = colors.reduce((acc, color) => {
-    acc[color] = totalChoices > 0 ? playerColorChoices[color] / totalChoices : 0.25;
+  const colorPreferences = totalChoices > 0 ? colors.reduce((acc, color) => {
+    acc[color] = playerColorChoices[color] / totalChoices;
     return acc;
-  }, {});
+  }, { red: 0, blue: 0, green: 0, yellow: 0 }) : colors.reduce((acc, color) => {
+    acc[color] = 0.25;
+    return acc;
+  }, { red: 0.25, blue: 0.25, green: 0.25, yellow: 0.25 });
 
   // Calculate scores for each color
+  const penalty = playerHand.length <= 3 ? 150 : 100; // Adaptive penalty
   const colorScores = colors.map(color => {
-    let score = computerColorCounts[color] * 10; // Prioritize colors AI has
-    // Penalize colors frequently chosen by player, prioritize least chosen
-    score -= colorPreferences[color] * 100; // Strong penalty for player's preferred colors
-    if (computerHand.length <= 2 && computerColorCounts[color] > 0) {
-      score *= 2; // Increase priority for AI's colors when hand is small
+    let score = computerColorCounts[color] * 10; // Prioritize AI's colors
+    score -= colorPreferences[color] * penalty; // Penalize player's preferred colors
+    if (currentColor === color && playerColorChoices[color] > 0) {
+      score -= 30; // Penalize if color matches discard pile and player prefers it
     }
-    // Bonus for colors the player rarely chooses
+    if (computerHand.length <= 2 && computerColorCounts[color] > 0) {
+      score *= 2; // Boost AI's colors when hand is small
+    }
     if (colorPreferences[color] < 0.15 && totalChoices > 0) {
       score += 50; // Bonus for colors player rarely picks
     }
