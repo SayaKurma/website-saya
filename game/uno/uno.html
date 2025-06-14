@@ -571,6 +571,7 @@ let unoCalled = false;
 let isDrawing = false;
 let playerHasOneCard = false;
 let waitingForPlayerConfirmation = false;
+const playerColorHistory = { red: 0, blue: 0, green: 0, yellow: 0 };
 
 const computerHandEl = document.getElementById('computer-hand');
 const playerHandEl = document.getElementById('player-hand');
@@ -588,7 +589,6 @@ const colors = ['red', 'blue', 'green', 'yellow'];
 const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Skip', 'Reverse', 'Draw2'];
 const wildCards = ['Wild', 'Wild_Draw4'];
 
-// Memoization cache
 const memoCache = new Map();
 
 function debounce(func, wait) {
@@ -617,6 +617,7 @@ function initGame() {
   playerHasOneCard = false;
   waitingForPlayerConfirmation = false;
   memoCache.clear();
+  Object.keys(playerColorHistory).forEach(color => playerColorHistory[color] = 0);
   createDeck();
   shuffleDeck();
   dealCards();
@@ -831,6 +832,9 @@ function handleDiscardClick(e) {
     playerMustDraw();
     return;
   }
+  if (card.color !== 'wild') {
+    playerColorHistory[card.color]++;
+  }
   const selectedCardEl = playerHandEl.children[selectedCardIndex];
   const discardRect = discardPileEl.getBoundingClientRect();
   const cardRect = selectedCardEl.getBoundingClientRect();
@@ -931,6 +935,20 @@ function computerChooseColor() {
   }, {});
   const maxCount = Math.max(...Object.values(colorCounts));
   const mostFrequentColors = Object.keys(colorCounts).filter(color => colorCounts[color] === maxCount);
+  
+  const totalPlays = Object.values(playerColorHistory).reduce((sum, count) => sum + count, 0) || 1;
+  const playerColorScores = colors.map(color => ({
+    color,
+    score: playerColorHistory[color] / totalPlays
+  }));
+  playerColorScores.sort((a, b) => a.score - b.score);
+  
+  for (const { color } of playerColorScores) {
+    if (mostFrequentColors.includes(color)) {
+      return color;
+    }
+  }
+  
   return mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
 }
 
@@ -986,6 +1004,21 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     }
 
     score += cardScore;
+  }
+
+  const colorMatchCount = computerHand.filter(c => c.color === currentColor).length;
+  score += colorMatchCount * 20;
+
+  const disruptiveSet = ['Draw2', 'Skip', 'Reverse'];
+  const comboCount = computerHand.filter(c => disruptiveSet.includes(c.value)).length;
+  if (comboCount >= 2) {
+    score += comboCount * 50;
+    const playableComboCount = computerHand.filter(
+      c => disruptiveSet.includes(c.value) && (c.color === currentColor || c.color === 'wild')
+    ).length;
+    if (playableComboCount >= 2) {
+      score += 100;
+    }
   }
 
   const assumedPlayerCards = estimatePlayerHand(playerHand.length);
@@ -1051,17 +1084,27 @@ function estimatePlayerHand(handSize) {
     wild: 0.1
   };
 
+  const totalPlays = Object.values(playerColorHistory).reduce((sum, count) => sum + count, 0) || 1;
+  const colorWeights = colors.reduce((acc, color) => {
+    acc[color] = 1 - (playerColorHistory[color] / totalPlays);
+    return acc;
+  }, {});
+  
+  const totalWeight = Object.values(colorWeights).reduce((sum, weight) => sum + weight, 0) || 1;
+  const colorProbs = colors.reduce((acc, color) => {
+    acc[color] = colorWeights[color] / totalWeight;
+    return acc;
+  }, {});
+
   for (let i = 0; i < handSize; i++) {
     const rand = Math.random();
     let card;
     if (rand < probabilities.number) {
-      card = cardTypes.filter(c => !isNaN(parseInt(c.value, 10)))[
-        Math.floor(Math.random() * values.length * colors.length)
-      ];
+      card = cardTypes.filter(c => !isNaN(parseInt(c.value, 10)));
+      card = selectCardWithColorWeight(card, colorProbs);
     } else if (rand < probabilities.number + probabilities.action) {
-      card = cardTypes.filter(c => ['Skip', 'Reverse', 'Draw2'].includes(c.value))[
-        Math.floor(Math.random() * 3 * colors.length)
-      ];
+      card = cardTypes.filter(c => ['Skip', 'Reverse', 'Draw2'].includes(c.value));
+      card = selectCardWithColorWeight(card, colorProbs);
     } else {
       card = cardTypes.filter(c => c.color === 'wild')[
         Math.floor(Math.random() * wildCards.length)
@@ -1071,6 +1114,19 @@ function estimatePlayerHand(handSize) {
   }
 
   return assumedCards;
+}
+
+function selectCardWithColorWeight(cards, colorProbs) {
+  const rand = Math.random();
+  let sum = 0;
+  for (const color of colors) {
+    sum += colorProbs[color];
+    if (rand < sum) {
+      const colorCards = cards.filter(c => c.color === color);
+      return colorCards[Math.floor(Math.random() * colorCards.length)] || cards[Math.floor(Math.random() * cards.length)];
+    }
+  }
+  return cards[Math.floor(Math.random() * cards.length)];
 }
 
 function getPossibleMoves(hand) {
