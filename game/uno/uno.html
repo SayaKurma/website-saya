@@ -1049,6 +1049,10 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
     if (computerHand.some(card => card.value === 'Wild_Draw4' || card.value === 'Draw2')) {
       score += 400;
     }
+    const wildCount = computerHand.filter(c => c.color === 'wild').length;
+    if (wildCount >= 2) {
+      score += 200;
+    }
   } else if (playerHand.length === 2) {
     score -= 500;
     if (computerHand.some(card => ['Wild_Draw4', 'Draw2', 'Skip'].includes(card.value))) {
@@ -1059,6 +1063,10 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   const uniqueColors = new Set(computerHand.filter(card => card.color !== 'wild').map(card => card.color));
   score += uniqueColors.size * 50;
 
+  if (computerHand.length === 1 && computerHand[0].color === 'wild') {
+    score += 150;
+  }
+
   if (deck.length < 10) {
     score -= 100;
     if (computerHand.some(card => card.color === 'wild')) {
@@ -1068,6 +1076,19 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
       c => !isNaN(parseInt(c.value, 10)) && parseInt(c.value, 10) >= 8
     ).length;
     score -= highNumberCount * 50;
+  }
+
+  const totalPlays = Object.values(playerColorHistory).reduce((sum, count) => sum + count, 0) || 1;
+  const playerColorScores = colors.map(color => ({
+    color,
+    score: playerColorHistory[color] / totalPlays
+  }));
+  const dominantPlayerColor = playerColorScores.reduce((max, curr) => curr.score > max.score ? curr : max).color;
+  const colorTrapCount = computerHand.filter(
+    c => c.color !== 'wild' && c.color === dominantPlayerColor
+  ).length;
+  if (colorTrapCount === computerHand.filter(c => c.color !== 'wild').length && colorTrapCount > 0) {
+    score -= colorTrapCount * 30;
   }
 
   if (currentValue === 'Draw2' || currentValue === 'Wild_Draw4') {
