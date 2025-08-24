@@ -958,9 +958,31 @@ function computerChooseColor() {
   return mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
 }
 
-function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
+function getRemainingCards(discardPile, computerHand) {
+  const allCards = [];
+  colors.forEach(color => {
+    allCards.push({ color, value: '0' });
+    values.slice(1).forEach(value => {
+      allCards.push({ color, value });
+      allCards.push({ color, value });
+    });
+  });
+  wildCards.forEach(value => {
+    for (let i = 0; i < 4; i++) {
+      allCards.push({ color: 'wild', value });
+    }
+  });
+  const knownCards = [...discardPile, ...computerHand];
+  const remaining = allCards.filter(
+    card => !knownCards.some(k => k.color === card.color && k.value === card.value)
+  );
+  return remaining;
+}
+
+function evaluateBoard(computerHand, playerHand, currentColor, currentValue, discardPile) {
   const stateKey = JSON.stringify({
     computerHand: computerHand.map(c => `${c.color}_${c.value}`),
+    discardPile: discardPile.map(c => `${c.color}_${c.value}`),
     playerHandLength: playerHand.length,
     currentColor,
     currentValue
@@ -1025,7 +1047,8 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   const playableComboScore = playableComboCount >= 2 ? 100 : 0;
   score += playableComboScore;
 
-  const assumedPlayerCards = estimatePlayerHand(playerHand.length);
+  const remainingCards = getRemainingCards(discardPile, computerHand);
+  const assumedPlayerCards = estimatePlayerHandImproved(playerHand.length, [...remainingCards], playerColorHistory);
   for (const card of assumedPlayerCards) {
     let cardScore = actionCardWeights[card.value] || (parseInt(card.value, 10) || 0) * 10 + 20;
 
@@ -1041,8 +1064,15 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
       cardScore *= 1.5;
     }
 
-    score -= cardScore * 1.1;
+    score -= cardScore * 1.2;
   }
+
+  const colorCounts = colors.reduce((acc, c) => {
+    acc[c] = assumedPlayerCards.filter(card => card.color === c).length;
+    return acc;
+  }, {});
+  const scarceColors = Object.values(colorCounts).filter(count => count / playerHand.length < 0.2).length;
+  score += scarceColors * 50; 
 
   if (playerHand.length === 1) {
     score -= 1000;
@@ -1101,61 +1131,40 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue) {
   return score;
 }
 
-function estimatePlayerHand(handSize) {
-  const assumedCards = [];
-  const cardTypes = [
-    ...colors.flatMap(color => values.map(value => ({ color, value }))),
-    ...wildCards.map(value => ({ color: 'wild', value }))
-  ];
-  const probabilities = {
-    number: 0.6,
-    action: 0.3,
-    wild: 0.1
-  };
-
+function estimatePlayerHandImproved(handSize, remainingCards, playerColorHistory) {
   const totalPlays = Object.values(playerColorHistory).reduce((sum, count) => sum + count, 0) || 1;
-  const colorWeights = colors.reduce((acc, color) => {
-    acc[color] = 1 - (playerColorHistory[color] / totalPlays);
-    return acc;
-  }, {});
-  
-  const totalWeight = Object.values(colorWeights).reduce((sum, weight) => sum + weight, 0) || 1;
   const colorProbs = colors.reduce((acc, color) => {
-    acc[color] = colorWeights[color] / totalWeight;
+    acc[color] = Math.max(0.1, 1 - (playerColorHistory[color] / totalPlays));
     return acc;
   }, {});
+  const totalProb = Object.values(colorProbs).reduce((sum, w) => sum + w, 0);
+  Object.keys(colorProbs).forEach(c => colorProbs[c] /= totalProb);
 
+  const estimated = [];
   for (let i = 0; i < handSize; i++) {
-    const rand = Math.random();
-    let card;
-    if (rand < probabilities.number) {
-      card = cardTypes.filter(c => !isNaN(parseInt(c.value, 10)));
-      card = selectCardWithColorWeight(card, colorProbs);
-    } else if (rand < probabilities.number + probabilities.action) {
-      card = cardTypes.filter(c => ['Skip', 'Reverse', 'Draw2'].includes(c.value));
-      card = selectCardWithColorWeight(card, colorProbs);
-    } else {
-      card = cardTypes.filter(c => c.color === 'wild')[
-        Math.floor(Math.random() * wildCards.length)
-      ];
+    if (remainingCards.length === 0) break;
+    const weighted = remainingCards.map(card => ({
+      card,
+      weight: card.color === 'wild' ? 1 : colorProbs[card.color]
+    }));
+    const totalWeight = weighted.reduce((sum, { weight }) => sum + weight, 0);
+    let rand = Math.random() * totalWeight;
+    let selected;
+    for (const { card, weight } of weighted) {
+      rand -= weight;
+      if (rand <= 0) {
+        selected = card;
+        break;
+      }
     }
-    assumedCards.push({ ...card });
-  }
-
-  return assumedCards;
-}
-
-function selectCardWithColorWeight(cards, colorProbs) {
-  const rand = Math.random();
-  let sum = 0;
-  for (const color of colors) {
-    sum += colorProbs[color];
-    if (rand < sum) {
-      const colorCards = cards.filter(c => c.color === color);
-      return colorCards[Math.floor(Math.random() * colorCards.length)] || cards[Math.floor(Math.random() * cards.length)];
+    if (selected) {
+      estimated.push(selected);
+      remainingCards = remainingCards.filter(
+        c => !(c.color === selected.color && c.value === selected.value)
+      );
     }
   }
-  return cards[Math.floor(Math.random() * cards.length)];
+  return estimated;
 }
 
 function getPossibleMoves(hand) {
@@ -1290,7 +1299,7 @@ function minimax(state, depth, alpha, beta, isMaximizing) {
   }
 
   if (depth === 0 || state.computerHand.length === 0 || state.playerHand.length === 0) {
-    const score = evaluateBoard(state.computerHand, state.playerHand, state.currentColor, state.currentValue);
+    const score = evaluateBoard(state.computerHand, state.playerHand, state.currentColor, state.currentValue, state.discardPile);
     memoCache.set(stateKey, score);
     return score;
   }
