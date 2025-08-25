@@ -929,6 +929,16 @@ function drawCard() {
 }
 
 function computerChooseColor() {
+  const colorComboAnalysis = evaluateColorCombos(computerHand);    
+  const bestComboColor = Object.entries(colorComboAnalysis.colorGroups)        
+    .filter(([color, group]) => group.total >= 2)        
+    .sort((a, b) => (b[1].total + b[1].actions * 2) - (a[1].total + a[1].actions * 2))        
+    [0]?.[0];
+    
+  if (bestComboColor) {        
+    return bestComboColor;    
+  }
+  
   const colorCounts = colors.reduce((acc, color) => {
     acc[color] = computerHand.filter(card => card.color === color).length;
     return acc;
@@ -979,6 +989,39 @@ function getRemainingCards(discardPile, computerHand) {
   return remaining;
 }
 
+function evaluateColorCombos(hand) {    
+  const colorGroups = {};    
+  const actionCards = ['Skip', 'Reverse', 'Draw2'];
+        
+  colors.forEach(color => {        
+    colorGroups[color] = {            
+      total: hand.filter(c => c.color === color).length,            
+      actions: hand.filter(c => c.color === color && actionCards.includes(c.value)).length,            
+      numbers: hand.filter(c => c.color === color && !actionCards.includes(c.value) && c.value !== 'Wild').length        
+    };    
+  });
+        
+  let totalBonus = 0;
+        
+  Object.entries(colorGroups).forEach(([color, group]) => {        
+    if (group.total >= 3) {            
+      totalBonus += group.total * 80; 
+                        
+      if (group.actions >= 2) {                
+        totalBonus += 200;             
+      } else if (group.actions >= 1) {                
+        totalBonus += 100;             
+      }
+                        
+      if (group.actions >= 2 && group.total >= 4) {                
+        totalBonus += 300;             
+      }        
+    }    
+  });
+        
+  return { totalBonus, colorGroups };
+}
+
 function evaluateBoard(computerHand, playerHand, currentColor, currentValue, discardPile) {
   const stateKey = JSON.stringify({
     computerHand: computerHand.map(c => `${c.color}_${c.value}`),
@@ -1011,7 +1054,7 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue, dis
     let cardScore = actionCardWeights[card.value] || (parseInt(card.value, 10) || 0) * 10 + 20;
 
     if (card.color === currentColor || card.value === currentValue || card.color === 'wild') {
-      cardScore *= 1.7;
+      cardScore *= 1.5;
     }
 
     if (card.color === 'wild') {
@@ -1036,6 +1079,9 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue, dis
 
   const colorMatchCount = computerHand.filter(c => c.color === currentColor).length;
   score += colorMatchCount * 20;
+
+  const colorComboAnalysis = evaluateColorCombos(computerHand);
+  score += colorComboAnalysis.totalBonus;
 
   const disruptiveSet = ['Draw2', 'Skip', 'Reverse'];
   const comboCount = computerHand.filter(c => disruptiveSet.includes(c.value)).length;
