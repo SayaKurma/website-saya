@@ -1094,11 +1094,11 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue, dis
     score -= cardScore * 1.2;
   }
 
-  const colorCounts = colors.reduce((acc, c) => {
+  const playerColorCounts = colors.reduce((acc, c) => {
     acc[c] = assumedPlayerCards.filter(card => card.color === c).length;
     return acc;
   }, {});
-  const scarceColors = Object.values(colorCounts).filter(count => count / playerHand.length < 0.2).length;
+  const scarceColors = Object.values(playerColorCounts).filter(count => count / playerHand.length < 0.2).length;
   score += scarceColors * 50; 
 
   if (playerHand.length === 1) {
@@ -1179,7 +1179,7 @@ function estimatePlayerHandImproved(handSize, remainingCards, playerColorHistory
   const estimated = [];
   for (let i = 0; i < handSize; i++) {
     if (remainingCards.length === 0) break;
-    const weighted = remainingCards.map(card => ({
+    const weighted = availableCards.map(card => ({
       card,
       weight: card.color === 'wild' ? 1 : colorProbs[card.color]
     }));
@@ -1195,9 +1195,12 @@ function estimatePlayerHandImproved(handSize, remainingCards, playerColorHistory
     }
     if (selected) {
       estimated.push(selected);
-      remainingCards = remainingCards.filter(
-        c => !(c.color === selected.color && c.value === selected.value)
-      );
+      const selectedIndex = availableCards.findIndex(
+        c => c.color === selected.color && c.value === selected.value            
+      );            
+      if (selectedIndex !== -1) {                
+        availableCards.splice(selectedIndex, 1);            
+      }
     }
   }
   return estimated;
