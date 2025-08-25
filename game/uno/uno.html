@@ -588,7 +588,6 @@ const colorButtons = document.querySelectorAll('.color-btn');
 const colors = ['red', 'blue', 'green', 'yellow'];
 const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Skip', 'Reverse', 'Draw2'];
 const wildCards = ['Wild', 'Wild_Draw4'];
-const disruptiveSet = ['Skip', 'Reverse', 'Draw2', 'Wild', 'Wild_Draw4'];
 
 const memoCache = new Map();
 
@@ -1038,41 +1037,15 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue, dis
   const colorMatchCount = computerHand.filter(c => c.color === currentColor).length;
   score += colorMatchCount * 20;
 
-  const actionCards = ['Draw2', 'Skip', 'Reverse'];
-  const totalActionCount = computerHand.filter(c => actionCards.includes(c.value)).length;
-  const totalActionScore = totalActionCount >= 2 ? totalActionCount * 50 : 0;
-  score += totalActionScore;
+  const disruptiveSet = ['Draw2', 'Skip', 'Reverse'];
+  const comboCount = computerHand.filter(c => disruptiveSet.includes(c.value)).length;
+  const comboScore = comboCount >= 2 ? comboCount * 50 : 0;
+  score += comboScore;
   const playableComboCount = computerHand.filter(
     c => disruptiveSet.includes(c.value) && (c.color === currentColor || c.color === 'wild')
   ).length;
   const playableComboScore = playableComboCount >= 2 ? 100 : 0;
   score += playableComboScore;
-
-  const colorCounts = {};
-  colors.forEach(color => {
-    colorCounts[color] = computerHand.filter(c => c.color === color).length;
-  });
-  const dominantColors = Object.keys(colorCounts).filter(color => colorCounts[color] >= 3);
-  let dominantBonus = dominantColors.length * 100; // Bonus besar per warna dominan
-  score += dominantBonus;
-
-  let actionPerColorBonus = 0;
-  Object.keys(colorCounts).forEach(color => {
-    const actionsInColor = computerHand.filter(c => c.color === color && actionCards.includes(c.value)).length;
-    if (actionsInColor >= 2) {
-      actionPerColorBonus += actionsInColor * 80; // Bonus combo aksi warna sama
-    }
-  });
-  score += actionPerColorBonus;
-
-  let sequentialComboBonus = 0;
-  Object.keys(colorCounts).forEach(color => {
-    const playableActions = computerHand.filter(c => c.color === color && actionCards.includes(c.value) && (c.color === currentColor || c.value === currentValue));
-    if (playableActions.length >= 2) {
-      sequentialComboBonus += playableActions.length * 120; // Bonus lebih besar untuk combo berturut
-    }
-  });
-  score += sequentialComboBonus;
 
   const remainingCards = getRemainingCards(discardPile, computerHand);
   const assumedPlayerCards = estimatePlayerHandImproved(playerHand.length, [...remainingCards], playerColorHistory);
@@ -1094,11 +1067,11 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue, dis
     score -= cardScore * 1.2;
   }
 
-  const playerColorCounts = colors.reduce((acc, c) => {
+  const colorCounts = colors.reduce((acc, c) => {
     acc[c] = assumedPlayerCards.filter(card => card.color === c).length;
     return acc;
   }, {});
-  const scarceColors = Object.values(playerColorCounts).filter(count => count / playerHand.length < 0.2).length;
+  const scarceColors = Object.values(colorCounts).filter(count => count / playerHand.length < 0.2).length;
   score += scarceColors * 50; 
 
   if (playerHand.length === 1) {
@@ -1179,7 +1152,7 @@ function estimatePlayerHandImproved(handSize, remainingCards, playerColorHistory
   const estimated = [];
   for (let i = 0; i < handSize; i++) {
     if (remainingCards.length === 0) break;
-    const weighted = availableCards.map(card => ({
+    const weighted = remainingCards.map(card => ({
       card,
       weight: card.color === 'wild' ? 1 : colorProbs[card.color]
     }));
@@ -1195,12 +1168,9 @@ function estimatePlayerHandImproved(handSize, remainingCards, playerColorHistory
     }
     if (selected) {
       estimated.push(selected);
-      const selectedIndex = availableCards.findIndex(
-        c => c.color === selected.color && c.value === selected.value            
-      );            
-      if (selectedIndex !== -1) {                
-        availableCards.splice(selectedIndex, 1);            
-      }
+      remainingCards = remainingCards.filter(
+        c => !(c.color === selected.color && c.value === selected.value)
+      );
     }
   }
   return estimated;
@@ -1765,3 +1735,4 @@ window.addEventListener('load', initGame);
 </script>
 </body>
 </html>
+
