@@ -1037,15 +1037,41 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue, dis
   const colorMatchCount = computerHand.filter(c => c.color === currentColor).length;
   score += colorMatchCount * 20;
 
-  const disruptiveSet = ['Draw2', 'Skip', 'Reverse'];
-  const comboCount = computerHand.filter(c => disruptiveSet.includes(c.value)).length;
-  const comboScore = comboCount >= 2 ? comboCount * 50 : 0;
-  score += comboScore;
+  const actionCards = ['Draw2', 'Skip', 'Reverse'];
+  const totalActionCount = computerHand.filter(c => actionCards.includes(c.value)).length;
+  const totalActionScore = totalActionCount >= 2 ? totalActionCount * 50 : 0;
+  score += totalActionScore;
   const playableComboCount = computerHand.filter(
     c => disruptiveSet.includes(c.value) && (c.color === currentColor || c.color === 'wild')
   ).length;
   const playableComboScore = playableComboCount >= 2 ? 100 : 0;
   score += playableComboScore;
+
+  const colorCounts = {};
+  colors.forEach(color => {
+    colorCounts[color] = computerHand.filter(c => c.color === color).length;
+  });
+  const dominantColors = Object.keys(colorCounts).filter(color => colorCounts[color] >= 3);
+  let dominantBonus = dominantColors.length * 100; // Bonus besar per warna dominan
+  score += dominantBonus;
+
+  let actionPerColorBonus = 0;
+  Object.keys(colorCounts).forEach(color => {
+    const actionsInColor = computerHand.filter(c => c.color === color && actionCards.includes(c.value)).length;
+    if (actionsInColor >= 2) {
+      actionPerColorBonus += actionsInColor * 80; // Bonus combo aksi warna sama
+    }
+  });
+  score += actionPerColorBonus;
+
+  let sequentialComboBonus = 0;
+  Object.keys(colorCounts).forEach(color => {
+    const playableActions = computerHand.filter(c => c.color === color && actionCards.includes(c.value) && (c.color === currentColor || c.value === currentValue));
+    if (playableActions.length >= 2) {
+      sequentialComboBonus += playableActions.length * 120; // Bonus lebih besar untuk combo berturut
+    }
+  });
+  score += sequentialComboBonus;
 
   const remainingCards = getRemainingCards(discardPile, computerHand);
   const assumedPlayerCards = estimatePlayerHandImproved(playerHand.length, [...remainingCards], playerColorHistory);
