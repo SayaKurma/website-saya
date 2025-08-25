@@ -1093,6 +1093,15 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue, dis
   const uniqueColors = new Set(computerHand.filter(card => card.color !== 'wild').map(card => card.color));
   score += uniqueColors.size * 50;
 
+  if (playerHand.length > 2) { 
+    const highCards = computerHand.filter(c => !isNaN(parseInt(c.value, 10)) && parseInt(c.value, 10) >= 7);
+    const highCount = highCards.length;
+    score -= highCount * 80; 
+    if (highCount >= 3) { 
+      score -= (highCount - 2) * 100; 
+    }
+  }
+
   if (computerHand.length === 1 && computerHand[0].color === 'wild') {
     score += 150;
   }
@@ -1103,7 +1112,7 @@ function evaluateBoard(computerHand, playerHand, currentColor, currentValue, dis
       score += 150;
     }
     const highNumberCount = computerHand.filter(
-      c => !isNaN(parseInt(c.value, 10)) && parseInt(c.value, 10) >= 8
+      c => !isNaN(parseInt(c.value, 10)) && parseInt(c.value, 10) >= 7
     ).length;
     score -= highNumberCount * 50;
   }
