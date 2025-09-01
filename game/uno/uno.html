@@ -572,6 +572,8 @@ let isDrawing = false;
 let playerHasOneCard = false;
 let waitingForPlayerConfirmation = false;
 const playerColorHistory = { red: 0, blue: 0, green: 0, yellow: 0 };
+const discardedCards = { red: 0, blue: 0, green: 0, yellow: 0 };
+const playerColorAvoidance = { red: 0, blue: 0, green: 0, yellow: 0 };
 
 const computerHandEl = document.getElementById('computer-hand');
 const playerHandEl = document.getElementById('player-hand');
@@ -618,6 +620,8 @@ function initGame() {
   waitingForPlayerConfirmation = false;
   memoCache.clear();
   Object.keys(playerColorHistory).forEach(color => playerColorHistory[color] = 0);
+  Object.keys(discardedCards).forEach(color => discardedCards[color] = 0);
+  Object.keys(playerColorAvoidance).forEach(color => playerColorAvoidance[color] = 0);
   createDeck();
   shuffleDeck();
   dealCards();
@@ -825,6 +829,9 @@ function handleDiscardClick(e) {
   }
   const card = playerHand[selectedCardIndex];
   if (!canPlayCard(card)) {
+    if (card.color !== 'wild') {
+        playerColorAvoidance[card.color]++;
+    }
     showMessage('❌ Kartu tidak valid! Pilih warna atau nilai yang cocok.');
     return;
   }
@@ -929,43 +936,39 @@ function drawCard() {
 }
 
 function computerChooseColor() {
-  const colorComboAnalysis = evaluateColorCombos(computerHand);    
-  const bestComboColor = Object.entries(colorComboAnalysis.colorGroups)        
-    .filter(([color, group]) => group.total >= 2)        
-    .sort((a, b) => (b[1].total + b[1].actions * 2) - (a[1].total + a[1].actions * 2))        
-    [0]?.[0];
+    const colorComboAnalysis = evaluateColorCombos(computerHand);
+    const playerColorProbs = calculatePlayerColorProbability();
     
-  if (bestComboColor) {        
-    return bestComboColor;    
-  }
-  
-  const colorCounts = colors.reduce((acc, color) => {
-    acc[color] = computerHand.filter(card => card.color === color).length;
-    return acc;
-  }, {});
-  const maxCount = Math.max(...Object.values(colorCounts));
-  const mostFrequentColors = Object.keys(colorCounts).filter(color => colorCounts[color] === maxCount);
-  
-  const totalPlays = Object.values(playerColorHistory).reduce((sum, count) => sum + count, 0) || 1;
-  const playerColorScores = colors.map(color => ({
-    color,
-    score: playerColorHistory[color] / totalPlays
-  }));
-  playerColorScores.sort((a, b) => a.score - b.score);
-  
-  for (const { color } of playerColorScores) {
-    if (mostFrequentColors.includes(color)) {
-      return color;
+    const strongCombos = Object.entries(colorComboAnalysis.colorGroups)
+        .filter(([color, group]) => group.total >= 2)
+        .sort((a, b) => {
+            const aScore = (a[1].total + a[1].actions * 2) * (1 - playerColorProbs[a[0]]);
+            const bScore = (b[1].total + b[1].actions * 2) * (1 - playerColorProbs[b[0]]);
+            return bScore - aScore;
+        });
+    
+    if (strongCombos.length > 0) {
+        return strongCombos[0][0];
     }
-  }
-  
-  const nonDominantColors = playerColorScores.slice(0, 3).map(s => s.color);
-  const availableNonDominant = mostFrequentColors.filter(c => nonDominantColors.includes(c));
-  if (availableNonDominant.length > 0) {
-    return availableNonDominant[Math.floor(Math.random() * availableNonDominant.length)];
-  }
-  
-  return mostFrequentColors[Math.floor(Math.random() * mostFrequentColors.length)];
+    
+    const colorCounts = colors.reduce((acc, color) => {
+        const count = computerHand.filter(card => card.color === color).length;
+        const playerLikelihood = playerColorProbs[color];
+        acc[color] = { count, playerLikelihood, score: count * (1 - playerLikelihood) };
+        return acc;
+    }, {});
+    
+    const bestColors = Object.entries(colorCounts)
+        .sort((a, b) => b[1].score - a[1].score);
+    
+    const topScore = bestColors[0][1].score;
+    const candidates = bestColors.filter(([color, data]) => data.score >= topScore * 0.8);
+    
+    const finalChoice = candidates.sort((a, b) => 
+        playerColorProbs[a[0]] - playerColorProbs[b[0]]
+    )[0][0];
+    
+    return finalChoice;
 }
 
 function getRemainingCards(discardPile, computerHand) {
@@ -987,6 +990,36 @@ function getRemainingCards(discardPile, computerHand) {
     card => !knownCards.some(k => k.color === card.color && k.value === card.value)
   );
   return remaining;
+}
+
+function analyzeRemainingColorDistribution() {
+    const totalCardsPerColor = 25; 
+    const remainingByColor = {};
+    
+    colors.forEach(color => {
+        const discarded = discardedCards[color];
+        const inComputerHand = computerHand.filter(c => c.color === color).length;
+        remainingByColor[color] = Math.max(0, totalCardsPerColor - discarded - inComputerHand);
+    });
+    
+    return remainingByColor;
+}
+
+function calculatePlayerColorProbability() {
+    const remaining = analyzeRemainingColorDistribution();
+    const totalPlays = Object.values(playerColorHistory).reduce((sum, count) => 
+        sum + count, 0) || 1;
+    
+    const colorScores = {};
+    colors.forEach(color => {
+        const playRate = playerColorHistory[color] / totalPlays;
+        const avoidanceScore = playerColorAvoidance[color];
+        const remainingCards = remaining[color];
+        
+        colorScores[color] = (playRate * 0.4) + (remainingCards / 25 * 0.4) - (avoidanceScore * 0.2);
+    });
+    
+    return colorScores;
 }
 
 function evaluateColorCombos(hand) {    
@@ -1550,6 +1583,10 @@ function computerTurn() {
 }
 
 function updateGameStateAfterPlay(card) {
+  if (card.color !== 'wild') {
+    discardedCards[card.color]++;
+  }
+
   if (card.color === 'wild') {
     currentValue = '';
   } else {
