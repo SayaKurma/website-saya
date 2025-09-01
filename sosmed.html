@@ -6,21 +6,58 @@
     <title>Sosial Media - Portofolio Saya</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
         :root {
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
             --dark-text: #334155;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
         }
+
         body {
             transition: background-color 0.5s ease, color 0.5s ease;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
         .active {
             font-weight: 600;
             color: var(--primary-color);
             position: relative;
         }
+
+        body.dark .active {
+            color: var(--primary-dark);
+        }
+
         .active::after {
             content: '';
             position: absolute;
@@ -31,9 +68,16 @@
             background-color: var(--primary-color);
             border-radius: 2px;
         }
+
+        body.dark .active::after {
+            background: linear-gradient(90deg, transparent, var(--primary-dark), transparent);
+            bottom: -2px;
+        }
+
         .nav-link {
             position: relative;
         }
+
         .nav-link::after {
             content: '';
             position: absolute;
@@ -45,36 +89,63 @@
             transition: width 0.3s ease;
             border-radius: 2px;
         }
+
+        body.dark .nav-link::after {
+            background: linear-gradient(90deg, transparent, var(--primary-dark), transparent);
+            bottom: -2px;
+        }
+
         .nav-link:hover::after {
             width: 100%;
         }
+
+        body.dark .nav-link:hover {
+            color: var(--primary-dark);
+        }
+
         .fade-in {
             animation: fadeIn 0.8s ease-in;
         }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
         .slide-in-right {
             animation: slideInRight 0.8s ease-out;
         }
+
         @keyframes slideInRight {
             from { opacity: 0; transform: translateX(50px); }
             to { opacity: 1; transform: translateX(0); }
         }
+
         .slide-in-left {
             animation: slideInLeft 0.8s ease-out;
         }
+
         @keyframes slideInLeft {
             from { opacity: 0; transform: translateX(-50px); }
             to { opacity: 1; transform: translateX(0); }
         }
+
         .social-icon {
             transition: all 0.3s ease;
         }
+
         .social-icon:hover {
             transform: scale(1.2) translateY(-5px);
         }
+
+        body.dark .social-icon {
+            color: var(--primary-dark);
+        }
+
+        body.dark .social-icon:hover {
+            color: #eab308;
+        }
+
         .btn-primary {
             background-color: var(--primary-color);
             color: white;
@@ -82,11 +153,23 @@
             position: relative;
             overflow: hidden;
         }
+
+        body.dark .btn-primary {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
         .btn-primary:hover {
             background-color: var(--primary-hover);
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
+
+        body.dark .btn-primary:hover {
+            background-color: var(--primary-dark-hover);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+        }
+
         .btn-primary::after {
             content: '';
             position: absolute;
@@ -99,10 +182,12 @@
             transform: translate(-50%, -50%) scale(0);
             transition: transform 0.5s;
         }
+
         .btn-primary:active::after {
             transform: translate(-50%, -50%) scale(1);
             transition: 0s;
         }
+
         .btn-outline {
             border: 2px solid var(--primary-color);
             color: var(--primary-color);
@@ -110,21 +195,185 @@
             position: relative;
             overflow: hidden;
         }
+
+        body.dark .btn-outline {
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
         .btn-outline:hover {
             background-color: rgba(59, 130, 246, 0.1);
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
         }
+
+        body.dark .btn-outline:hover {
+            background-color: rgba(250, 204, 21, 0.1);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+        }
+
         .card-hover {
             transition: all 0.3s ease;
         }
+
         .card-hover:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
+
+        body.dark .card-hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .card-hover:hover {
+            box-shadow: 0 10px 25px rgba(250, 204, 21, 0.2);
+        }
+
         footer {
             transition: background-color 0.5s ease;
         }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+            z-index: 10;
+            padding: 8px 0;
+        }
+
+        body.dark .dropdown-menu {
+            background-color: #1e293b;
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--dark-text);
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+        }
+
+        body.dark .dropdown-menu a {
+            color: #e2e8f0;
+        }
+
+        .dropdown-menu a:hover {
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .dropdown-menu a i {
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+
+        .mobile-dropdown-menu {
+            display: none;
+            flex-direction: column;
+            padding-left: 24px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            background-color: rgba(243, 244, 246, 0.5);
+            border-radius: 8px;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        body.dark .mobile-dropdown-menu {
+            background-color: rgba(30, 41, 59, 0.5);
+        }
+
+        .mobile-dropdown-menu.active {
+            display: flex;
+            max-height: 200px;
+            opacity: 1;
+        }
+
+        .mobile-dropdown-menu a {
+            padding: 10px 20px;
+            color: var(--dark-text);
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+        }
+
+        body.dark .mobile-dropdown-menu a {
+            color: #e2e8f0;
+        }
+
+        body.dark .mobile-dropdown-menu a:hover {
+            background: linear-gradient(to right, rgba(250, 204, 21, 0.1), rgba(250, 204, 21, 0.05));
+            color: var(--primary-dark);
+            transform: translateX(5px);
+        }
+
+        .mobile-dropdown-menu a i {
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        body.dark .mobile-nav-link {
+            color: #e2e8f0;
+        }
+
+        body.dark .mobile-nav-link:hover {
+            background: #1e293b;
+            color: var(--primary-dark);
+        }
+
+        body.dark #mobileMenuButton {
+            background-color: #020617;
+        }
+
+        body.dark #mobileMenuButton:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark #mobileMenuButton i {
+            color: var(--primary-dark);
+        }
+
         .social-logo {
             width: 48px;
             height: 48px;
@@ -148,9 +397,21 @@
                     <a href="insta-post.html" class="nav-link hover:text-blue-500 transition">Insta Post</a>
                     <a href="galeri.html" class="nav-link hover:text-blue-500 transition">Galeri</a>
                     <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition">Proyek Anime</a>
+                    <div class="dropdown">
+                        <a href="#" class="nav-link hover:text-blue-500 transition flex items-center">
+                            Game
+                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="game/uno/uno.html" class="nav-link"><i class="fas fa-dice mr-2"></i>UNO</a>
+                        </div>
+                    </div>
                     <a href="sosmed.html" class="nav-link hover:text-blue-500 transition active">Sosial Media</a>
                 </nav>
                 <div class="flex items-center space-x-4">
+                    <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                        <i class="fas fa-sun text-yellow-500"></i>
+                    </button>
                     <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all">
                         <i class="fas fa-bars"></i>
                     </button>
@@ -158,13 +419,22 @@
             </div>
             <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2 rounded-xl bg-white shadow-lg p-4 transition-all duration-300">
                 <div class="flex flex-col space-y-4">
-                    <a href="index.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Beranda</a>
-                    <a href="profile.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Profil</a>
-                    <a href="tulisan.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Tulisan</a>
-                    <a href="insta-post.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Insta Post</a>
-                    <a href="galeri.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Galeri</a>
-                    <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Proyek Anime</a>
-                    <a href="sosmed.html" class="nav-link hover:text-blue-500 transition active py-2 px-3 rounded-lg hover:bg-gray-100">Sosial Media</a>
+                    <a href="index.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Beranda</a>
+                    <a href="profile.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Profil</a>
+                    <a href="tulisan.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Tulisan</a>
+                    <a href="insta-post.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Insta Post</a>
+                    <a href="galeri.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Proyek Anime</a>
+                    <div class="dropdown">
+                        <a href="#" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100 flex items-center" id="mobileGameDropdown">
+                            Game
+                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                        </a>
+                        <div class="mobile-dropdown-menu">
+                            <a href="game/uno/uno.html" class="nav-link py-2 px-3 rounded-lg hover:bg-gray-100"><i class="fas fa-dice mr-2"></i>UNO</a>
+                        </div>
+                    </div>
+                    <a href="sosmed.html" class="nav-link mobile-nav-link hover:text-blue-500 transition active py-2 px-3 rounded-lg hover:bg-gray-100">Sosial Media</a>
                 </div>
             </div>
         </div>
@@ -227,7 +497,7 @@
                     <a href="https://www.linkedin.com/in/muhammad-alfaridzi-9729b8327?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="social-icon text-gray-500 hover:text-blue-600">
                         <i class="fab fa-linkedin-in text-xl"></i>
                     </a>
-                    <a href="https://www.instagram.com/mhmmdalfaridzi_23/profilecard/?igsh=MXJ5Y3B1a2FldnR1bA==" class="social-icon text-gray-500 hover:text-pink-500">
+                    <a href="https://www.instagram.com/mhmmdalfaridzi_23" class="social-icon text-gray-500 hover:text-pink-500">
                         <i class="fab fa-instagram text-xl"></i>
                     </a>
                 </div>
@@ -237,6 +507,11 @@
     <script>
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
+        const mobileGameDropdown = document.getElementById('mobileGameDropdown');
+        const mobileDropdownMenu = mobileGameDropdown.nextElementSibling;
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+
         mobileMenuButton.addEventListener('click', () => {
             if (mobileMenu.classList.contains('hidden')) {
                 mobileMenu.classList.remove('hidden');
@@ -246,6 +521,84 @@
                 mobileMenu.classList.remove('fade-in');
             }
         });
+
+        mobileGameDropdown.addEventListener('click', (e) => {
+            e.preventDefault();
+            mobileDropdownMenu.classList.toggle('active');
+            const chevron = mobileGameDropdown.querySelector('i');
+            chevron.classList.toggle('fa-chevron-down');
+            chevron.classList.toggle('fa-chevron-up');
+        });
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeIcon.classList.remove('text-yellow-500');
+                themeIcon.classList.add('text-primaryDark');
+                document.querySelector('header').classList.remove('bg-white/90', 'shadow-md');
+                document.querySelector('header').classList.add('bg-dark/90', 'backdrop-blur-sm', 'border-b', 'border-secondary');
+                document.querySelector('header span').classList.remove('from-blue-500', 'to-blue-700');
+                document.querySelector('header span').classList.add('from-primaryDark', 'to-yellow-600');
+                document.querySelector('#mobileMenu').classList.remove('bg-white', 'shadow-lg');
+                document.querySelector('#mobileMenu').classList.add('bg-darker', 'shadow-lg');
+                document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                    link.classList.remove('hover:bg-gray-100', 'hover:text-blue-500');
+                    link.classList.add('hover:bg-secondary', 'hover:text-primaryDark');
+                });
+                document.querySelector('#themeToggle').classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                document.querySelector('#themeToggle').classList.add('bg-darker', 'hover:bg-secondary');
+                document.querySelector('footer').classList.remove('bg-white', 'border-gray-200');
+                document.querySelector('footer').classList.add('bg-dark', 'border-secondary');
+                document.querySelector('footer span').classList.remove('from-blue-500', 'to-blue-700');
+                document.querySelector('footer span').classList.add('from-primaryDark', 'to-yellow-600');
+                document.querySelector('p.text-gray-600').classList.remove('text-gray-600');
+                document.querySelector('p.text-gray-600').classList.add('text-gray-300');
+                document.querySelector('footer p').classList.remove('text-gray-600');
+                document.querySelector('footer p').classList.add('text-gray-500');
+                document.querySelectorAll('.card-hover').forEach(card => {
+                    card.classList.remove('bg-white', 'hover:bg-gray-50');
+                    card.classList.add('bg-darker', 'hover:bg-secondary');
+                });
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIcon.classList.remove('text-primaryDark');
+                themeIcon.classList.add('text-yellow-500');
+                document.querySelector('header').classList.add('bg-white/90', 'shadow-md');
+                document.querySelector('header').classList.remove('bg-dark/90', 'backdrop-blur-sm', 'border-b', 'border-secondary');
+                document.querySelector('header span').classList.add('from-blue-500', 'to-blue-700');
+                document.querySelector('header span').classList.remove('from-primaryDark', 'to-yellow-600');
+                document.querySelector('#mobileMenu').classList.add('bg-white', 'shadow-lg');
+                document.querySelector('#mobileMenu').classList.remove('bg-darker', 'shadow-lg');
+                document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                    link.classList.add('hover:bg-gray-100', 'hover:text-blue-500');
+                    link.classList.remove('hover:bg-secondary', 'hover:text-primaryDark');
+                });
+                document.querySelector('#themeToggle').classList.add('bg-gray-200', 'hover:bg-gray-300');
+                document.querySelector('#themeToggle').classList.remove('bg-darker', 'hover:bg-secondary');
+                document.querySelector('footer').classList.add('bg-white', 'border-gray-200');
+                document.querySelector('footer').classList.remove('bg-dark', 'border-secondary');
+                document.querySelector('footer span').classList.add('from-blue-500', 'to-blue-700');
+                document.querySelector('footer span').classList.remove('from-primaryDark', 'to-yellow-600');
+                document.querySelector('p.text-gray-300').classList.add('text-gray-600');
+                document.querySelector('p.text-gray-300').classList.remove('text-gray-300');
+                document.querySelector('footer p').classList.add('text-gray-600');
+                document.querySelector('footer p').classList.remove('text-gray-500');
+                document.querySelectorAll('.card-hover').forEach(card => {
+                    card.classList.add('bg-white', 'hover:bg-gray-50');
+                    card.classList.remove('bg-darker', 'hover:bg-secondary');
+                });
+            }
+        });
+
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+            }
+        });
+
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -261,6 +614,7 @@
                 }
             });
         });
+
         function addFadeInOnScroll() {
             const sections = document.querySelectorAll('section');
             const observer = new IntersectionObserver((entries) => {
@@ -276,13 +630,9 @@
                     observer.observe(section);
                 }
             });
-document.addEventListener('contextmenu', function(e) {
-  if (e.target.tagName === 'IMG') {
-    e.preventDefault();
-  }
-});
         }
         addFadeInOnScroll();
+
         function updateActiveNavLink() {
             const navLinks = document.querySelectorAll('.nav-link');
             const currentPage = window.location.pathname.split('/').pop() || 'index.html';
@@ -297,5 +647,5 @@ document.addEventListener('contextmenu', function(e) {
         }
         updateActiveNavLink();
     </script>
-</body>
+</body>    
 </html>
