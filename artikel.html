@@ -6,24 +6,58 @@
     <title id="pageTitle">Artikel - Portofolio Pribadi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        /* Theme Settings */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
         :root {
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
             --dark-text: #334155;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
         }
-        /* Base Styles */
+
         body {
             transition: background-color 0.5s ease, color 0.5s ease;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        /* Navigation & Menu */
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
         .active {
             font-weight: 600;
             color: var(--primary-color);
             position: relative;
         }
+
+        body.dark .active {
+            color: var(--primary-dark);
+        }
+
         .active::after {
             content: '';
             position: absolute;
@@ -34,9 +68,16 @@
             background-color: var(--primary-color);
             border-radius: 2px;
         }
+
+        body.dark .active::after {
+            background: linear-gradient(90deg, transparent, var(--primary-dark), transparent);
+            bottom: -2px;
+        }
+
         .nav-link {
             position: relative;
         }
+
         .nav-link::after {
             content: '';
             position: absolute;
@@ -48,95 +89,54 @@
             transition: width 0.3s ease;
             border-radius: 2px;
         }
+
+        body.dark .nav-link::after {
+            background: linear-gradient(90deg, transparent, var(--primary-dark), transparent);
+            bottom: -2px;
+        }
+
         .nav-link:hover::after {
             width: 100%;
         }
-        /* Animation Effects */
+
+        body.dark .nav-link:hover {
+            color: var(--primary-dark);
+        }
+
         .fade-in {
             animation: fadeIn 0.8s ease-in;
         }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* Floating Action Buttons */
-        .floating-action {
-            position: fixed;
-            right: 2.5rem;
-            width: 2.75rem;
-            height: 2.75rem;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 99;
+
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease-out;
         }
-        .back-to-top {
-            bottom: 2.5rem;
-            background-color: var(--primary-color);
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
         }
-        .share-button {
-            bottom: 6rem;
-            background-color: #f97316; /* Fixed orange color */
+
+        .social-icon {
+            transition: all 0.3s ease;
         }
-        .floating-action.visible {
-            opacity: 1;
-            transform: translateY(0);
+
+        .social-icon:hover {
+            transform: scale(1.2) translateY(-5px);
         }
-        .floating-action:hover {
-            transform: translateY(-4px);
+
+        body.dark .social-icon {
+            color: var(--primary-dark);
         }
-        /* Article Content */
-        .article-content {
-            line-height: 1.9;
-            font-size: 1.05rem;
+
+        body.dark .social-icon:hover {
+            color: #eab308;
         }
-        .article-content p {
-            margin-bottom: 1.75rem;
-            color: var(--dark-text);
-        }
-        .article-content h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin: 2rem 0 1.25rem;
-            color: var(--primary-color);
-        }
-        .article-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 0.75rem;
-            margin: 2rem 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        .article-content ul {
-            margin-bottom: 1.5rem;
-            padding-left: 1.75rem;
-            list-style-type: disc;
-        }
-        .article-content li {
-            margin-bottom: 0.75rem;
-        }
-/* Blockquote Styling */
-.blockquote-medium {
-    background-color: #f8fafc;
-    border-left: 4px solid var(--primary-color);
-    padding: 1rem 1.5rem;
-    margin: 1.5rem 0;
-    border-radius: 0.5rem;
-    font-style: italic;
-    font-size: 1.1rem;
-    color: var(--dark-text);
-}
-.blockquote-medium p {
-    margin: 0;
-    color: var(--dark-text);
-}
-        /* Button Styles */
+
         .btn-primary {
             background-color: var(--primary-color);
             color: white;
@@ -144,11 +144,23 @@
             position: relative;
             overflow: hidden;
         }
+
+        body.dark .btn-primary {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
         .btn-primary:hover {
             background-color: var(--primary-hover);
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
+
+        body.dark .btn-primary:hover {
+            background-color: var(--primary-dark-hover);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+        }
+
         .btn-primary::after {
             content: '';
             position: absolute;
@@ -161,62 +173,380 @@
             transform: translate(-50%, -50%) scale(0);
             transition: transform 0.5s;
         }
+
         .btn-primary:active::after {
             transform: translate(-50%, -50%) scale(1);
             transition: 0s;
         }
-        /* Article Meta and Author Credit */
+
+        footer {
+            transition: background-color 0.5s ease;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+            z-index: 10;
+            padding: 8px 0;
+        }
+
+        body.dark .dropdown-menu {
+            background-color: #1e293b;
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--dark-text);
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+        }
+
+        body.dark .dropdown-menu a {
+            color: #e2e8f0;
+        }
+
+        .dropdown-menu a:hover {
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        body.dark .dropdown-menu a:hover {
+            background: linear-gradient(to right, rgba(250, 204, 21, 0.1), rgba(250, 204, 21, 0.05));
+            color: var(--primary-dark);
+        }
+
+        .dropdown-menu a i {
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+
+        .mobile-dropdown-menu {
+            display: none;
+            flex-direction: column;
+            padding-left: 24px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            background-color: rgba(243, 244, 246, 0.5);
+            border-radius: 8px;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        body.dark .mobile-dropdown-menu {
+            background-color: rgba(30, 41, 59, 0.5);
+        }
+
+        .mobile-dropdown-menu.active {
+            display: flex;
+            max-height: 200px;
+            opacity: 1;
+        }
+
+        .mobile-dropdown-menu a {
+            padding: 10px 20px;
+            color: var(--dark-text);
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+        }
+
+        body.dark .mobile-dropdown-menu a {
+            color: #e2e8f0;
+        }
+
+        body.dark .mobile-dropdown-menu a:hover {
+            background: linear-gradient(to right, rgba(250, 204, 21, 0.1), rgba(250, 204, 21, 0.05));
+            color: var(--primary-dark);
+            transform: translateX(5px);
+        }
+
+        .mobile-dropdown-menu a i {
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        body.dark .mobile-nav-link {
+            color: #e2e8f0;
+        }
+
+        body.dark .mobile-nav-link:hover {
+            background: #1e293b;
+            color: var(--primary-dark);
+        }
+
+        body.dark #mobileMenuButton {
+            background-color: #020617;
+        }
+
+        body.dark #mobileMenuButton:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark #mobileMenuButton i {
+            color: var(--primary-dark);
+        }
+
+        .floating-action {
+            position: fixed;
+            right: 2.5rem;
+            width: 2.75rem;
+            height: 2.75rem;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 99;
+        }
+
+        .back-to-top {
+            bottom: 2.5rem;
+            background-color: var(--primary-color);
+        }
+
+        body.dark .back-to-top {
+            background-color: var(--primary-dark);
+        }
+
+        .back-to-top:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-4px);
+        }
+
+        body.dark .back-to-top:hover {
+            background-color: var(--primary-dark-hover);
+        }
+
+        .share-button {
+            bottom: 6rem;
+            background-color: #f97316;
+        }
+
+        body.dark .share-button {
+            background-color: #f97316;
+        }
+
+        .share-button:hover {
+            background-color: #ea580c;
+            transform: translateY(-4px);
+        }
+
+        .floating-action.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .article-content {
+            line-height: 1.9;
+            font-size: 1.05rem;
+        }
+
+        .article-content p {
+            margin-bottom: 1.75rem;
+            color: var(--dark-text);
+        }
+
+        body.dark .article-content p {
+            color: #e2e8f0;
+        }
+
+        .article-content h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 2rem 0 1.25rem;
+            color: var(--primary-color);
+        }
+
+        body.dark .article-content h2 {
+            color: var(--primary-dark);
+        }
+
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.75rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .article-content ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.75rem;
+            list-style-type: disc;
+        }
+
+        .article-content li {
+            margin-bottom: 0.75rem;
+        }
+
+        .blockquote-medium {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0.5rem;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--dark-text);
+        }
+
+        body.dark .blockquote-medium {
+            background-color: #1e293b;
+            border-left: 4px solid var(--primary-dark);
+            color: #e2e8f0;
+        }
+
+        .blockquote-medium p {
+            margin: 0;
+            color: var(--dark-text);
+        }
+
+        body.dark .blockquote-medium p {
+            color: #e2e8f0;
+        }
+
         #articleMeta {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             flex-wrap: wrap;
         }
+
         #articleMeta .separator {
             color: rgb(107 114 128);
         }
+
+        body.dark #articleMeta .separator {
+            color: #94a3b8;
+        }
+
         #articleAuthor {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             transition: transform 0.2s ease;
         }
+
         #articleAuthor:hover {
             transform: translateY(-2px);
         }
+
         #articleAuthor img {
             width: 2.5rem;
             height: 2.5rem;
             border-radius: 50%;
             object-fit: cover;
         }
+
         #articleAuthor .author-info {
             display: flex;
             flex-direction: column;
         }
+
         #articleAuthor .author-name {
             font-size: 0.95rem;
             font-weight: 600;
             color: var(--dark-text);
         }
+
+        body.dark #articleAuthor .author-name {
+            color: #e2e8f0;
+        }
+
         #articleAuthor .author-title {
             font-size: 0.8rem;
             color: rgb(107 114 128);
         }
-        /* Footer Styles */
-        footer {
-            transition: background-color 0.5s ease;
+
+        body.dark #articleAuthor .author-title {
+            color: #94a3b8;
         }
-        .social-icon {
-            transition: all 0.3s ease;
+
+        body.dark .bg-blue-100 {
+            background-color: #334155;
         }
-        .social-icon:hover {
-            transform: scale(1.2) translateY(-5px);
+
+        body.dark .text-blue-800 {
+            color: #e2e8f0;
+        }
+
+        body.dark .bg-green-100 {
+            background-color: #334155;
+        }
+
+        body.dark .text-green-800 {
+            color: #e2e8f0;
+        }
+
+        body.dark .bg-purple-100 {
+            background-color: #334155;
+        }
+
+        body.dark .text-purple-800 {
+            color: #e2e8f0;
+        }
+
+        body.dark .bg-gray-100 {
+            background-color: #334155;
+        }
+
+        body.dark .text-gray-800 {
+            color: #e2e8f0;
+        }
+
+        body.dark .text-gray-500 {
+            color: #94a3b8;
         }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen">
-    <!-- Header/Navigation -->
     <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-md">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
@@ -232,46 +562,62 @@
                     <a href="insta-post.html" class="nav-link hover:text-blue-500 transition">Insta Post</a>
                     <a href="galeri.html" class="nav-link hover:text-blue-500 transition">Galeri</a>
                     <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition">Proyek Anime</a>
+                    <div class="dropdown">
+                        <a href="#" class="nav-link hover:text-blue-500 transition flex items-center">
+                            Game
+                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="game/uno/uno.html" class="nav-link"><i class="fas fa-dice mr-2"></i>UNO</a>
+                        </div>
+                    </div>
                     <a href="sosmed.html" class="nav-link hover:text-blue-500 transition">Sosial Media</a>
                 </nav>
                 <div class="flex items-center space-x-4">
+                    <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                        <i class="fas fa-sun text-yellow-500"></i>
+                    </button>
                     <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
             </div>
-            <!-- Mobile Menu -->
             <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2 rounded-xl bg-white shadow-lg p-4 transition-all duration-300">
                 <div class="flex flex-col space-y-4">
-                    <a href="index.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Beranda</a>
-                    <a href="profile.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Profil</a>
-                    <a href="tulisan.html" class="nav-link hover:text-blue-500 transition active py-2 px-3 rounded-lg hover:bg-gray-100">Tulisan</a>
-                    <a href="insta-post.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Insta Post</a>
-                    <a href="galeri.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Galeri</a>
-                    <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Proyek Anime</a>
-                    <a href="sosmed.html" class="nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Sosial Media</a>
+                    <a href="index.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Beranda</a>
+                    <a href="profile.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Profil</a>
+                    <a href="tulisan.html" class="nav-link mobile-nav-link hover:text-blue-500 transition active py-2 px-3 rounded-lg hover:bg-gray-100">Tulisan</a>
+                    <a href="insta-post.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Insta Post</a>
+                    <a href="galeri.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Proyek Anime</a>
+                    <div class="dropdown">
+                        <a href="#" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100 flex items-center" id="mobileGameDropdown">
+                            Game
+                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                        </a>
+                        <div class="mobile-dropdown-menu">
+                            <a href="game/uno/uno.html" class="nav-link py-2 px-3 rounded-lg hover:bg-gray-100"><i class="fas fa-dice mr-2"></i>UNO</a>
+                        </div>
+                    </div>
+                    <a href="sosmed.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Sosial Media</a>
                 </div>
             </div>
         </div>
     </header>
-    <!-- Article Container -->
     <main class="container mx-auto px-6 py-12 max-w-4xl fade-in">
-        <!-- Article Header -->
-        <article id="articleContent">
+        <article id="articleContent" class="slide-in-left">
             <div class="mb-8">
                 <div id="articleMeta" class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
                     <span id="articleCategory" class="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded-full">Kategori</span>
                     <span class="separator">•</span>
                     <span id="articleDate" class="text-sm text-gray-500">Tanggal</span>
                 </div>
-                <h1 id="articleTitle" class="text-3xl font-bold mb-4">Judul Artikel</h1>
+                <h1 id="articleTitle" class="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Judul Artikel</h1>
                 <div id="articleAuthor" class="text-sm text-gray-500"></div>
             </div>
-            <!-- Article Content -->
             <div id="articleBody" class="article-content mb-12">
                 <p>Loading article...</p>
             </div>
-            <!-- Article Footer -->
             <div class="border-t border-gray-200 pt-6">
                 <a href="tulisan.html" class="btn-primary px-6 py-2 rounded-full font-semibold">
                     <i class="fas fa-arrow-left mr-2"></i> Kembali ke semua tulisan
@@ -279,7 +625,6 @@
             </div>
         </article>
     </main>
-    <!-- Footer -->
     <footer class="bg-white border-t border-gray-200 mt-12">
         <div class="container mx-auto px-6 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
@@ -294,14 +639,13 @@
                     <a href="https://www.linkedin.com/in/muhammad-alfaridzi-9729b8327?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="social-icon text-gray-500 hover:text-blue-600">
                         <i class="fab fa-linkedin-in text-xl"></i>
                     </a>
-                    <a href="https://www.instagram.com/mhmmdalfaridzi_23/profilecard/?igsh=MXJ5Y3B1a2FldnR1bA==" class="social-icon text-gray-500 hover:text-pink-500">
+                    <a href="https://www.instagram.com/mhmmdalfaridzi_23/profilecard/?igsh=MXJ5Y3B1a2fldnR1bA==" class="social-icon text-gray-500 hover:text-pink-500">
                         <i class="fab fa-instagram text-xl"></i>
                     </a>
                 </div>
             </div>
         </div>
     </footer>
-    <!-- Floating Action Buttons -->
     <div class="floating-action back-to-top" id="backToTop">
         <i class="fas fa-arrow-up"></i>
     </div>
@@ -309,9 +653,15 @@
         <i class="fas fa-share-alt"></i>
     </div>
     <script>
-        // Mobile Menu Toggle
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
+        const mobileGameDropdown = document.getElementById('mobileGameDropdown');
+        const mobileDropdownMenu = mobileGameDropdown ? mobileGameDropdown.nextElementSibling : null;
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const backToTopButton = document.getElementById('backToTop');
+        const shareButton = document.getElementById('shareButton');
+
         mobileMenuButton.addEventListener('click', () => {
             if (mobileMenu.classList.contains('hidden')) {
                 mobileMenu.classList.remove('hidden');
@@ -321,7 +671,104 @@
                 mobileMenu.classList.remove('fade-in');
             }
         });
-        // Smooth scrolling for anchor links
+
+        if (mobileGameDropdown) {
+            mobileGameDropdown.addEventListener('click', (e) => {
+                e.preventDefault();
+                mobileDropdownMenu.classList.toggle('active');
+                const chevron = mobileGameDropdown.querySelector('i');
+                chevron.classList.toggle('fa-chevron-down');
+                chevron.classList.toggle('fa-chevron-up');
+            });
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeIcon.classList.remove('text-yellow-500');
+                themeIcon.classList.add('text-primaryDark');
+                document.querySelector('header').classList.remove('bg-white/90', 'shadow-md');
+                document.querySelector('header').classList.add('bg-dark/90', 'backdrop-blur-sm', 'border-b', 'border-secondary');
+                document.querySelector('header span').classList.remove('from-blue-500', 'to-blue-700');
+                document.querySelector('header span').classList.add('from-primaryDark', 'to-yellow-600');
+                document.querySelector('#mobileMenu').classList.remove('bg-white', 'shadow-lg');
+                document.querySelector('#mobileMenu').classList.add('bg-darker', 'shadow-lg');
+                document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                    link.classList.remove('hover:bg-gray-100', 'hover:text-blue-500');
+                    link.classList.add('hover:bg-secondary', 'hover:text-primaryDark');
+                });
+                document.querySelector('#themeToggle').classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                document.querySelector('#themeToggle').classList.add('bg-darker', 'hover:bg-secondary');
+                document.querySelector('footer').classList.remove('bg-white', 'border-gray-200');
+                document.querySelector('footer').classList.add('bg-dark', 'border-secondary');
+                document.querySelector('#articleTitle').classList.remove('from-blue-500', 'to-blue-700');
+                document.querySelector('#articleTitle').classList.add('from-primaryDark', 'to-yellow-600');
+                document.querySelector('footer span').classList.remove('from-blue-500', 'to-blue-700');
+                document.querySelector('footer span').classList.add('from-primaryDark', 'to-yellow-600');
+                document.querySelector('footer p').classList.remove('text-gray-600');
+                document.querySelector('footer p').classList.add('text-gray-500');
+                backToTopButton.classList.remove('bg-primary');
+                backToTopButton.classList.add('bg-primaryDark');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIcon.classList.remove('text-primaryDark');
+                themeIcon.classList.add('text-yellow-500');
+                document.querySelector('header').classList.add('bg-white/90', 'shadow-md');
+                document.querySelector('header').classList.remove('bg-dark/90', 'backdrop-blur-sm', 'border-b', 'border-secondary');
+                document.querySelector('header span').classList.add('from-blue-500', 'to-blue-700');
+                document.querySelector('header span').classList.remove('from-primaryDark', 'to-yellow-600');
+                document.querySelector('#mobileMenu').classList.add('bg-white', 'shadow-lg');
+                document.querySelector('#mobileMenu').classList.remove('bg-darker', 'shadow-lg');
+                document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                    link.classList.add('hover:bg-gray-100', 'hover:text-blue-500');
+                    link.classList.remove('hover:bg-secondary', 'hover:text-primaryDark');
+                });
+                document.querySelector('#themeToggle').classList.add('bg-gray-200', 'hover:bg-gray-300');
+                document.querySelector('#themeToggle').classList.remove('bg-darker', 'hover:bg-secondary');
+                document.querySelector('footer').classList.add('bg-white', 'border-gray-200');
+                document.querySelector('footer').classList.remove('bg-dark', 'border-secondary');
+                document.querySelector('#articleTitle').classList.add('from-blue-500', 'to-blue-700');
+                document.querySelector('#articleTitle').classList.remove('from-primaryDark', 'to-yellow-600');
+                document.querySelector('footer span').classList.add('from-blue-500', 'to-blue-700');
+                document.querySelector('footer span').classList.remove('from-primaryDark', 'to-yellow-600');
+                document.querySelector('footer p').classList.add('text-gray-600');
+                document.querySelector('footer p').classList.remove('text-gray-500');
+                backToTopButton.classList.add('bg-primary');
+                backToTopButton.classList.remove('bg-primaryDark');
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+                shareButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+                shareButton.classList.remove('visible');
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        shareButton.addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.getElementById('articleTitle').textContent,
+                    url: window.location.href
+                }).catch(error => console.error('Error sharing:', error));
+            } else {
+                alert('Fitur berbagi tidak didukung di peramban ini.');
+            }
+        });
+
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -338,53 +785,7 @@
                 }
             });
         });
-        // Animation on scroll
-        function addFadeInOnScroll() {
-            const sections = document.querySelectorAll('section, main');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-            sections.forEach(section => {
-                if (!section.classList.contains('fade-in')) {
-                    observer.observe(section);
-                }
-            });
-        }
-        addFadeInOnScroll();
-        // Floating Action Buttons
-        const backToTopButton = document.getElementById('backToTop');
-        const shareButton = document.getElementById('shareButton');
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                backToTopButton.classList.add('visible');
-                shareButton.classList.add('visible');
-            } else {
-                backToTopButton.classList.remove('visible');
-                shareButton.classList.remove('visible');
-            }
-        });
-        backToTopButton.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-        shareButton.addEventListener('click', () => {
-            if (navigator.share) {
-                navigator.share({
-                    title: document.getElementById('articleTitle').textContent,
-                    url: window.location.href
-                }).catch(error => console.error('Error sharing:', error));
-            } else {
-                alert('Fitur berbagi tidak didukung di peramban ini.');
-            }
-        });
-        // Dynamic Article Loading
+
         async function loadArticle() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -406,7 +807,8 @@
                 document.getElementById('articleCategory').className = `text-sm font-medium px-3 py-1 rounded-full ${
                     article.category === 'teknologi' ? 'bg-blue-100 text-blue-800' :
                     article.category === 'desain' ? 'bg-green-100 text-green-800' :
-                    'bg-purple-100 text-purple-800'
+                    article.category === 'pendidikan' ? 'bg-purple-100 text-purple-800' :
+                    'bg-gray-100 text-gray-800'
                 }`;
                 document.getElementById('articleDate').textContent = article.date;
                 document.getElementById('articleAuthor').innerHTML = `
@@ -422,14 +824,24 @@
                 document.getElementById('articleBody').innerHTML = '<p>Terjadi kesalahan saat memuat artikel.</p>';
             }
         }
-        window.addEventListener('DOMContentLoaded', loadArticle);
-        // Disable right-click for images
-        document.addEventListener('contextmenu', function(e) {
-            if (e.target.tagName === 'IMG') {
-                e.preventDefault();
-            }
-        });
-        // Track current active navigation link
+
+        function addFadeInOnScroll() {
+            const sections = document.querySelectorAll('section, main');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => {
+                if (!section.classList.contains('fade-in')) {
+                    observer.observe(section);
+                }
+            });
+        }
+
         function updateActiveNavLink() {
             const navLinks = document.querySelectorAll('.nav-link');
             const currentPage = window.location.pathname.split('/').pop() || 'index.html';
@@ -442,7 +854,18 @@
                 }
             });
         }
-        updateActiveNavLink();
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadArticle();
+            addFadeInOnScroll();
+            updateActiveNavLink();
+        });
+
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
