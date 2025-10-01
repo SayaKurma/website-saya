@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tebak Kode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --dark-text: #334155;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
+        }
+
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            color: #334155;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .game-container {
+            max-width: 90vw;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+
+        body.dark .game-container {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-primary {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        body.dark .btn-primary:hover {
+            background-color: var(--primary-dark-hover);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
+        }
+
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
+        }
+
+        .status-badge {
+            transition: all 0.3s ease;
+        }
+
+        .status-badge:hover {
+            transform: translateY(-5px);
+        }
+
+        body.dark .status-badge {
+            background: linear-gradient(to right, var(--primary-dark), #eab308);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+            z-index: 10;
+            padding: 8px 0;
+        }
+
+        body.dark .dropdown-menu {
+            background-color: #1e293b;
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--dark-text);
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+        }
+
+        body.dark .dropdown-menu a {
+            color: #e2e8f0;
+        }
+
+        .dropdown-menu a:hover {
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        body.dark .dropdown-menu a:hover {
+            background: linear-gradient(to right, rgba(250, 204, 21, 0.1), rgba(250, 204, 21, 0.05));
+            color: var(--primary-dark);
+        }
+
+        .dropdown-menu a i {
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(55, 65, 81, 0.7);
+            backdrop-filter: blur(5px);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark .modal-content {
+            background-color: #1e293b;
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        body.dark .modal-header {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        body.dark .close-btn {
+            color: #0f172a;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-menu ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 15px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        body.dark .modal-menu ul {
+            border-bottom: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .modal-menu a {
+            text-decoration: none;
+            color: var(--dark-text);
+            margin: 0 15px;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        body.dark .modal-menu a {
+            color: #e2e8f0;
+        }
+
+        .modal-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        body.dark .modal-menu a:hover {
+            color: var(--primary-dark);
+        }
+
+        .modal-menu a.active {
+            color: var(--primary-color);
+        }
+
+        body.dark .modal-menu a.active {
+            color: var(--primary-dark);
+        }
+
+        .modal-menu a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        body.dark .modal-menu a.active::after {
+            background-color: var(--primary-dark);
+        }
+
+        .info-content {
+            padding: 25px;
+        }
+
+        body.dark .info-content {
+            color: #e2e8f0;
+        }
+
+        .info-content h3 {
+            color: var(--primary-color);
+        }
+
+        body.dark .info-content h3 {
+            color: var(--primary-dark);
+        }
+
+        .info-content p, .info-content ul li {
+            color: #6B7280;
+        }
+
+        body.dark .info-content p, body.dark .info-content ul li {
+            color: #94a3b8;
+        }
+
+        .score-display {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.7);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1100;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .score-display.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .score-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            perspective: 500px;
+        }
+
+        .score-circle-container {
+            perspective: 500px;
+        }
+
+        .score-circle {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #4FD1C5, #3B82F6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                0 15px 30px rgba(59, 130, 246, 0.3),
+                inset 0 -5px 15px rgba(255, 255, 255, 0.2);
+            transform: rotateX(20deg);
+            transition: all 0.5s ease;
+        }
+
+        body.dark .score-circle {
+            background: linear-gradient(145deg, #4FD1C5, var(--primary-dark));
+            box-shadow: 
+                0 15px 30px rgba(250, 204, 21, 0.3),
+                inset 0 -5px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .score-circle:hover {
+            transform: rotateX(0deg) scale(1.05);
+            box-shadow: 
+                0 20px 40px rgba(59, 130, 246, 0.4),
+                inset 0 -5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        body.dark .score-circle:hover {
+            box-shadow: 
+                0 20px 40px rgba(250, 204, 21, 0.4),
+                inset 0 -5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .score-text {
+            font-size: 5rem;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark .score-text {
+            color: #0f172a;
+        }
+
+        .score-label {
+            color: white;
+            font-size: 1rem;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        body.dark .score-label {
+            color: #0f172a;
+        }
+
+        .score-subtitle {
+            margin-top: 20px;
+            color: #1F2937;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        body.dark .score-subtitle {
+            color: #e2e8f0;
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+        }
+
+        .score-display.show .score-subtitle {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .message-modal {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .message-content {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark .message-content {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-dark-hover));
+        }
+
+        .title-glow {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+        }
+
+        body.dark .title-glow {
+            text-shadow: 0 0 20px rgba(250, 204, 21, 0.6);
+        }
+
+        .guess-history {
+            margin-bottom: 25px;
+            max-height: 250px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) transparent;
+        }
+
+        body.dark .guess-history {
+            scrollbar-color: var(--primary-dark) transparent;
+        }
+
+        .guess-history > div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+            background-color: #F3F4F6;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        body.dark .guess-history > div {
+            background-color: #1e293b;
+        }
+
+        .feedback {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        #guessInput {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        body.dark #guessInput {
+            border: 2px solid var(--primary-dark);
+            background-color: #1e293b;
+            color: #e2e8f0;
+        }
+
+        #guessInput:focus {
+            outline: none;
+            border-color: var(--primary-hover);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        body.dark #guessInput:focus {
+            border-color: var(--primary-dark-hover);
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2);
+        }
+
+        .game-description {
+            margin-bottom: 25px;
+            color: #6B7280;
+        }
+
+        body.dark .game-description {
+            color: #94a3b8;
+        }
+
+        .game-header h1 {
+            color: var(--primary-color);
+        }
+
+        body.dark .game-header h1 {
+            color: var(--primary-dark);
+        }
+
+        .info-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-color);
+            transition: transform 0.3s, color 0.3s;
+        }
+
+        body.dark .info-icon {
+            color: var(--primary-dark);
+        }
+
+        .info-icon:hover {
+            transform: scale(1.1);
+            color: var(--primary-hover);
+        }
+
+        body.dark .info-icon:hover {
+            color: var(--primary-dark-hover);
+        }
+
+        #result {
+            color: #6B7280;
+        }
+
+        body.dark #result {
+            color: #94a3b8;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-outline {
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        body.dark .btn-outline:hover {
+            background-color: rgba(250, 204, 21, 0.1);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+        }
+
+        @media screen and (max-width: 480px) {
+            .input-section {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal-menu ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .modal-menu a {
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-800 transition-colors duration-300">
+    <div class="game-container mx-2 my-4 rounded-xl fade-in" role="main" aria-label="Area permainan Tebak Kode">
+        <div class="flex justify-end p-4">
+            <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                <i class="fas fa-sun text-yellow-500"></i>
+            </button>
+        </div>
+        <div class="game-header flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold">Tebak Kode</h1>
+            <button id="infoIcon" class="info-icon" aria-label="Game Information">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="game-description text-center mb-6">
+            <p class="text-lg">Tebak kombinasi 5 digit (0-9) dalam 5 kesempatan!</p>
+        </div>
+
+        <div id="guesses" class="guess-history"></div>
+
+        <div class="input-section flex gap-4 mb-6">
+            <input type="text" id="guessInput" maxlength="5" placeholder="Masukkan tebakan (5 digit)" pattern="[0-9]*" inputmode="numeric">
+            <button id="submitGuess" class="btn-primary px-6 py-3 rounded-full font-semibold">Tebak</button>
+        </div>
+
+        <div id="result" class="text-center text-xl font-semibold mb-4"></div>
+    </div>
+
+    <div id="scoreDisplay" class="score-display"></div>
+
+    <div id="message" class="message-modal fixed inset-0 flex items-center justify-center z-50 hidden" role="dialog" aria-live="assertive">
+        <div class="message-content text-white px-6 py-4 mx-4 max-w-md w-full text-center">
+            <p id="message-text" class="text-lg md:text-xl mb-4 font-semibold title-glow"></p>
+            <div id="message-buttons" class="flex justify-center gap-3">
+                <button id="play-again-btn" class="btn-primary px-6 py-3 rounded-full font-semibold hidden">Main Lagi</button>
+                <button id="back-btn" class="btn-outline px-6 py-3 rounded-full font-semibold hidden">Kembali</button>
+                <button id="close-message" class="btn-outline px-6 py-3 rounded-full font-semibold">Lanjut</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <button id="closeModal" class="close-btn" aria-label="Close Modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <div class="modal-header">
+                <h2>Informasi Permainan</h2>
+            </div>
+
+            <div class="modal-menu">
+                <ul>
+                    <li><a href="#" class="menu-item active" data-content="deskripsi">Deskripsi</a></li>
+                    <li><a href="#" class="menu-item" data-content="aturan">Aturan</a></li>
+                    <li><a href="#" class="menu-item" data-content="skor">Skor</a></li>
+                </ul>
+            </div>
+
+            <div id="infoContent" class="info-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let secretCode = '';
+        let attempts = 0;
+        const maxAttempts = 5;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGame();
+            setupEventListeners();
+        });
+
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeIcon.classList.remove('text-yellow-500');
+                themeIcon.classList.add('text-primaryDark');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIcon.classList.remove('text-primaryDark');
+                themeIcon.classList.add('text-yellow-500');
+            }
+        });
+
+        function initializeGame() {
+            secretCode = generateSecretCode();
+            attempts = 0;
+            resetGameUI();
+        }
+
+        function setupEventListeners() {
+            const submitButton = document.getElementById('submitGuess');
+            const infoIcon = document.getElementById('infoIcon');
+            const closeModalButton = document.getElementById('closeModal');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const guessInput = document.getElementById('guessInput');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const backBtn = document.getElementById('back-btn');
+            const closeMessageBtn = document.getElementById('close-message');
+
+            if (submitButton) submitButton.addEventListener('click', handleGuess);
+            if (infoIcon) infoIcon.addEventListener('click', openModal);
+            if (closeModalButton) closeModalButton.addEventListener('click', closeModal);
+
+            menuItems.forEach(item => item.addEventListener('click', handleInfoMenu));
+
+            guessInput.addEventListener('input', () => {
+                guessInput.value = guessInput.value.replace(/[^0-9]/g, '');
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === document.getElementById('infoModal')) closeModal();
+            });
+
+            guessInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleGuess();
+                }
+            });
+
+            playAgainBtn.addEventListener('click', () => {
+                document.getElementById('message').classList.add('hidden');
+                initializeGame();
+            });
+
+            backBtn.addEventListener('click', () => {
+                window.location.href = 'index.html'; // Ganti dengan URL portfolio utama jika berbeda
+            });
+
+            closeMessageBtn.addEventListener('click', () => {
+                document.getElementById('message').classList.add('hidden');
+            });
+        }
+
+        function generateSecretCode() {
+            return Array.from({ length: 5 }, () => Math.floor(Math.random() * 10)).join('');
+        }
+
+        function handleGuess() {
+            const guessInput = document.getElementById('guessInput');
+            const guess = guessInput.value;
+
+            if (!validateGuess(guess)) return;
+
+            attempts++;
+            const feedback = generateFeedback(guess);
+            displayGuess(guess, feedback);
+
+            if (guess === secretCode) {
+                handleWin();
+            } else if (attempts >= maxAttempts) {
+                handleLoss();
+            }
+
+            guessInput.value = '';
+        }
+
+        function validateGuess(guess) {
+            if (guess.length !== 5) {
+                alert('Masukkan 5 digit angka!');
+                return false;
+            }
+            return true;
+        }
+
+        function generateFeedback(guess) {
+            const secretArray = secretCode.split('');
+            const guessArray = guess.split('');
+            const feedback = new Array(5).fill(null);
+
+            guessArray.forEach((digit, index) => {
+                if (digit === secretArray[index]) {
+                    feedback[index] = 'green';
+                    secretArray[index] = null;
+                    guessArray[index] = null;
+                }
+            });
+
+            guessArray.forEach((digit, index) => {
+                if (digit !== null) {
+                    const matchIndex = secretArray.indexOf(digit);
+                    if (matchIndex !== -1) {
+                        feedback[index] = 'yellow';
+                        secretArray[matchIndex] = null;
+                    } else {
+                        feedback[index] = 'red';
+                    }
+                }
+            });
+
+            return feedback;
+        }
+
+        function displayGuess(guess, feedback) {
+            const guessesDiv = document.getElementById('guesses');
+            const guessDiv = document.createElement('div');
+            const guessText = document.createElement('span');
+
+            guessText.textContent = guess;
+            guessDiv.appendChild(guessText);
+
+            feedback.forEach(color => {
+                const feedbackDiv = document.createElement('span');
+                feedbackDiv.className = 'feedback';
+                feedbackDiv.style.backgroundColor = color;
+                guessDiv.appendChild(feedbackDiv);
+            });
+
+            guessesDiv.appendChild(guessDiv);
+            guessesDiv.scrollTop = guessesDiv.scrollHeight;
+        }
+
+        function handleWin() {
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = 'Selamat! Kamu menebak kode dengan benar!';
+            resultElement.style.color = 'var(--feedback-green)';
+
+            const score = calculateScore(attempts);
+            displayScore(score);
+            launchConfetti();
+            showMessage('🎉 Selamat! Kamu menebak kode dengan benar!');
+        }
+
+        function handleLoss() {
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = `Permainan berakhir! Kode rahasia adalah ${secretCode}.`;
+            resultElement.style.color = 'var(--feedback-red)';
+            showMessage('😔 Permainan berakhir! Kode rahasia adalah ' + secretCode + '. Coba lagi!');
+        }
+
+        function calculateScore(attempts) {
+            return Math.max(0, 100 - (attempts - 1) * 20);
+        }
+
+        function resetGameUI() {
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guesses').innerHTML = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('submitGuess').disabled = false;
+        }
+
+        function openModal() {
+            document.getElementById('infoModal').style.display = 'block';
+            const deskripsiItem = document.querySelector('.menu-item[data-content="deskripsi"]');
+
+            if (deskripsiItem) {
+                document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+                deskripsiItem.classList.add('active');
+            }
+
+            showInfo('deskripsi');
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        function handleInfoMenu(event) {
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+            showInfo(event.target.getAttribute('data-content'));
+        }
+
+        function showInfo(contentType) {
+            const infoContent = document.getElementById('infoContent');
+            let content = '';
+
+            if (contentType === 'deskripsi') {
+                content = `
+                    <h3 class="text-xl font-bold mb-4">Deskripsi Permainan</h3>
+                    <p>Tebak Kode adalah permainan logika yang menantang. Tugasmu adalah menebak kombinasi 5 digit rahasia dalam 5 kesempatan. Gunakan petunjuk warna untuk mendekati kode yang benar!</p>
+                `;
+            } else if (contentType === 'aturan') {
+                content = `
+                    <h3 class="text-xl font-bold mb-4">Aturan Permainan</h3>
+                    <ul class="list-disc pl-6">
+                        <li>Kamu punya 5 kesempatan untuk menebak kode 5 digit</li>
+                        <li>Petunjuk warna akan membantu:</li>
+                        <li>🟢 Hijau: Angka benar dan posisi tepat</li>
+                        <li>🟡 Kuning: Angka benar tapi posisi salah</li>
+                        <li>🔴 Merah: Angka tidak ada dalam kode</li>
+                    </ul>
+                `;
+            } else if (contentType === 'skor') {
+                content = `
+                    <h3 class="text-xl font-bold mb-4">Perhitungan Skor</h3>
+                    <p>Poin = 100 - (Jumlah Tebakan - 1) × 20</p>
+                    <p>Semakin sedikit tebakan, semakin tinggi skor!</p>
+                `;
+            }
+
+            infoContent.innerHTML = content;
+        }
+
+        function displayScore(score) {
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const scoreElement = document.createElement('div');
+            scoreElement.className = 'score-wrapper animated-score';
+
+            scoreElement.innerHTML = `
+                <div class="score-circle-container">
+                    <div class="score-circle">
+                        <div class="score-text">${score}</div>
+                        <div class="score-label">Point</div>
+                    </div>
+                </div>
+                <div class="score-subtitle">
+                    <span>Keren! Kamu berhasil menebak!</span>
+                </div>
+            `;
+
+            scoreDisplay.innerHTML = '';
+            scoreDisplay.appendChild(scoreElement);
+
+            scoreDisplay.offsetWidth;
+
+            scoreDisplay.classList.add('show');
+
+            setTimeout(() => {
+                scoreDisplay.classList.remove('show');
+                setTimeout(() => {
+                    scoreDisplay.innerHTML = '';
+                }, 500);
+            }, 5000);
+        }
+
+        function launchConfetti() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#3b82f6', '#facc15', '#0f172a', '#e2e8f0']
+            });
+        }
+
+        function showMessage(text) {
+            const messageTextEl = document.getElementById('message-text');
+            const messageEl = document.getElementById('message');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const backBtn = document.getElementById('back-btn');
+            const closeMessageBtn = document.getElementById('close-message');
+
+            messageTextEl.textContent = text;
+            messageEl.classList.remove('hidden');
+            if (text.includes('Selamat') || text.includes('berakhir')) {
+                playAgainBtn.classList.remove('hidden');
+                backBtn.classList.remove('hidden');
+                closeMessageBtn.classList.add('hidden');
+                document.getElementById('submitGuess').disabled = true;
+                playAgainBtn.focus();
+            } else {
+                playAgainBtn.classList.add('hidden');
+                backBtn.classList.add('hidden');
+                closeMessageBtn.classList.remove('hidden');
+                closeMessageBtn.focus();
+            }
+        }
+    </script>
+</body>
+</html>
