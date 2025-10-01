@@ -349,9 +349,15 @@
 
         .score-display {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.7);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
             opacity: 0;
             visibility: hidden;
             z-index: 1100;
@@ -359,104 +365,54 @@
         }
 
         .score-display.show {
-            transform: translate(-50%, -50%) scale(1);
             opacity: 1;
             visibility: visible;
         }
 
-        .score-wrapper {
-            position: relative;
+        .score-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            perspective: 500px;
-        }
-
-        .score-circle-container {
-            perspective: 500px;
-        }
-
-        .score-circle {
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #4FD1C5, #3B82F6);
-            display: flex;
-            flex-direction: column;
             justify-content: center;
-            align-items: center;
-            box-shadow: 
-                0 15px 30px rgba(59, 130, 246, 0.3),
-                inset 0 -5px 15px rgba(255, 255, 255, 0.2);
-            transform: rotateX(20deg);
-            transition: all 0.5s ease;
+            margin: 30px 0;
         }
 
-        body.dark .score-circle {
-            background: linear-gradient(145deg, #4FD1C5, var(--primary-dark));
-            box-shadow: 
-                0 15px 30px rgba(250, 204, 21, 0.3),
-                inset 0 -5px 15px rgba(255, 255, 255, 0.2);
+        .circular-progress {
+            position: relative;
+            display: inline-block;
         }
 
-        .score-circle:hover {
-            transform: rotateX(0deg) scale(1.05);
-            box-shadow: 
-                0 20px 40px rgba(59, 130, 246, 0.4),
-                inset 0 -5px 15px rgba(255, 255, 255, 0.3);
+        .progress-ring {
+            transform: rotate(-90deg);
         }
 
-        body.dark .score-circle:hover {
-            box-shadow: 
-                0 20px 40px rgba(250, 204, 21, 0.4),
-                inset 0 -5px 15px rgba(255, 255, 255, 0.3);
+        .progress-ring__circle {
+            transition: stroke-dasharray 2s ease-in-out;
+        }
+
+        .progress-ring__progress {
+            transition: stroke-dashoffset 0.1s ease-out;
+            stroke: var(--primary-color);
+        }
+
+        body.dark .progress-ring__progress {
+            stroke: var(--primary-dark);
         }
 
         .score-text {
-            font-size: 5rem;
-            color: white;
-            font-weight: bold;
-            text-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
         }
 
-        body.dark .score-text {
-            color: #0f172a;
+        #skor-poin {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-color);
         }
 
-        .score-label {
-            color: white;
-            font-size: 1rem;
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        body.dark .score-label {
-            color: #0f172a;
-        }
-
-        .score-subtitle {
-            margin-top: 20px;
-            color: #1F2937;
-            font-size: 1.2rem;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
-
-        body.dark .score-subtitle {
-            color: #e2e8f0;
-            background: rgba(30, 41, 59, 0.8);
-            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
-        }
-
-        .score-display.show .score-subtitle {
-            transform: translateY(0);
-            opacity: 1;
+        body.dark #skor-poin {
+            color: var(--primary-dark);
         }
 
         .message-modal {
@@ -668,8 +624,8 @@
             <p id="message-text" class="text-lg md:text-xl mb-4 font-semibold title-glow"></p>
             <div id="message-buttons" class="flex justify-center gap-3">
                 <button id="play-again-btn" class="btn-primary px-6 py-3 rounded-full font-semibold hidden">Main Lagi</button>
-                <button id="back-btn" class="btn-outline px-6 py-3 rounded-full font-semibold hidden">Kembali</button>
-                <button id="close-message" class="btn-outline px-6 py-3 rounded-full font-semibold">Lanjut</button>
+                <button id="back-btn" class="bg-white text-purple-800 px-6 py-3 rounded-full font-semibold hidden">Kembali</button>
+                <button id="close-message" class="bg-white text-purple-800 px-6 py-3 rounded-full font-semibold">Lanjut</button>
             </div>
         </div>
     </div>
@@ -856,20 +812,12 @@
         }
 
         function handleWin() {
-            const resultElement = document.getElementById('result');
-            resultElement.textContent = 'Selamat! Kamu menebak kode dengan benar!';
-            resultElement.style.color = 'var(--feedback-green)';
-
             const score = calculateScore(attempts);
             displayScore(score);
             launchConfetti();
-            showMessage('🎉 Selamat! Kamu menebak kode dengan benar!');
         }
 
         function handleLoss() {
-            const resultElement = document.getElementById('result');
-            resultElement.textContent = `Permainan berakhir! Kode rahasia adalah ${secretCode}.`;
-            resultElement.style.color = 'var(--feedback-red)';
             showMessage('😔 Permainan berakhir! Kode rahasia adalah ' + secretCode + '. Coba lagi!');
         }
 
@@ -940,17 +888,17 @@
         function displayScore(score) {
             const scoreDisplay = document.getElementById('scoreDisplay');
             const scoreElement = document.createElement('div');
-            scoreElement.className = 'score-wrapper animated-score';
+            scoreElement.className = 'score-container';
 
             scoreElement.innerHTML = `
-                <div class="score-circle-container">
-                    <div class="score-circle">
-                        <div class="score-text">${score}</div>
-                        <div class="score-label">Point</div>
+                <div class="circular-progress">
+                    <svg class="progress-ring" width="200" height="200">
+                        <circle class="progress-ring__circle" stroke="#e6e6e6" stroke-width="8" fill="transparent" r="90" cx="100" cy="100"/>
+                        <circle class="progress-ring__progress" stroke="#007bff" stroke-width="8" fill="transparent" r="90" cx="100" cy="100"/>
+                    </svg>
+                    <div class="score-text">
+                        <span id="skor-poin">0</span>
                     </div>
-                </div>
-                <div class="score-subtitle">
-                    <span>Keren! Kamu berhasil menebak!</span>
                 </div>
             `;
 
@@ -961,12 +909,43 @@
 
             scoreDisplay.classList.add('show');
 
+            createCircularProgress(score);
+
             setTimeout(() => {
                 scoreDisplay.classList.remove('show');
                 setTimeout(() => {
                     scoreDisplay.innerHTML = '';
+                    showMessage('🎉 Selamat! Kamu menebak kode dengan benar!');
                 }, 500);
             }, 5000);
+        }
+
+        function createCircularProgress(score) {
+            const circle = document.querySelector('.progress-ring__progress');
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference;
+
+            let currentScore = 0;
+            const increment = score / 60;
+
+            const animateProgress = () => {
+                if (currentScore < score) {
+                    currentScore += increment;
+                    if (currentScore > score) currentScore = score;
+
+                    const offset = circumference - (currentScore / 100) * circumference;
+                    circle.style.strokeDashoffset = offset;
+
+                    document.getElementById('skor-poin').textContent = Math.round(currentScore);
+
+                    requestAnimationFrame(animateProgress);
+                }
+            };
+
+            requestAnimationFrame(animateProgress);
         }
 
         function launchConfetti() {
