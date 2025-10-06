@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Permainan Memori</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+
+        tailwind.config = {
+
+            darkMode: 'class',
+
+            theme: {
+
+                extend: {
+
+                    colors: {
+
+                        dark: '#0f172a',
+
+                        darker: '#020617',
+
+                        primary: '#3b82f6',
+
+                        secondary: '#1e293b',
+
+                        primaryDark: '#facc15',
+
+                    },
+
+                    fontFamily: {
+
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+
+                        poppins: ['Poppins', 'sans-serif'],
+
+                    },
+
+                }
+
+            }
+
+        }
+
+    </script>
+
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+
+            --primary-color: #3b82f6;
+
+            --primary-hover: #2563eb;
+
+            --dark-text: #334155;
+
+            --primary-dark: #facc15;
+
+            --primary-dark-hover: #eab308;
+
+        }
+
+        body {
+
+            transition: background-color 0.5s ease, color 0.5s ease;
+
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+        }
+
+        body.dark {
+
+            font-family: 'Poppins', sans-serif;
+
+            background-color: #0f172a;
+
+            color: #e2e8f0;
+
+        }
+
+        .card {
+
+            width: 80px;
+
+            height: 100px;
+
+            perspective: 1000px;
+
+            cursor: pointer;
+
+            margin: 5px;
+
+        }
+
+        
+
+        .card-inner {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 100%;
+
+            transition: transform 0.6s;
+
+            transform-style: preserve-3d;
+
+        }
+
+        
+
+        .card.flipped .card-inner {
+
+            transform: rotateY(180deg);
+
+        }
+
+        
+
+        .card-front, .card-back {
+
+            position: absolute;
+
+            width: 100%;
+
+            height: 100%;
+
+            backface-visibility: hidden;
+
+            border-radius: 8px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        }
+
+        
+
+        .card-front {
+
+            background-color: white;
+
+            border: 2px solid #4f46e5;
+
+        }
+
+        
+
+        .card-back {
+
+            background-color: #4f46e5;
+
+            color: white;
+
+            font-size: 24px;
+
+            transform: rotateY(180deg);
+
+        }
+
+        
+
+        body.dark .card-front {
+
+            background-color: #1e293b;
+
+            border: 2px solid #facc15;
+
+        }
+
+        
+
+        body.dark .card-back {
+
+            background-color: #facc15;
+
+            color: #0f172a;
+
+        }
+
+        
+
+        .turn-indicator {
+
+            transition: all 0.3s ease;
+
+        }
+
+        
+
+        .active-turn {
+
+            transform: scale(1.05);
+
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.5);
+
+        }
+
+        
+
+        body.dark .active-turn {
+
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.5);
+
+        }
+
+        
+
+        .modal {
+
+            display: none;
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            background-color: rgba(0, 0, 0, 0.7);
+
+            z-index: 100;
+
+            justify-content: center;
+
+            align-items: center;
+
+        }
+
+        
+
+        .modal-content {
+
+            background-color: white;
+
+            padding: 30px;
+
+            border-radius: 10px;
+
+            text-align: center;
+
+            max-width: 400px;
+
+            width: 90%;
+
+        }
+
+        
+
+        body.dark .modal-content {
+
+            background-color: #1e293b;
+
+        }
+
+        
+
+        @keyframes pulse {
+
+            0% { transform: scale(1); }
+
+            50% { transform: scale(1.05); }
+
+            100% { transform: scale(1); }
+
+        }
+
+        
+
+        .pulse {
+
+            animation: pulse 1.5s infinite;
+
+        }
+
+        
+
+        /* Mobile responsiveness */
+
+        @media (max-width: 640px) {
+
+            .card {
+
+                width: 50px;
+
+                height: 70px;
+
+                margin: 3px;
+
+            }
+
+            
+
+            #game-board {
+
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+
+                gap: 1rem;
+
+            }
+
+            
+
+            .score-container {
+
+                flex-direction: column;
+
+                align-items: center;
+
+                gap: 1rem;
+
+            }
+
+            
+
+            #player-score, #computer-score {
+
+                width: 80%;
+
+                margin: 0;
+
+            }
+
+            
+
+            #turn-indicator {
+
+                order: -1;
+
+                margin-bottom: 1rem;
+
+            }
+
+        }
+
+        
+
+        .btn-primary {
+
+            background-color: var(--primary-color);
+
+            color: white;
+
+            transition: all 0.3s ease;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+        
+
+        body.dark .btn-primary {
+
+            background-color: var(--primary-dark);
+
+            color: #0f172a;
+
+        }
+
+        
+
+        .btn-primary:hover {
+
+            background-color: var(--primary-hover);
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+
+        }
+
+        
+
+        body.dark .btn-primary:hover {
+
+            background-color: var(--primary-dark-hover);
+
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+
+        }
+
+        
+
+        .btn-primary::after {
+
+            content: '';
+
+            position: absolute;
+
+            top: 50%;
+
+            left: 50%;
+
+            width: 300px;
+
+            height: 300px;
+
+            background-color: rgba(255, 255, 255, 0.2);
+
+            border-radius: 50%;
+
+            transform: translate(-50%, -50%) scale(0);
+
+            transition: transform 0.5s;
+
+        }
+
+        
+
+        .btn-primary:active::after {
+
+            transform: translate(-50%, -50%) scale(1);
+
+            transition: 0s;
+
+        }
+
+        
+
+        .btn-outline {
+
+            border: 2px solid var(--primary-color);
+
+            color: var(--primary-color);
+
+            transition: all 0.3s ease;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+        
+
+        body.dark .btn-outline {
+
+            border: 2px solid var(--primary-dark);
+
+            color: var(--primary-dark);
+
+        }
+
+        
+
+        .btn-outline:hover {
+
+            background-color: rgba(59, 130, 246, 0.1);
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+
+        }
+
+        
+
+        body.dark .btn-outline:hover {
+
+            background-color: rgba(250, 204, 21, 0.1);
+
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+
+        }
+
+        
+
+        .theme-toggle {
+
+            transition: all 0.3s ease;
+
+        }
+
+        
+
+        .theme-toggle:hover {
+
+            transform: scale(1.2);
+
+        }
+
+        
+
+        body.dark .theme-toggle {
+
+            background-color: #020617;
+
+        }
+
+        
+
+        body.dark .theme-toggle:hover {
+
+            background-color: #1e293b;
+
+        }
+
+        
+
+        body.dark .theme-toggle i {
+
+            color: var(--primary-dark);
+
+        }
+
+        
+
+        .title-glow {
+
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+
+        }
+
+        
+
+        body.dark .title-glow {
+
+            text-shadow: 0 0 20px rgba(250, 204, 21, 0.6);
+
+        }
+
+        
+
+        .message-modal {
+
+            background: rgba(0, 0, 0, 0.85);
+
+            backdrop-filter: blur(5px);
+
+        }
+
+        
+
+        .message-content {
+
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+
+            border-radius: 15px;
+
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+
+        }
+
+        
+
+        body.dark .message-content {
+
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-dark-hover));
+
+        }
+
+        
+
+        .fade-in {
+
+            animation: fadeIn 0.8s ease-in;
+
+        }
+
+        
+
+        @keyframes fadeIn {
+
+            from { opacity: 0; transform: translateY(20px); }
+
+            to { opacity: 1; transform: translateY(0); }
+
+        }
+
+        
+
+        .score-container {
+
+            background: rgba(255, 255, 255, 0.25);
+
+            backdrop-filter: blur(10px);
+
+            border-radius: 12px;
+
+            padding: 1rem;
+
+            border: 1px solid rgba(59, 130, 246, 0.2);
+
+        }
+
+        
+
+        body.dark .score-container {
+
+            background: rgba(30, 41, 59, 0.25);
+
+            border: 1px solid rgba(250, 204, 21, 0.2);
+
+        }
+
+        
+
+        #game-board {
+
+            background: rgba(255, 255, 255, 0.15);
+
+            backdrop-filter: blur(10px);
+
+            border-radius: 12px;
+
+            border: 1px solid rgba(59, 130, 246, 0.2);
+
+            padding: 1rem;
+
+        }
+
+        
+
+        body.dark #game-board {
+
+            background: rgba(30, 41, 59, 0.15);
+
+            border: 1px solid rgba(250, 204, 21, 0.2);
+
+        }
+
+        
+
+        #player-score, #computer-score {
+
+            background-color: white;
+
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        }
+
+        
+
+        body.dark #player-score, body.dark #computer-score {
+
+            background-color: #1e293b;
+
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+        }
+
+        
+
+        #turn-indicator {
+
+            background-color: #4f46e5;
+
+            color: white;
+
+        }
+
+        
+
+        body.dark #turn-indicator {
+
+            background-color: #facc15;
+
+            color: #0f172a;
+
+        }
+
+        
+
+        #play-again-btn {
+
+            background-color: #4f46e5;
+
+            color: white;
+
+        }
+
+        
+
+        body.dark #play-again-btn {
+
+            background-color: #facc15;
+
+            color: #0f172a;
+
+        }
+
+        
+
+    </style>
+
+</head>
+
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen flex flex-col items-center py-8">
+
+    <div class="flex justify-end w-full max-w-4xl px-4 mb-4">
+
+        <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+
+            <i class="fas fa-sun text-yellow-500"></i>
+
+        </button>
+
+    </div>
+
+    
+
+    <div class="score-container flex justify-between items-center w-full max-w-4xl mb-8 px-4">
+
+        <div id="player-score" class="turn-indicator bg-white p-4 rounded-lg shadow-md text-center w-40">
+
+            <div class="font-bold text-indigo-600">Pemain</div>
+
+            <div class="text-3xl font-bold">0</div>
+
+        </div>
+
+        
+
+        <div class="flex items-center justify-center">
+
+            <div id="turn-indicator" class="bg-indigo-600 text-white px-6 py-3 rounded-full font-bold text-lg">
+
+                Giliran Pemain
+
+            </div>
+
+        </div>
+
+        
+
+        <div id="computer-score" class="turn-indicator bg-white p-4 rounded-lg shadow-md text-center w-40">
+
+            <div class="font-bold text-indigo-600">Komputer</div>
+
+            <div class="text-3xl font-bold">0</div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="game-board" class="grid grid-cols-6 gap-2 mb-8">
+
+        <!-- Cards will be generated here -->
+
+    </div>
+
+    
+
+    <div id="message" class="message-modal fixed inset-0 flex items-center justify-center z-50 hidden" role="dialog" aria-live="assertive">
+
+        <div class="message-content text-white px-6 py-4 mx-4 max-w-md w-full text-center">
+
+            <h2 id="result-title" class="text-2xl font-bold mb-4 title-glow">Permainan Selesai!</h2>
+
+            <p id="result-message" class="text-lg mb-6"></p>
+
+            <div class="flex justify-center gap-3">
+
+                <button id="play-again-btn" class="btn-primary text-white px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-all">
+
+                    Main Lagi
+
+                </button>
+
+                <button id="back-btn" class="bg-white text-purple-800 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-all">
+
+                    Kembali
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Game variables
+
+            const emojis = ['🇮🇩', '🇲🇾', '🇹🇭', '🇻🇳', '🇸🇬', '🇱🇦', '🇰🇭', '🇵🇭', '🇧🇳', '🇹🇱', '🇲🇲', '🇦🇺'];
+
+            let cards = [];
+
+            let flippedCards = [];
+
+            let matchedPairs = 0;
+
+            let playerScore = 0;
+
+            let computerScore = 0;
+
+            let isPlayerTurn = true;
+
+            let isProcessing = false;
+
+            let totalPairs = 12;
+
+            let turnCount = 0;
+
+            let computerMemory = {}; // {index: {value: string, seenTurn: number}}
+
+            const forgetThreshold = 5; // turns after which higher chance to forget
+
+            const probForget = 0.1; // 10% chance to forget per turn if old
+
+            const probMisremember = 0.05; // 5% chance to misremember per turn
+
+            
+
+            // DOM elements
+
+            const gameBoard = document.getElementById('game-board');
+
+            const playerScoreElement = document.querySelector('#player-score div:last-child');
+
+            const computerScoreElement = document.querySelector('#computer-score div:last-child');
+
+            const turnIndicator = document.getElementById('turn-indicator');
+
+            const playerScoreContainer = document.getElementById('player-score');
+
+            const computerScoreContainer = document.getElementById('computer-score');
+
+            const messageEl = document.getElementById('message');
+
+            const resultMessage = document.getElementById('result-message');
+
+            const resultTitle = document.getElementById('result-title');
+
+            const playAgainBtn = document.getElementById('play-again-btn');
+
+            const backBtn = document.getElementById('back-btn');
+
+            
+
+            // Initialize game
+
+            initGame();
+
+            
+
+            // Event listeners
+
+            playAgainBtn.addEventListener('click', () => {
+
+                messageEl.classList.add('hidden');
+
+                initGame();
+
+            });
+
+            
+
+            backBtn.addEventListener('click', () => {
+
+                window.location.href = 'https://sayakurma.github.io/website-saya/';
+
+            });
+
+            
+
+            function initGame() {
+
+                // Reset game state
+
+                cards = [];
+
+                flippedCards = [];
+
+                matchedPairs = 0;
+
+                playerScore = 0;
+
+                computerScore = 0;
+
+                isPlayerTurn = true;
+
+                isProcessing = false;
+
+                turnCount = 0;
+
+                computerMemory = {};
+
+                
+
+                // Update UI
+
+                playerScoreElement.textContent = '0';
+
+                computerScoreElement.textContent = '0';
+
+                turnIndicator.textContent = "Giliran Pemain";
+
+                updateTurnIndicator();
+
+                
+
+                // Clear game board
+
+                gameBoard.innerHTML = '';
+
+                
+
+                // Create pairs of cards
+
+                let cardValues = [];
+
+                for (let i = 0; i < totalPairs; i++) {
+
+                    cardValues.push(emojis[i]);
+
+                    cardValues.push(emojis[i]);
+
+                }
+
+                
+
+                // Shuffle cards
+
+                cardValues = shuffleArray(cardValues);
+
+                
+
+                // Create card elements
+
+                for (let i = 0; i < 24; i++) {
+
+                    const card = document.createElement('div');
+
+                    card.className = 'card';
+
+                    card.dataset.index = i;
+
+                    card.dataset.value = cardValues[i];
+
+                    
+
+                    card.innerHTML = `
+
+                        <div class="card-inner">
+
+                            <div class="card-front">
+
+                                <i class="fas fa-question text-indigo-600 text-3xl"></i>
+
+                            </div>
+
+                            <div class="card-back">
+
+                                <span>${cardValues[i]}</span>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                    
+
+                    card.addEventListener('click', () => handleCardClick(card));
+
+                    gameBoard.appendChild(card);
+
+                    cards.push({
+
+                        element: card,
+
+                        value: cardValues[i],
+
+                        isFlipped: false,
+
+                        isMatched: false
+
+                    });
+
+                }
+
+            }
+
+            
+
+            function handleCardClick(card) {
+
+                if (!isPlayerTurn || isProcessing) return;
+
+                
+
+                const index = parseInt(card.dataset.index);
+
+                const cardData = cards[index];
+
+                
+
+                // Don't allow clicking on already flipped or matched cards
+
+                if (cardData.isFlipped || cardData.isMatched) return;
+
+                
+
+                // Prevent flipping more than 2 cards
+
+                if (flippedCards.length >= 2) return;
+
+                
+
+                // Flip the card
+
+                flipCard(cardData);
+
+                
+
+                // Add to flipped cards
+
+                flippedCards.push(cardData);
+
+                
+
+                // Check for match if two cards are flipped
+
+                if (flippedCards.length === 2) {
+
+                    isProcessing = true;
+
+                    turnCount++;
+
+                    updateMemory(); // Update memory each turn
+
+                    
+
+                    // Check for match
+
+                    if (flippedCards[0].value === flippedCards[1].value) {
+
+                        // Match found
+
+                        setTimeout(() => {
+
+                            flippedCards[0].isMatched = true;
+
+                            flippedCards[1].isMatched = true;
+
+                            removeFromMemory(flippedCards[0].element.dataset.index);
+
+                            removeFromMemory(flippedCards[1].element.dataset.index);
+
+                            flippedCards = [];
+
+                            isProcessing = false;
+
+                            
+
+                            // Update score
+
+                            playerScore++;
+
+                            playerScoreElement.textContent = playerScore;
+
+                            matchedPairs++;
+
+                            
+
+                            // Check for game over
+
+                            checkGameOver();
+
+                            
+
+                            // Player gets another turn
+
+                            isPlayerTurn = true;
+
+                            turnIndicator.textContent = "Giliran Pemain";
+
+                            updateTurnIndicator();
+
+                        }, 1000);
+
+                    } else {
+
+                        // No match, add to memory
+
+                        addToMemory(flippedCards[0].element.dataset.index, flippedCards[0].value);
+
+                        addToMemory(flippedCards[1].element.dataset.index, flippedCards[1].value);
+
+                        
+
+                        // No match
+
+                        setTimeout(() => {
+
+                            // Flip cards back
+
+                            unflipCard(flippedCards[0]);
+
+                            unflipCard(flippedCards[1]);
+
+                            flippedCards = [];
+
+                            isProcessing = false;
+
+                            
+
+                            // Switch turns
+
+                            isPlayerTurn = false;
+
+                            turnIndicator.textContent = "Giliran Komputer";
+
+                            updateTurnIndicator();
+
+                            
+
+                            // Computer's turn
+
+                            setTimeout(computerTurn, 1000);
+
+                        }, 1500);
+
+                    }
+
+                }
+
+            }
+
+            
+
+            function flipCard(cardData) {
+
+                cardData.isFlipped = true;
+
+                cardData.element.classList.add('flipped');
+
+            }
+
+            
+
+            function unflipCard(cardData) {
+
+                cardData.isFlipped = false;
+
+                cardData.element.classList.remove('flipped');
+
+            }
+
+            
+
+            function computerTurn() {
+
+                if (isPlayerTurn || isProcessing) return;
+
+                
+
+                isProcessing = true;
+
+                turnCount++;
+
+                updateMemory();
+
+                
+
+                // Get all unflipped, unmatched cards
+
+                const availableCards = cards.filter(card => !card.isFlipped && !card.isMatched);
+
+                
+
+                if (availableCards.length < 2) {
+
+                    isProcessing = false;
+
+                    isPlayerTurn = true;
+
+                    turnIndicator.textContent = "Giliran Pemain";
+
+                    updateTurnIndicator();
+
+                    return;
+
+                }
+
+                
+
+                // Build value to indices map from memory
+
+                const knownValues = {};
+
+                for (const [index, mem] of Object.entries(computerMemory)) {
+
+                    const idx = parseInt(index);
+
+                    if (!cards[idx].isMatched && !cards[idx].isFlipped) {
+
+                        if (!knownValues[mem.value]) knownValues[mem.value] = [];
+
+                        knownValues[mem.value].push(idx);
+
+                    }
+
+                }
+
+                
+
+                // Computer "thinking" delay
+
+                setTimeout(() => {
+
+                    // Refresh available cards after delay
+
+                    const refreshedAvailable = cards.filter(card => !card.isFlipped && !card.isMatched);
+
+                    
+
+                    if (refreshedAvailable.length < 2) {
+
+                        isProcessing = false;
+
+                        isPlayerTurn = true;
+
+                        turnIndicator.textContent = "Giliran Pemain";
+
+                        updateTurnIndicator();
+
+                        return;
+
+                    }
+
+                    
+
+                    // First card: random
+
+                    const firstIndex = Math.floor(Math.random() * refreshedAvailable.length);
+
+                    const firstCard = refreshedAvailable[firstIndex];
+
+                    flipCard(firstCard);
+
+                    flippedCards.push(firstCard);
+
+                    addToMemory(firstCard.element.dataset.index, firstCard.value);
+
+                    
+
+                    // Second selection after delay
+
+                    setTimeout(() => {
+
+                        // Refresh remaining cards
+
+                        const remainingCards = cards.filter(card => !card.isFlipped && !card.isMatched);
+
+                        
+
+                        if (remainingCards.length === 0) {
+
+                            unflipCard(firstCard);
+
+                            flippedCards = [];
+
+                            isProcessing = false;
+
+                            isPlayerTurn = true;
+
+                            turnIndicator.textContent = "Giliran Pemain";
+
+                            updateTurnIndicator();
+
+                            return;
+
+                        }
+
+                        
+
+                        // For second card: try known match, with misremember chance already in memory
+
+                        let secondCard;
+
+                        const firstValue = computerMemory[firstCard.element.dataset.index]?.value || firstCard.value; // Use remembered, which might be wrong
+
+                        if (knownValues[firstValue] && knownValues[firstValue].length > 0) {
+
+                            const matchIdx = knownValues[firstValue].find(i => i !== parseInt(firstCard.element.dataset.index));
+
+                            if (matchIdx) {
+
+                                secondCard = cards[matchIdx];
+
+                            }
+
+                        }
+
+                        
+
+                        if (!secondCard) {
+
+                            // Random second
+
+                            const secondIndex = Math.floor(Math.random() * remainingCards.length);
+
+                            secondCard = remainingCards[secondIndex];
+
+                        }
+
+                        
+
+                        flipCard(secondCard);
+
+                        flippedCards.push(secondCard);
+
+                        addToMemory(secondCard.element.dataset.index, secondCard.value);
+
+                        
+
+                        // Check for match (using true values)
+
+                        if (flippedCards[0].value === flippedCards[1].value) {
+
+                            // Match found
+
+                            setTimeout(() => {
+
+                                flippedCards[0].isMatched = true;
+
+                                flippedCards[1].isMatched = true;
+
+                                removeFromMemory(flippedCards[0].element.dataset.index);
+
+                                removeFromMemory(flippedCards[1].element.dataset.index);
+
+                                flippedCards = [];
+
+                                isProcessing = false;
+
+                                
+
+                                // Update score
+
+                                computerScore++;
+
+                                computerScoreElement.textContent = computerScore;
+
+                                matchedPairs++;
+
+                                
+
+                                // Check for game over
+
+                                checkGameOver();
+
+                                
+
+                                // Computer gets another turn
+
+                                isPlayerTurn = false;
+
+                                turnIndicator.textContent = "Giliran Komputer";
+
+                                updateTurnIndicator();
+
+                                
+
+                                setTimeout(computerTurn, 1000);
+
+                            }, 1000);
+
+                        } else {
+
+                            // No match
+
+                            setTimeout(() => {
+
+                                // Flip cards back
+
+                                unflipCard(flippedCards[0]);
+
+                                unflipCard(flippedCards[1]);
+
+                                flippedCards = [];
+
+                                isProcessing = false;
+
+                                
+
+                                // Switch turns
+
+                                isPlayerTurn = true;
+
+                                turnIndicator.textContent = "Giliran Pemain";
+
+                                updateTurnIndicator();
+
+                            }, 1500);
+
+                        }
+
+                    }, 800);
+
+                }, 1000);
+
+            }
+
+            
+
+            function addToMemory(index, value) {
+
+                computerMemory[index] = { value, seenTurn: turnCount };
+
+            }
+
+            
+
+            function removeFromMemory(index) {
+
+                delete computerMemory[index];
+
+            }
+
+            
+
+            function updateMemory() {
+
+                for (const index in computerMemory) {
+
+                    const mem = computerMemory[index];
+
+                    const age = turnCount - mem.seenTurn;
+
+                    
+
+                    // Chance to misremember
+
+                    if (Math.random() < probMisremember) {
+
+                        const unmatchedEmojis = emojis.filter(e => 
+
+                            cards.filter(c => c.value === e && c.isMatched).length < 2
+
+                        );
+
+                        if (unmatchedEmojis.length > 0) {
+
+                            mem.value = unmatchedEmojis[Math.floor(Math.random() * unmatchedEmojis.length)];
+
+                        }
+
+                    }
+
+                    
+
+                    // Chance to forget, higher if old
+
+                    let forgetProb = probForget * Math.max(0, age - forgetThreshold + 1);
+
+                    if (Math.random() < forgetProb) {
+
+                        delete computerMemory[index];
+
+                    }
+
+                }
+
+            }
+
+            
+
+            function updateTurnIndicator() {
+
+                if (isPlayerTurn) {
+
+                    playerScoreContainer.classList.add('active-turn');
+
+                    computerScoreContainer.classList.remove('active-turn');
+
+                    playerScoreContainer.classList.add('pulse');
+
+                    computerScoreContainer.classList.remove('pulse');
+
+                } else {
+
+                    computerScoreContainer.classList.add('active-turn');
+
+                    playerScoreContainer.classList.remove('active-turn');
+
+                    computerScoreContainer.classList.add('pulse');
+
+                    playerScoreContainer.classList.remove('pulse');
+
+                }
+
+            }
+
+            
+
+            function checkGameOver() {
+
+                if (matchedPairs === totalPairs) {
+
+                    setTimeout(() => {
+
+                        showGameOver();
+
+                    }, 1000);
+
+                }
+
+            }
+
+            
+
+            function showGameOver() {
+
+                const isDark = document.body.classList.contains('dark');
+
+                messageEl.classList.remove('hidden');
+
+                if (playerScore > computerScore) {
+
+                    resultTitle.textContent = "Anda Menang!";
+
+                    resultMessage.textContent = `Selamat! Anda menang ${playerScore} melawan ${computerScore}.`;
+
+                    resultTitle.className = `text-2xl font-bold mb-4 ${isDark ? 'text-green-700' : 'text-green-300'} title-glow`;
+
+                    launchConfetti();
+
+                } else if (computerScore > playerScore) {
+
+                    resultTitle.textContent = "Komputer Menang!";
+
+                    resultMessage.textContent = `Komputer menang ${computerScore} melawan ${playerScore}. Coba lagi!`;
+
+                    resultTitle.className = `text-2xl font-bold mb-4 ${isDark ? 'text-red-700' : 'text-red-300'} title-glow`;
+
+                } else {
+
+                    resultTitle.textContent = "Seri!";
+
+                    resultMessage.textContent = `Permainan berakhir seri dengan ${playerScore} poin masing-masing.`;
+
+                    resultTitle.className = `text-2xl font-bold mb-4 ${isDark ? 'text-yellow-700' : 'text-yellow-300'} title-glow`;
+
+                }
+
+            }
+
+            
+
+            function launchConfetti() {
+
+                confetti({
+
+                    particleCount: 100,
+
+                    spread: 70,
+
+                    origin: { y: 0.6 },
+
+                    colors: ['#3b82f6', '#facc15', '#D40000', '#2CA05A']
+
+                });
+
+            }
+
+            
+
+            // Helper function to shuffle array
+
+            function shuffleArray(array) {
+
+                const newArray = [...array];
+
+                for (let i = newArray.length - 1; i > 0; i--) {
+
+                    const j = Math.floor(Math.random() * (i + 1));
+
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+
+                }
+
+                return newArray;
+
+            }
+
+            
+
+            const themeToggle = document.getElementById('themeToggle');
+
+            const themeIcon = themeToggle.querySelector('i');
+
+            themeToggle.addEventListener('click', () => {
+
+                document.body.classList.toggle('dark');
+
+                if (document.body.classList.contains('dark')) {
+
+                    themeIcon.classList.remove('fa-sun');
+
+                    themeIcon.classList.add('fa-moon');
+
+                    themeIcon.classList.remove('text-yellow-500');
+
+                    themeIcon.classList.add('text-primaryDark');
+
+                    document.querySelectorAll('.card-front i').forEach(i => i.classList.replace('text-indigo-600', 'text-primaryDark'));
+
+                    document.querySelectorAll('#player-score .font-bold, #computer-score .font-bold').forEach(el => el.classList.replace('text-indigo-600', 'text-primaryDark'));
+
+                    document.querySelector('#turn-indicator').classList.replace('bg-indigo-600', 'bg-primaryDark');
+
+                    document.querySelector('#turn-indicator').classList.replace('text-white', 'text-darker');
+
+                } else {
+
+                    themeIcon.classList.remove('fa-moon');
+
+                    themeIcon.classList.add('fa-sun');
+
+                    themeIcon.classList.remove('text-primaryDark');
+
+                    themeIcon.classList.add('text-yellow-500');
+
+                    document.querySelectorAll('.card-front i').forEach(i => i.classList.replace('text-primaryDark', 'text-indigo-600'));
+
+                    document.querySelectorAll('#player-score .font-bold, #computer-score .font-bold').forEach(el => el.classList.replace('text-primaryDark', 'text-indigo-600'));
+
+                    document.querySelector('#turn-indicator').classList.replace('bg-primaryDark', 'bg-indigo-600');
+
+                    document.querySelector('#turn-indicator').classList.replace('text-darker', 'text-white');
+
+                }
+
+            });
+
+        });
+
+    </script>
+
+</body>
+
+</html>
