@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konversi Penanggalan Hijriah & Masehi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --dark-text: #334155;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
+        }
+
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-outline {
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        body.dark .btn-outline:hover {
+            background-color: rgba(250, 204, 21, 0.1);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        .input-group input[type="date"] {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f7f9fc;
+        }
+
+        body.dark .input-group input[type="date"] {
+            background-color: #1e293b;
+            border-color: #4b5563;
+            color: #e2e8f0;
+        }
+
+        .input-group input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        body.dark .input-group input[type="date"]:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        body.dark .input-icon {
+            color: var(--primary-dark);
+        }
+
+        .result-text {
+            display: block;
+            font-size: 1.1em;
+            font-weight: bold;
+            min-height: 20px;
+            padding: 5px 0;
+            color: var(--primary-color);
+        }
+
+        body.dark .result-text {
+            color: var(--primary-dark);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: var(--primary-color);
+        }
+
+        body.dark .loading {
+            color: var(--primary-dark);
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        body.dark .error-message {
+            color: #fc8181;
+        }
+
+        .container {
+            transition: background-color 0.5s ease;
+        }
+
+        body.dark .container {
+            background-color: #0f172a;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen">
+    <main class="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <section class="py-8 md:py-12 lg:py-16">
+            <div class="flex justify-between items-center mb-6 sm:mb-8">
+                <a href="https://sayakurma.github.io/website-saya/" class="btn-outline px-4 sm:px-6 py-2 rounded-full font-semibold text-sm sm:text-base">
+                    <i class="fas fa-arrow-left mr-2"></i> Kembali
+                </a>
+                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                    <i class="fas fa-sun text-yellow-500"></i>
+                </button>
+            </div>
+            <div class="bg-white dark:bg-darker p-6 sm:p-8 rounded-2xl shadow-lg max-w-md mx-auto">
+                <header class="mb-6">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-center">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700 dark:from-primaryDark dark:to-yellow-600">
+                            Konversi Penanggalan Hijriah & Masehi
+                        </span>
+                    </h1>
+                </header>
+                <div class="space-y-6">
+                    <div class="input-group">
+                        <label for="gregorianDate" class="block mb-2 font-semibold text-gray-700 dark:text-gray-300">
+                            Pilih Tanggal Masehi:
+                        </label>
+                        <div class="relative">
+                            <div class="input-icon">🗓️</div>
+                            <input 
+                                type="date" 
+                                id="gregorianDate" 
+                                required
+                                aria-describedby="dateError"
+                                class="w-full"
+                            >
+                        </div>
+                        <div id="dateError" class="error-message"></div>
+                    </div>
+                    <div class="input-group">
+                        <label class="block mb-2 font-semibold text-gray-700 dark:text-gray-300">
+                            Hasil Konversi ke Hijriah:
+                        </label>
+                        <div class="loading" id="loadingIndicator">
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Mengkonversi...
+                        </div>
+                        <span class="result-text" id="hijriResult"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        const hijriMonthMap = {
+            'محرم': 'Muharram', 
+            'صفر': 'Safar', 
+            'ربيع الأول': 'Rabiul Awal',
+            'ربيع الآخر': 'Rabiul Akhir', 
+            'جمادى الأولى': 'Jumadil Awal', 
+            'جمادى الآخرة': 'Jumadil Akhir', 
+            'رجب': 'Rajab', 
+            'شعبان': 'Syaban', 
+            'رمضان': 'Ramadhan', 
+            'شوال': 'Syawal', 
+            'ذو القعدة': 'Zulkaidah', 
+            'ذو الحجة': 'Zulhijah'
+        };
+        
+        const arabicNumeralsMap = {
+            '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+            '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
+        };
+
+        const gregorianDateInput = document.getElementById('gregorianDate');
+        const hijriResultSpan = document.getElementById('hijriResult');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const dateError = document.getElementById('dateError');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+
+        function formatHijriToLatin(rawString) {
+            let result = rawString;
+            for (const arabNum in arabicNumeralsMap) {
+                const regex = new RegExp(arabNum, 'g');
+                result = result.replace(regex, arabicNumeralsMap[arabNum]);
+            }
+            let translatedMonth = '';
+            for (const arabName in hijriMonthMap) {
+                const regex = new RegExp(arabName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g');
+                if (regex.test(result)) {
+                    translatedMonth = hijriMonthMap[arabName];
+                    result = result.replace(regex, '||BULAN||')
+                                  .replace(/[\u064B-\u065F]/g, '')
+                                  .replace('هـ', '')
+                                  .trim();
+                    result = result.replace('||BULAN||', translatedMonth).trim();
+                    result = result.replace(/\s\s+/g, ' ');
+                    return result;
+                }
+            }
+            return result;
+        }
+
+        function validateDate(input) {
+            const date = new Date(input);
+            dateError.textContent = '';
+            gregorianDateInput.setAttribute('aria-invalid', 'false');
+            if (isNaN(date.getTime())) {
+                dateError.textContent = 'Format tanggal tidak valid';
+                gregorianDateInput.setAttribute('aria-invalid', 'true');
+                return false;
+            }
+            return true;
+        }
+
+        function getTodayDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function convertGregorianToHijri() {
+            const gregorianInput = gregorianDateInput.value;
+            if (!gregorianInput) {
+                hijriResultSpan.textContent = 'Mohon pilih tanggal Masehi.';
+                return;
+            }
+            if (!validateDate(gregorianInput)) {
+                hijriResultSpan.textContent = '';
+                return;
+            }
+            loadingIndicator.style.display = 'block';
+            hijriResultSpan.textContent = '';
+            setTimeout(() => {
+                try {
+                    const date = new Date(gregorianInput + 'T00:00:00');
+                    const hijriOptions = {
+                        calendar: 'islamic-umalqura',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        timeZone: 'UTC'
+                    };
+                    const rawHijriString = date.toLocaleDateString('ar-SA', hijriOptions);
+                    const finalHijriDisplay = formatHijriToLatin(rawHijriString);
+                    hijriResultSpan.textContent = `${finalHijriDisplay} H`;
+                } catch (error) {
+                    console.error('Error converting date:', error);
+                    hijriResultSpan.textContent = 'Terjadi kesalahan dalam konversi.';
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
+            }, 500);
+        }
+
+        function initApp() {
+            const todayDate = getTodayDate();
+            gregorianDateInput.value = todayDate;
+            convertGregorianToHijri();
+        }
+
+        gregorianDateInput.addEventListener('change', function() {
+            validateDate(this.value);
+            convertGregorianToHijri();
+        });
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                themeIcon.classList.replace('text-yellow-500', 'text-primaryDark');
+                themeToggle.classList.replace('bg-gray-200', 'hover:bg-gray-300');
+                themeToggle.classList.add('bg-darker', 'hover:bg-secondary');
+            } else {
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                themeIcon.classList.replace('text-primaryDark', 'text-yellow-500');
+                themeToggle.classList.add('bg-gray-200', 'hover:bg-gray-300');
+                themeToggle.classList.remove('bg-darker', 'hover:bg-secondary');
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
