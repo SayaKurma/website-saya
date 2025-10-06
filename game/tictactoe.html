@@ -497,7 +497,7 @@
             <div class="board" id="board">
                 <div class="grid" id="grid"></div>
             </div>
-            <button class="btn-back px-6 py-2 rounded-full font-semibold" onclick="backToSelect()">Ganti Karakter</button>
+            <button class="btn-back px-6 py-2 rounded-full font-semibold" onclick="changeCharacter()">Ganti Karakter</button>
         </div>
     </div>
     <div class="message-modal" id="resultModal">
@@ -719,6 +719,12 @@
 
         function backToSelect() {
             window.location.href = 'https://sayakurma.github.io/website-saya/';
+        }
+
+        function changeCharacter() {  
+            document.getElementById('resultModal').classList.remove('active');  
+            document.getElementById('gameContainer').classList.remove('active');
+            document.getElementById('characterSelect').style.display = 'block';
         }
 
         const themeToggle = document.getElementById('themeToggle');
