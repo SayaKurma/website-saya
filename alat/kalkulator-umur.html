@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Umur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --dark-text: #334155;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
+        }
+
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-primary {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        body.dark .btn-primary:hover {
+            background-color: var(--primary-dark-hover);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
+        }
+
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-outline {
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        body.dark .btn-outline:hover {
+            background-color: rgba(250, 204, 21, 0.1);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        .input-group input[type="date"] {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f7f9fc;
+        }
+
+        body.dark .input-group input[type="date"] {
+            background-color: #1e293b;
+            border-color: #4b5563;
+            color: #e2e8f0;
+        }
+
+        .input-group input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        body.dark .input-group input[type="date"]:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        body.dark .input-icon {
+            color: var(--primary-dark);
+        }
+
+        #hasil {
+            margin-top: 30px;
+            padding: 25px 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f7f9fc, #edf2f7);
+            font-size: 1.2em;
+            color: #2d3748;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #cbd5e0;
+            transition: all 0.3s ease;
+        }
+
+        body.dark #hasil {
+            background: linear-gradient(135deg, #1e293b, #2d3748);
+            border-color: #4b5563;
+            color: #e2e8f0;
+        }
+
+        #hasil.has-content {
+            border: 2px solid #48bb78;
+            background: linear-gradient(135deg, #f0fff4, #e6fffa);
+        }
+
+        body.dark #hasil.has-content {
+            border-color: #68d391;
+            background: linear-gradient(135deg, #2d3748, #1e293b);
+        }
+
+        .result-text {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        body.dark .result-text {
+            color: var(--primary-dark);
+        }
+
+        .result-age {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #6a1cb0;
+            margin: 10px 0;
+        }
+
+        body.dark .result-age {
+            color: var(--primary-dark);
+        }
+
+        .result-details {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+
+        .age-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 80px;
+            max-width: 120px;
+        }
+
+        body.dark .age-item {
+            background: #2d3748;
+        }
+
+        .age-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        body.dark .age-value {
+            color: var(--primary-dark);
+        }
+
+        .age-label {
+            font-size: 0.8em;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .error {
+            color: #f56565;
+            font-weight: 600;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #fed7d7;
+            border-left: 4px solid #f56565;
+        }
+
+        body.dark .error {
+            background-color: #742a2a;
+            border-color: #f56565;
+            color: #f56565;
+        }
+
+        .birthday-message {
+            color: #48bb78;
+            font-weight: 600;
+            margin-top: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        body.dark .birthday-message {
+            color: #68d391;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 480px) {
+            .result-details {
+                gap: 10px;
+            }
+
+            .age-item {
+                padding: 8px 10px;
+            }
+
+            .age-value {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen">
+    <main class="container mx-auto px-6 py-12">
+        <section class="py-12 md:py-16 lg:py-20">
+            <div class="flex justify-between items-center mb-8">
+                <a href="index.html" class="btn-outline px-6 py-2 rounded-full font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i> Kembali
+                </a>
+                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                    <i class="fas fa-sun text-yellow-500"></i>
+                </button>
+            </div>
+            <div class="bg-white dark:bg-darker p-8 rounded-2xl shadow-lg max-w-md mx-auto">
+                <h1 class="text-3xl font-bold text-center mb-6">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700 dark:from-primaryDark dark:to-yellow-600">Kalkulator Umur</span>
+                </h1>
+                <form id="ageForm">
+                    <div class="input-group mb-6">
+                        <label for="tanggalLahir" class="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Masukkan Tanggal Lahir Anda:</label>
+                        <div class="relative">
+                            <div class="input-icon">🗓️</div>
+                            <input type="date" id="tanggalLahir" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary px-8 py-3 rounded-full font-semibold w-full">Hitung Umur Saya</button>
+                </form>
+                <div id="hasil" class="mt-8">
+                    <div>Hasil akan ditampilkan di sini</div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeIcon.classList.remove('text-yellow-500');
+                themeIcon.classList.add('text-primaryDark');
+                document.querySelector('#themeToggle').classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                document.querySelector('#themeToggle').classList.add('bg-darker', 'hover:bg-secondary');
+                document.querySelector('h1 span').classList.remove('from-blue-500', 'to-blue-700');
+                document.querySelector('h1 span').classList.add('from-primaryDark', 'to-yellow-600');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIcon.classList.remove('text-primaryDark');
+                themeIcon.classList.add('text-yellow-500');
+                document.querySelector('#themeToggle').classList.add('bg-gray-200', 'hover:bg-gray-300');
+                document.querySelector('#themeToggle').classList.remove('bg-darker', 'hover:bg-secondary');
+                document.querySelector('h1 span').classList.add('from-blue-500', 'to-blue-700');
+                document.querySelector('h1 span').classList.remove('from-primaryDark', 'to-yellow-600');
+            }
+        });
+
+        document.getElementById('ageForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const tanggalLahirStr = document.getElementById('tanggalLahir').value;
+            const hasilDiv = document.getElementById('hasil');
+
+            if (!tanggalLahirStr) {
+                hasilDiv.innerHTML = '<div class="error">Mohon masukkan tanggal lahir Anda.</div>';
+                hasilDiv.classList.remove('has-content');
+                return;
+            }
+
+            const tanggalLahir = new Date(tanggalLahirStr);
+            const tanggalSekarang = new Date();
+
+            if (isNaN(tanggalLahir.getTime())) {
+                hasilDiv.innerHTML = '<div class="error">Format tanggal tidak valid.</div>';
+                hasilDiv.classList.remove('has-content');
+                return;
+            }
+
+            if (tanggalLahir > tanggalSekarang) {
+                hasilDiv.innerHTML = '<div class="error">Anda belum lahir! Tanggal lahir tidak boleh di masa depan.</div>';
+                hasilDiv.classList.remove('has-content');
+                return;
+            }
+
+            let umurTahun = tanggalSekarang.getFullYear() - tanggalLahir.getFullYear();
+            const bulanSekarang = tanggalSekarang.getMonth();
+            const bulanLahir = tanggalLahir.getMonth();
+            const tanggalHariSekarang = tanggalSekarang.getDate();
+            const tanggalHariLahir = tanggalLahir.getDate();
+
+            if (bulanSekarang < bulanLahir || (bulanSekarang === bulanLahir && tanggalHariSekarang < tanggalHariLahir)) {
+                umurTahun--;
+            }
+
+            let umurBulan = bulanSekarang - bulanLahir;
+            let umurHari = tanggalHariSekarang - tanggalHariLahir;
+
+            if (umurHari < 0) {
+                const bulanSebelumnya = bulanSekarang === 0 ? 11 : bulanSekarang - 1;
+                const tahunSebelumnya = bulanSekarang === 0 ? tanggalSekarang.getFullYear() - 1 : tanggalSekarang.getFullYear();
+                const hariDiBulanSebelumnya = new Date(tahunSebelumnya, bulanSebelumnya + 1, 0).getDate();
+                umurHari += hariDiBulanSebelumnya;
+                umurBulan--;
+            }
+
+            if (umurBulan < 0) {
+                umurBulan += 12;
+            }
+
+            const isBirthdayToday = bulanSekarang === bulanLahir && tanggalHariSekarang === tanggalHariLahir;
+            let birthdayMessage = '';
+            if (isBirthdayToday) {
+                birthdayMessage = '<div class="birthday-message">🎉 Selamat Ulang Tahun! 🎉</div>';
+            }
+
+            hasilDiv.innerHTML = `
+                <div class="result-text">Usia Anda saat ini:</div>
+                <div class="result-details">
+                    <div class="age-item">
+                        <div class="age-value">${umurTahun}</div>
+                        <div class="age-label">Tahun</div>
+                    </div>
+                    <div class="age-item">
+                        <div class="age-value">${umurBulan}</div>
+                        <div class="age-label">Bulan</div>
+                    </div>
+                    <div class="age-item">
+                        <div class="age-value">${umurHari}</div>
+                        <div class="age-label">Hari</div>
+                    </div>
+                </div>
+                ${birthdayMessage}
+            `;
+            hasilDiv.classList.add('has-content');
+        });
+    </script>
+</body>                      
+</html>
