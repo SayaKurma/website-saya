@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Diskon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --dark-text: #334155;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
+        }
+
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-primary {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        body.dark .btn-primary:hover {
+            background-color: var(--primary-dark-hover);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
+        }
+
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-outline {
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        body.dark .btn-outline:hover {
+            background-color: rgba(250, 204, 21, 0.1);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen">
+    <main class="container mx-auto px-6 py-12">
+        <section class="py-12 fade-in">
+            <div class="flex justify-between items-center mb-8">
+                <a href="https://sayakurma.github.io/website-saya/" class="btn-outline px-6 py-2 rounded-full font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i> Kembali
+                </a>
+                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                    <i class="fas fa-sun text-yellow-500"></i>
+                </button>
+            </div>
+            <div class="bg-white dark:bg-darker rounded-2xl shadow-lg p-8 max-w-lg mx-auto">
+                <h1 class="text-3xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700 dark:from-primaryDark dark:to-yellow-600">Kalkulator Diskon</h1>
+                <div class="space-y-6">
+                    <div>
+                        <label for="originalPrice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Harga Asli Produk (Rp):</label>
+                        <input type="number" id="originalPrice" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-primaryDark" placeholder="Masukkan harga asli">
+                    </div>
+                    <div>
+                        <label for="discountPercentage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Persentase Diskon (%):</label>
+                        <input type="number" id="discountPercentage" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-primaryDark" placeholder="Masukkan persentase diskon">
+                    </div>
+                    <div>
+                        <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kuantitas:</label>
+                        <input type="number" id="quantity" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-primaryDark" placeholder="Masukkan kuantitas" value="1">
+                    </div>
+                    <button class="btn-primary w-full py-3 rounded-lg font-semibold" onclick="calculateDiscount()">Hitung Diskon</button>
+                    <div class="hidden bg-gray-50 dark:bg-secondary rounded-lg p-6" id="result">
+                        <div class="text-center bg-gradient-to-r from-blue-500 to-blue-700 dark:from-primaryDark dark:to-yellow-600 text-white rounded-lg p-6 mb-6">
+                            <div class="text-lg opacity-90">Total yang Harus Dibayar</div>
+                            <div class="text-3xl font-bold" id="totalPrice">Rp 0</div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button class="btn-outline flex-1 py-3 rounded-lg font-semibold" onclick="showDiscountAmount()">Jumlah Diskon</button>
+                            <button class="btn-outline flex-1 py-3 rounded-lg font-semibold" onclick="showDiscountedPrice()">Harga Satuan Setelah Diskon</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-overlay fixed inset-0 bg-black/50 dark:bg-black/70 hidden justify-center items-center" id="discountAmountModal">
+                <div class="bg-white dark:bg-darker p-8 rounded-2xl max-w-sm w-full text-center relative">
+                    <button class="close-btn absolute top-4 right-4 text-2xl text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-secondary rounded-full w-8 h-8 flex items-center justify-center" onclick="closeModal('discountAmountModal')">&times;</button>
+                    <div class="text-3xl font-bold text-blue-500 dark:text-primaryDark" id="modalDiscountAmount">Rp 0</div>
+                </div>
+            </div>
+            <div class="modal-overlay fixed inset-0 bg-black/50 dark:bg-black/70 hidden justify-center items-center" id="discountedPriceModal">
+                <div class="bg-white dark:bg-darker p-8 rounded-2xl max-w-sm w-full text-center relative">
+                    <button class="close-btn absolute top-4 right-4 text-2xl text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-secondary rounded-full w-8 h-8 flex items-center justify-center" onclick="closeModal('discountedPriceModal')">&times;</button>
+                    <div class="text-3xl font-bold text-blue-500 dark:text-primaryDark" id="modalDiscountedPrice">Rp 0</div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        let discountAmount = 0;
+        let discountedPrice = 0;
+        let originalPrice = 0;
+
+        function calculateDiscount() {
+            originalPrice = parseFloat(document.getElementById('originalPrice').value);
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+
+            if (isNaN(originalPrice) || isNaN(discountPercentage) || isNaN(quantity) || originalPrice <= 0 || discountPercentage < 0 || quantity <= 0) {
+                alert("Mohon masukkan nilai yang valid untuk semua kolom.");
+                return;
+            }
+
+            discountAmount = originalPrice * (discountPercentage / 100);
+            discountedPrice = originalPrice - discountAmount;
+            const totalPrice = discountedPrice * quantity;
+
+            function formatRupiah(angka) {
+                return "Rp " + Math.round(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+
+            document.getElementById('totalPrice').textContent = formatRupiah(totalPrice);
+            document.getElementById('modalDiscountAmount').textContent = formatRupiah(discountAmount);
+            document.getElementById('modalDiscountedPrice').textContent = formatRupiah(discountedPrice);
+            document.getElementById('result').classList.remove('hidden');
+        }
+        
+        function showDiscountAmount() {
+            document.getElementById('discountAmountModal').classList.remove('hidden');
+            document.getElementById('discountAmountModal').classList.add('flex');
+        }
+        
+        function showDiscountedPrice() {
+            document.getElementById('discountedPriceModal').classList.remove('hidden');
+            document.getElementById('discountedPriceModal').classList.add('flex');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('flex');
+        }
+        
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal-overlay');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target === modals[i]) {
+                    modals[i].classList.add('hidden');
+                    modals[i].classList.remove('flex');
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        calculateDiscount();
+                    }
+                });
+            });
+
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark');
+                if (document.body.classList.contains('dark')) {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    themeIcon.classList.remove('text-yellow-500');
+                    themeIcon.classList.add('text-primaryDark');
+                    document.querySelector('h1').classList.remove('from-blue-500', 'to-blue-700');
+                    document.querySelector('h1').classList.add('from-primaryDark', 'to-yellow-600');
+                    document.querySelector('#themeToggle').classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                    document.querySelector('#themeToggle').classList.add('bg-darker', 'hover:bg-secondary');
+                    document.querySelector('#result').classList.remove('bg-gray-50');
+                    document.querySelector('#result').classList.add('bg-secondary');
+                    document.querySelector('.bg-gradient-to-r').classList.remove('from-blue-500', 'to-blue-700');
+                    document.querySelector('.bg-gradient-to-r').classList.add('from-primaryDark', 'to-yellow-600');
+                    document.querySelectorAll('label').forEach(label => {
+                        label.classList.remove('text-gray-700');
+                        label.classList.add('text-gray-300');
+                    });
+                    document.querySelectorAll('input').forEach(input => {
+                        input.classList.remove('border-gray-300', 'bg-gray-50', 'focus:ring-blue-500');
+                        input.classList.add('border-gray-600', 'bg-secondary', 'focus:ring-primaryDark');
+                    });
+                } else {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    themeIcon.classList.remove('text-primaryDark');
+                    themeIcon.classList.add('text-yellow-500');
+                    document.querySelector('h1').classList.add('from-blue-500', 'to-blue-700');
+                    document.querySelector('h1').classList.remove('from-primaryDark', 'to-yellow-600');
+                    document.querySelector('#themeToggle').classList.add('bg-gray-200', 'hover:bg-gray-300');
+                    document.querySelector('#themeToggle').classList.remove('bg-darker', 'hover:bg-secondary');
+                    document.querySelector('#result').classList.add('bg-gray-50');
+                    document.querySelector('#result').classList.remove('bg-secondary');
+                    document.querySelector('.bg-gradient-to-r').classList.add('from-blue-500', 'to-blue-700');
+                    document.querySelector('.bg-gradient-to-r').classList.remove('from-primaryDark', 'to-yellow-600');
+                    document.querySelectorAll('label').forEach(label => {
+                        label.classList.add('text-gray-700');
+                        label.classList.remove('text-gray-300');
+                    });
+                    document.querySelectorAll('input').forEach(input => {
+                        input.classList.add('border-gray-300', 'bg-gray-50', 'focus:ring-blue-500');
+                        input.classList.remove('border-gray-600', 'bg-secondary', 'focus:ring-primaryDark');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
