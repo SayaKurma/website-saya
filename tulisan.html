@@ -207,111 +207,6 @@
             transition: background-color 0.5s ease;
         }
 
-        .dropdown {
-            position: relative;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: white;
-            border-radius: 12px;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-            min-width: 180px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
-            z-index: 10;
-            padding: 8px 0;
-        }
-
-        body.dark .dropdown-menu {
-            background-color: #1e293b;
-            border: 1px solid rgba(250, 204, 21, 0.2);
-        }
-
-        .dropdown:hover .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .dropdown-menu a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: var(--dark-text);
-            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-        }
-
-        body.dark .dropdown-menu a {
-            color: #e2e8f0;
-        }
-
-        .dropdown-menu a:hover {
-            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
-            color: var(--primary-color);
-            transform: translateX(5px);
-        }
-
-        body.dark .dropdown-menu a:hover {
-            background: linear-gradient(to right, rgba(250, 204, 21, 0.1), rgba(250, 204, 21, 0.05));
-            color: var(--primary-dark);
-        }
-
-        .dropdown-menu a i {
-            margin-right: 10px;
-            font-size: 1rem;
-        }
-
-        .mobile-dropdown-menu {
-            display: none;
-            flex-direction: column;
-            padding-left: 24px;
-            padding-top: 8px;
-            padding-bottom: 8px;
-            background-color: rgba(243, 244, 246, 0.5);
-            border-radius: 8px;
-            transition: max-height 0.3s ease, opacity 0.3s ease;
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-        }
-
-        body.dark .mobile-dropdown-menu {
-            background-color: rgba(30, 41, 59, 0.5);
-        }
-
-        .mobile-dropdown-menu.active {
-            display: flex;
-            max-height: 200px;
-            opacity: 1;
-        }
-
-        .mobile-dropdown-menu a {
-            padding: 10px 20px;
-            color: var(--dark-text);
-            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-        }
-
-        body.dark .mobile-dropdown-menu a {
-            color: #e2e8f0;
-        }
-
-        body.dark .mobile-dropdown-menu a:hover {
-            background: linear-gradient(to right, rgba(250, 204, 21, 0.1), rgba(250, 204, 21, 0.05));
-            color: var(--primary-dark);
-            transform: translateX(5px);
-        }
-
-        .mobile-dropdown-menu a i {
-            margin-right: 10px;
-            font-size: 1rem;
-        }
-
         .theme-toggle {
             transition: all 0.3s ease;
         }
@@ -490,25 +385,6 @@
                     <a href="insta-post.html" class="nav-link hover:text-blue-500 transition">Insta Post</a>
                     <a href="galeri.html" class="nav-link hover:text-blue-500 transition">Galeri</a>
                     <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition">Proyek Anime</a>
-                    <div class="dropdown">
-                        <a href="#" class="nav-link hover:text-blue-500 transition flex items-center">
-                            Game
-                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
-                        </a>
-                        <div class="dropdown-menu">
-                            <a href="game/uno/uno.html" class="nav-link"><i class="fas fa-dice mr-2"></i>UNO</a>
-                            <a href="game/tebak-kode.html" class="nav-link"><i class="fa-solid fa-key mr-2"></i>Tebak Kode</a>
-                            <a href="game/pencocokkan.html" class="nav-link"><i class="fa-solid fa-brain mr-2"></i>Pencocokkan</a>
-                            <a href="game/tictactoe.html" class="nav-link"><i class="fa-solid fa-xmark mr-2"></i>XOXO</a>
-                        </div>
-                        <a href="#" class="nav-link hover:text-blue-500 transition flex items-center">
-                            Alat
-                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
-                        </a>
-                        <div class="dropdown-menu">
-                            <a href="alat/kalkulator-umur.html" class="nav-link">Kalkulator Umur</a>                           
-                        </div>
-                    </div>
                     <a href="sosmed.html" class="nav-link hover:text-blue-500 transition">Sosial Media</a>
                 </nav>
                 <div class="flex items-center space-x-4">
@@ -528,25 +404,6 @@
                     <a href="insta-post.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Insta Post</a>
                     <a href="galeri.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Galeri</a>
                     <a href="proyek-anime.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Proyek Anime</a>
-                    <div class="dropdown">
-                        <a href="#" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100 flex items-center" id="mobileGameDropdown">
-                            Game
-                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
-                        </a>
-                        <div class="mobile-dropdown-menu">
-                            <a href="game/uno/uno.html" class="nav-link py-2 px-3 rounded-lg hover:bg-gray-100"><i class="fas fa-dice mr-2"></i>UNO</a>
-                            <a href="game/tebak-kode.html" class="nav-link py-2 px-3 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-key mr-2"></i>Tebak Kode</a>
-                            <a href="game/pencocokkan.html" class="nav-link py-2 px-3 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-brain mr-2"></i>Pencocokkan</a>
-                            <a href="game/tictactoe.html" class="nav-link py-2 px-3 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-xmark mr-2"></i>XOXO</a>
-                        </div>
-                        <a href="#" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100 flex items-center" id="mobileGameDropdown">
-                            Alat
-                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
-                        </a>
-                        <div class="mobile-dropdown-menu">
-                            <a href="alat/kalkulator-umur.html" class="nav-link py-2 px-3 rounded-lg hover:bg-gray-100">Kalkulator Umur</a>                          
-                        </div>
-                    </div>
                     <a href="sosmed.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Sosial Media</a>
                 </div>
             </div>
@@ -598,8 +455,6 @@
     <script>
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
-        const mobileGameDropdown = document.getElementById('mobileGameDropdown');
-        const mobileDropdownMenu = mobileGameDropdown ? mobileGameDropdown.nextElementSibling : null;
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle.querySelector('i');
         const backToTopButton = document.getElementById('backToTop');
@@ -613,16 +468,6 @@
                 mobileMenu.classList.remove('fade-in');
             }
         });
-
-        if (mobileGameDropdown) {
-            mobileGameDropdown.addEventListener('click', (e) => {
-                e.preventDefault();
-                mobileDropdownMenu.classList.toggle('active');
-                const chevron = mobileGameDropdown.querySelector('i');
-                chevron.classList.toggle('fa-chevron-down');
-                chevron.classList.toggle('fa-chevron-up');
-            });
-        }
 
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark');
