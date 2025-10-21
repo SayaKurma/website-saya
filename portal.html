@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Game & Alat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --dark-text: #334155;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
+        }
+
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .active {
+            font-weight: 600;
+            color: var(--primary-color);
+            position: relative;
+        }
+
+        body.dark .active {
+            color: var(--primary-dark);
+        }
+
+        .active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        body.dark .active::after {
+            background: linear-gradient(90deg, transparent, var(--primary-dark), transparent);
+            bottom: -2px;
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        body.dark .nav-link::after {
+            background: linear-gradient(90deg, transparent, var(--primary-dark), transparent);
+            bottom: -2px;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        body.dark .nav-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.2) translateY(-5px);
+        }
+
+        body.dark .social-icon {
+            color: var(--primary-dark);
+        }
+
+        body.dark .social-icon:hover {
+            color: #eab308;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-primary {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        body.dark .btn-primary:hover {
+            background-color: var(--primary-dark-hover);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
+        }
+
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-outline {
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        body.dark .btn-outline:hover {
+            background-color: rgba(250, 204, 21, 0.1);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        body.dark .mobile-nav-link {
+            color: #e2e8f0;
+        }
+
+        body.dark .mobile-nav-link:hover {
+            background: #1e293b;
+            color: var(--primary-dark);
+        }
+
+        body.dark #mobileMenuButton {
+            background-color: #020617;
+        }
+
+        body.dark #mobileMenuButton:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark #mobileMenuButton i {
+            color: var(--primary-dark);
+        }
+
+        .portal-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 56rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .category-box {
+            flex: 1;
+            text-align: center;
+        }
+
+        .main-button {
+            display: block;
+            width: 100%;
+            padding: 1.875rem 1.25rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 0.625rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .main-button.game { background-color: #e74c3c; }
+        .main-button.game:hover { background-color: #c0392b; transform: translateY(-2px); }
+        .main-button.alat { background-color: #3498db; }
+        .main-button.alat:hover { background-color: #2980b9; transform: translateY(-2px); }
+
+        .page-view, .subpage-view {
+            width: 100%;
+            max-width: 38rem;
+            background: white;
+            padding: 1.875rem;
+            border-radius: 0.9375rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            display: none; 
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            position: absolute;
+        }
+
+        body.dark .page-view, body.dark .subpage-view {
+            background: #1e293b;
+        }
+        
+        .active {
+            display: block; 
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+        }
+
+        .search-container {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 0.9375rem 0.75rem 2.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        body.dark .search-input {
+            background: #334155;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+        
+        .search-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .search-container::before {
+            content: "🔍";
+            position: absolute;
+            left: 0.9375rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 1.125rem;
+        }
+        
+        .subpage-view h2 {
+            text-align: center;
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 1.25rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.9375rem;
+        }
+
+        body.dark .subpage-view h2 {
+            color: #e2e8f0;
+            border-bottom-color: #475569;
+        }
+
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3125rem;
+            max-height: 25rem;
+            overflow-y: auto;
+            padding-right: 0.625rem;
+        }
+
+        .list-container a {
+            color: #333;
+            padding: 0.9375rem;
+            text-decoration: none;
+            display: block;
+            border-radius: 0.5rem;
+            background-color: #f8f8f8;
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 500;
+        }
+
+        body.dark .list-container a {
+            background-color: #334155;
+            color: #e2e8f0;
+        }
+        
+        .list-container a.hidden {
+            display: none;
+        }
+
+        .list-container a:hover {
+            background-color: #e6e9ed;
+            color: #2c3e50;
+        }
+
+        body.dark .list-container a:hover {
+            background-color: #475569;
+            color: #facc15;
+        }
+
+        .back-btn {
+            background: #bdc3c7;
+            color: #333;
+            border: none;
+            padding: 0.625rem 0.9375rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 1.25rem;
+            transition: background-color 0.2s;
+        }
+
+        body.dark .back-btn {
+            background: #475569;
+            color: #e2e8f0;
+        }
+
+        .back-btn:hover {
+            background: #95a5a6;
+        }
+
+        body.dark .back-btn:hover {
+            background: #64748b;
+        }
+
+        @media (max-width: 650px) {
+            .portal-container {
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+            .page-view, .subpage-view {
+                padding: 1.25rem;
+                max-width: 100%;
+            }
+            .main-button {
+                padding: 1.25rem 0.9375rem;
+                font-size: 1.25rem;
+            }
+            .list-container {
+                max-height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen">
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-md">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-2xl font-bold">
+                    <a href="index.html" class="flex items-center gap-2">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Portofolio</span>
+                    </a>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="nav-link hover:text-blue-500 transition">Beranda</a>
+                    <a href="profile.html" class="nav-link hover:text-blue-500 transition">Profil</a>
+                    <a href="tulisan.html" class="nav-link hover:text-blue-500 transition">Tulisan</a>
+                    <a href="insta-post.html" class="nav-link hover:text-blue-500 transition">Insta Post</a>
+                    <a href="galeri.html" class="nav-link hover:text-blue-500 transition">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link hover:text-blue-500 transition">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link hover:text-blue-500 transition">Sosial Media</a>
+                    <a href="portal.html" class="nav-link hover:text-blue-500 transition active">Portal</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                        <i class="fas fa-sun text-yellow-500"></i>
+                    </button>
+                    <button id="mobileMenuButton" class="md:hidden p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2 rounded-xl bg-white shadow-lg p-4 transition-all duration-300">
+                <div class="flex flex-col space-y-4">
+                    <a href="index.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Beranda</a>
+                    <a href="profile.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Profil</a>
+                    <a href="tulisan.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Tulisan</a>
+                    <a href="insta-post.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Insta Post</a>
+                    <a href="galeri.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Galeri</a>
+                    <a href="proyek-anime.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Proyek Anime</a>
+                    <a href="sosmed.html" class="nav-link mobile-nav-link hover:text-blue-500 transition py-2 px-3 rounded-lg hover:bg-gray-100">Sosial Media</a>
+                    <a href="portal.html" class="nav-link mobile-nav-link hover:text-blue-500 transition active py-2 px-3 rounded-lg hover:bg-gray-100">Portal</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="container mx-auto px-6 py-12 flex justify-center items-center min-h-screen">
+        <div id="main-content" class="page-view active">
+            <div class="portal-container">
+                <div class="category-box">
+                    <button id="game-btn" class="main-button game">GAME</button>
+                </div>
+                <div class="category-box">
+                    <button id="alat-btn" class="main-button alat">ALAT</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-page" class="subpage-view">
+            <button class="back-btn" data-target="main-content">← Kembali ke Menu Utama</button>
+            <h2>🎮 Daftar Game 🎮</h2>
+            <div class="search-container">
+                <input type="text" id="game-search" class="search-input" placeholder="Cari Game...">
+            </div>
+            <div id="game-list" class="list-container">
+                <a href="game/uno/uno.html" target="_blank">UNO</a>
+                <a href="game/pencocokkan.html" target="_blank">Pencocokan</a>
+                <a href="game/tebak-kode.html" target="_blank">Tebak Kode</a>
+                <a href="game/tictactoe.html" target="_blank">XOXO</a>
+            </div>
+        </div>
+
+        <div id="alat-page" class="subpage-view">
+            <button class="back-btn" data-target="main-content">← Kembali ke Menu Utama</button>
+            <h2>🛠 Daftar Alat 🛠</h2>
+            <div class="search-container">
+                <input type="text" id="alat-search" class="search-input" placeholder="Cari Alat...">
+            </div>
+            <div id="alat-list" class="list-container">
+                <a href="alat/kalkulator-umur.html" target="_blank">Kalkulator Umur</a>
+                <a href="alat/alokasi-kuota.html" target="_blank">Alokasi Kuota</a>
+                <a href="alat/kalkulator-diskon.html" target="_blank">Kalkulator Diskon</a>
+                <a href="alat/pengukur-BBI.html" target="_blank">Berat Badan Ideal</a>
+                <a href="alat/penghitung-teks.html" target="_blank">Penghitung Teks</a>
+                <a href="alat/konversi-hijriah.html" target="_blank">Konversi Hijriyah</a>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <span class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Portofolio</span>
+                    <p class="text-gray-600 mt-2">© Website Pribadi. Hak Cipta Dilindung.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="https://t.me/sayakurma" class="social-icon text-gray-500 hover:text-blue-400">
+                        <i class="fab fa-telegram text-xl"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/muhammad-alfaridzi-9729b8327?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="social-icon text-gray-500 hover:text-blue-600">
+                        <i class="fab fa-linkedin-in text-xl"></i>
+                    </a>
+                    <a href="https://www.instagram.com/mhmmdalfaridzi_23/profilecard/?igsh=MXJ5Y3B1a2fldnR1bA==" class="social-icon text-gray-500 hover:text-pink-500">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+
+        mobileMenuButton.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('fade-in');
+            } else {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('fade-in');
+            }
+        });
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeIcon.classList.remove('text-yellow-500');
+                themeIcon.classList.add('text-primaryDark');
+                document.querySelector('header').classList.remove('bg-white/90', 'shadow-md');
+                document.querySelector('header').classList.add('bg-dark/90', 'backdrop-blur-sm', 'border-b', 'border-secondary');
+                document.querySelector('header span').classList.remove('from-blue-500', 'to-blue-700');
+                document.querySelector('header span').classList.add('from-primaryDark', 'to-yellow-600');
+                document.querySelector('#mobileMenu').classList.remove('bg-white', 'shadow-lg');
+                document.querySelector('#mobileMenu').classList.add('bg-darker', 'shadow-lg');
+                document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                    link.classList.remove('hover:bg-gray-100', 'hover:text-blue-500');
+                    link.classList.add('hover:bg-secondary', 'hover:text-primaryDark');
+                });
+                document.querySelector('#themeToggle').classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                document.querySelector('#themeToggle').classList.add('bg-darker', 'hover:bg-secondary');
+                document.querySelector('footer').classList.remove('bg-white', 'border-gray-200');
+                document.querySelector('footer').classList.add('bg-dark', 'border-secondary');
+                document.querySelector('footer span').classList.remove('from-blue-500', 'to-blue-700');
+                document.querySelector('footer span').classList.add('from-primaryDark', 'to-yellow-600');
+                document.querySelector('footer p').classList.remove('text-gray-600');
+                document.querySelector('footer p').classList.add('text-gray-500');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIcon.classList.remove('text-primaryDark');
+                themeIcon.classList.add('text-yellow-500');
+                document.querySelector('header').classList.add('bg-white/90', 'shadow-md');
+                document.querySelector('header').classList.remove('bg-dark/90', 'backdrop-blur-sm', 'border-b', 'border-secondary');
+                document.querySelector('header span').classList.add('from-blue-500', 'to-blue-700');
+                document.querySelector('header span').classList.remove('from-primaryDark', 'to-yellow-600');
+                document.querySelector('#mobileMenu').classList.add('bg-white', 'shadow-lg');
+                document.querySelector('#mobileMenu').classList.remove('bg-darker', 'shadow-lg');
+                document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                    link.classList.add('hover:bg-gray-100', 'hover:text-blue-500');
+                    link.classList.remove('hover:bg-secondary', 'hover:text-primaryDark');
+                });
+                document.querySelector('#themeToggle').classList.add('bg-gray-200', 'hover:bg-gray-300');
+                document.querySelector('#themeToggle').classList.remove('bg-darker', 'hover:bg-secondary');
+                document.querySelector('footer').classList.add('bg-white', 'border-gray-200');
+                document.querySelector('footer').classList.remove('bg-dark', 'border-secondary');
+                document.querySelector('footer span').classList.add('from-blue-500', 'to-blue-700');
+                document.querySelector('footer span').classList.remove('from-primaryDark', 'to-yellow-600');
+                document.querySelector('footer p').classList.add('text-gray-600');
+                document.querySelector('footer p').classList.remove('text-gray-500');
+            }
+        });
+
+        function switchPage(targetId) {
+            const allPages = document.querySelectorAll('.page-view, .subpage-view');
+            allPages.forEach(page => page.classList.remove('active'));
+            const targetPage = document.getElementById(targetId);
+            if (targetPage) {
+                setTimeout(() => {
+                    targetPage.classList.add('active');
+                    window.scrollTo(0, 0);
+                    if (targetId === 'game-page') document.getElementById('game-search').focus();
+                    else if (targetId === 'alat-page') document.getElementById('alat-search').focus();
+                }, 50);
+            }
+        }
+
+        document.getElementById('game-btn').addEventListener('click', () => switchPage('game-page'));
+        document.getElementById('alat-btn').addEventListener('click', () => switchPage('alat-page'));
+
+        const backButtons = document.querySelectorAll('.back-btn');
+        backButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const currentSearchInput = document.querySelector('.subpage-view.active .search-input');
+                if (currentSearchInput) {
+                    currentSearchInput.value = '';
+                    const listId = currentSearchInput.id.replace('-search', '-list');
+                    filterList(currentSearchInput.id, listId);
+                }
+                switchPage(this.getAttribute('data-target'));
+            });
+        });
+
+        function filterList(inputId, listId) {
+            const input = document.getElementById(inputId);
+            const filter = input.value.toUpperCase();
+            const listContainer = document.getElementById(listId);
+            const items = listContainer.getElementsByTagName('a');
+            for (let i = 0; i < items.length; i++) {
+                const itemText = items[i].textContent || items[i].innerText;
+                if (itemText.toUpperCase().indexOf(filter) > -1) {
+                    items[i].classList.remove('hidden');
+                } else {
+                    items[i].classList.add('hidden');
+                }
+            }
+        }
+
+        document.getElementById('game-search').addEventListener('keyup', () => filterList('game-search', 'game-list'));
+        document.getElementById('alat-search').addEventListener('keyup', () => filterList('alat-search', 'alat-list'));
+
+        function updateActiveNavLink() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const currentPage = window.location.pathname.split('/').pop() || 'portal.html';
+            navLinks.forEach(link => {
+                const linkHref = link.getAttribute('href');
+                if (linkHref === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        updateActiveNavLink();
+    </script>
+</body>
+</html>
