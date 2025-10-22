@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tes Refleks Kecepatan (Rambu)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
+        }
+
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-primary {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        body.dark .btn-primary:hover {
+            background-color: var(--primary-dark-hover);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
+        }
+
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        body.dark .btn-outline {
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        body.dark .btn-outline:hover {
+            background-color: rgba(250, 204, 21, 0.1);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        .traffic-light-box {
+            background-color: #333;
+            border: 3pxkrat solid #222;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .light {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #111;
+            opacity: 0.3;
+            transition: opacity 0.3s, box-shadow 0.3s;
+        }
+
+        .light.red.on {
+            background-color: #dc3545;
+            opacity: 1;
+            box-shadow: 0 0 40px #dc3545;
+        }
+
+        .light.yellow.on {
+            background-color: #ffc107;
+            opacity: 1;
+            box-shadow: 0 0 40px #ffc107;
+        }
+
+        .light.green.on {
+            background-color: #28a745;
+            opacity: 1;
+            box-shadow: 0 0 40px #28a745;
+        }
+
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            animation: fall 3s ease-in-out forwards;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .result-success {
+            color: #28a745;
+        }
+
+        .result-fail {
+            color: #dc3545;
+        }
+
+        body.dark .result-success {
+            color: #68d391;
+        }
+
+        body.dark .result-fail {
+            color: #f87171;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen">
+    <main class="container mx-auto px-6 py-12">
+        <section class="py-12 md:py-16 lg:py-20">
+            <div class="flex justify-between items-center mb-8">
+                <a href="https://sayakurma.github.io/website-saya/" class="btn-outline px-6 py-2 rounded-full font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i> Kembali
+                </a>
+                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                    <i class="fas fa-sun text-yellow-500"></i>
+                </button>
+            </div>
+            <div class="bg-white dark:bg-darker p-8 rounded-2xl shadow-lg max-w-md mx-auto">
+                <h1 id="page-title" class="text-3xl font-bold text-center mb-6">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700 dark:from-primaryDark dark:to-yellow-600">Tes Refleks Kecepatan</span>
+                </h1>
+
+                <div id="start-screen" class="text-center">
+                    <p class="mb-6 text-lg">Ketuk layar atau klik kiri setelah lampu merah menyala.</p>
+                    <button id="start-button" class="btn-primary px-8 py-3 rounded-full font-semibold w-full">Mulai</button>
+                </div>
+
+                <div id="game-screen" class="text-center hidden">
+                    <p id="countdown-text" class="text-xl font-semibold mb-6">Tekan ketika lampunya Merah!</p>
+                    <div class="flex justify-center">
+                        <div class="traffic-light-box">
+                            <div id="red-light" class="light red"></div>
+                            <div id="yellow-light" class="light yellow"></div>
+                            <div id="green-light" class="light green"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="result-screen" class="text-center hidden">
+                    <h2 id="result-title" class="text-2xl font-bold mb-4">Hasil Tes Refleks</h2>
+                    <p id="too-soon-message" class="result-fail text-xl font-bold mb-4 hidden">Terlalu buru-buru!</p>
+                    <h3 id="reaction-time" class="result-success text-3xl font-bold mb-2">00:00.000</h3>
+                    <p id="time-description" class="text-lg"></p>
+                    <button id="restart-button" class="btn-primary px-8 py-3 rounded-full font-semibold w-full mt-6">Ulangi Tes</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const pageTitle = document.getElementById('page-title');
+        const resultTitle = document.getElementById('result-title');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-sun', 'text-yellow-500');
+                themeIcon.classList.add('fa-moon', 'text-primaryDark');
+                themeToggle.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                themeToggle.classList.add('bg-darker', 'hover:bg-secondary');
+                document.querySelector('h1 span').classList.remove('from-blue-500', 'to-blue-700');
+                document.querySelector('h1 span').classList.add('from-primaryDark', 'to-yellow-600');
+            } else {
+                themeIcon.classList.remove('fa-moon', 'text-primaryDark');
+                themeIcon.classList.add('fa-sun', 'text-yellow-500');
+                themeToggle.classList.add('bg-gray-200', 'hover:bg-gray-300');
+                themeToggle.classList.remove('bg-darker', 'hover:bg-secondary');
+                document.querySelector('h1 span').classList.add('from-blue-500', 'to-blue-700');
+                document.querySelector('h1 span').classList.remove('from-primaryDark', 'to-yellow-600');
+            }
+        });
+
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const countdownText = document.getElementById('countdown-text');
+        const reactionTimeDisplay = document.getElementById('reaction-time');
+        const timeDescription = document.getElementById('time-description');
+        const tooSoonMessage = document.getElementById('too-soon-message');
+        const confettiContainer = document.getElementById('confetti-container');
+        const redLight = document.getElementById('red-light');
+        const yellowLight = document.getElementById('yellow-light');
+        const greenLight = document.getElementById('green-light');
+
+        let state = 'IDLE';
+        let startTime;
+        let timeoutId;
+        let pressHandled = false;
+
+        function formatTime(ms) {
+            if (ms < 0) ms = 0;
+            ms = Math.round(ms);
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const milliseconds = ms % 1000;
+            const minStr = String(minutes).padStart(2, '0');
+            const secStr = String(seconds).padStart(2, '0');
+            const msStr = String(milliseconds).padStart(3, '0');
+            return {
+                formatted: `${minStr}:${secStr}.${msStr}`,
+                minutes, seconds, milliseconds
+            };
+        }
+
+        function changeScreen(screen) {
+            [startScreen, gameScreen, resultScreen].forEach(s => s.classList.add('hidden'));
+            screen.classList.remove('hidden');
+            pageTitle.style.display = (screen === startScreen) ? 'block' : 'none';
+        }
+
+        function setLight(color) {
+            redLight.classList.remove('on');
+            yellowLight.classList.remove('on');
+            greenLight.classList.remove('on');
+            if (color === 'red') redLight.classList.add('on');
+            else if (color === 'yellow') yellowLight.classList.add('on');
+            else if (color === 'green') greenLight.classList.add('on');
+        }
+
+        function trafficLightCountdown() {
+            state = 'COUNTDOWN';
+            countdownText.textContent = 'Bersiap!';
+            pressHandled = false;
+            const colors = ['green', 'yellow', 'red'];
+            let colorIndex = 0;
+            function nextColor() {
+                if (colorIndex >= colors.length) return;
+                const currentColor = colors[colorIndex];
+                setLight(currentColor);
+                if (currentColor === 'green') countdownText.textContent = 'Tunggu...';
+                else if (currentColor === 'yellow') countdownText.textContent = 'Perhatian!';
+                colorIndex++;
+                if (currentColor === 'green') {
+                    const delay = Math.random() * 4000 + 1000;
+                    timeoutId = setTimeout(nextColor, delay);
+                } else if (currentColor === 'yellow') {
+                    const delay = Math.random() * 2000 + 3000;
+                    state = 'WAITING';
+                    timeoutId = setTimeout(() => {
+                        setLight('red');
+                        countdownText.textContent = 'GAS!';
+                        state = 'RED';
+                        startTime = performance.now();
+                    }, delay);
+                }
+            }
+            nextColor();
+        }
+
+        function handleScreenPress() {
+            if (pressHandled) return;
+            if (state === 'COUNTDOWN' || state === 'WAITING') {
+                clearTimeout(timeoutId);
+                pressHandled = true;
+                showResult(0);
+            } else if (state === 'RED') {
+                const endTime = performance.now();
+                const reactionTime = Math.round(endTime - startTime);
+                pressHandled = true;
+                showResult(reactionTime);
+                triggerConfetti();
+            }
+        }
+
+        function showResult(timeValue) {
+            state = 'RESULT';
+            changeScreen(resultScreen);
+            setLight(null);
+            resultTitle.style.display = 'none';
+            tooSoonMessage.classList.add('hidden');
+            reactionTimeDisplay.classList.add('hidden');
+            timeDescription.classList.add('hidden');
+            if (timeValue > 0) {
+                resultTitle.style.display = 'block';
+                reactionTimeDisplay.classList.remove('hidden');
+                timeDescription.classList.remove('hidden');
+                const timeData = formatTime(timeValue);
+                reactionTimeDisplay.textContent = timeData.formatted;
+                let desc = '';
+                if (timeData.minutes > 0) desc += `${timeData.minutes} menit `;
+                if (timeData.seconds > 0 || timeData.minutes > 0) desc += `${timeData.seconds} detik `;
+                desc += `${timeData.milliseconds} milidetik`;
+                timeDescription.textContent = `(${desc})`;
+            } else {
+                tooSoonMessage.classList.remove('hidden');
+            }
+        }
+
+        function triggerConfetti() {
+            const colors = ['#f44336', '#ffeb3b', '#2196f3', '#4caf50', '#ff9800', '#9c27b0'];
+            confettiContainer.innerHTML = '';
+            for (let i = 0; i < 50; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = `${Math.random() * 100}vw`;
+                c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                c.style.animationDelay = `${Math.random() * 2}s`;
+                c.style.animationDuration = `${Math.random() * 2 + 2}s`;
+                confettiContainer.appendChild(c);
+            }
+            setTimeout(() => confettiContainer.innerHTML = '', 4000);
+        }
+
+        document.getElementById('start-button').addEventListener('click', () => {
+            changeScreen(gameScreen);
+            trafficLightCountdown();
+        });
+
+        document.getElementById('restart-button').addEventListener('click', () => {
+            state = 'IDLE';
+            pressHandled = false;
+            clearTimeout(timeoutId);
+            setLight(null);
+            changeScreen(startScreen);
+        });
+
+        gameScreen.addEventListener('click', handleScreenPress);
+        gameScreen.addEventListener('touchstart', e => { e.preventDefault(); handleScreenPress(); });
+    </script>
+</body>
+</html>
