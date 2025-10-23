@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Bahasa Interaktif Cepat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        secondary: '#1e293b',
+                        primaryDark: '#facc15',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --dark-text: #334155;
+            --primary-dark: #facc15;
+            --primary-dark-hover: #eab308;
+        }
+
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont,, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body.dark {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .active {
+            font-weight: 600;
+            color: var(--primary-color);
+            position: relative;
+        }
+
+        body.dark .active {
+            color: var(--primary-dark);
+        }
+
+        .active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        body.dark .active::after {
+            background: linear-gradient(90deg, transparent, var(--primary-dark), transparent);
+            bottom: -2px;
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        body.dark .nav-link::after {
+            background: linear-gradient(90deg, transparent, var(--primary-dark), transparent);
+            bottom: -2px;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        body.dark .nav-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.2) translateY(-5px);
+        }
+
+        body.dark .social-icon {
+            color: var(--primary-dark);
+        }
+
+        body.dark .social-icon:hover {
+            color: #eab308;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em;
+            background: var(--primary-color);
+            margin-left: 5px;
+            animation: blink 1s infinite;
+            vertical-align: text-top;
+        }
+
+        body.dark .typing-cursor {
+            background: var(--primary-dark);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .profile-image-container {
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-image-container:hover {
+            transform: scale(1.05);
+        }
+
+        .glow {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.7);
+        }
+
+        body.dark .glow {
+            box-shadow: 0 0 25px rgba(250, 204, 21, 0.7);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-primary {
+            background-color: var(--primary-dark);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        body.dark .btn-primary:hover {
+            background-color: var(--primary-dark-hover);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s;
+        }
+
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: 0s;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .btn-outline {
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        body.dark .btn-outline:hover {
+            background-color: rgba(250, 204, 21, 0.1);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+            border: 2px solid #6b7280;
+            transition: all 0.3s ease;
+        }
+
+        body.dark .btn-secondary {
+            background-color: #475569;
+            border-color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+            border-color: #4b5563;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(75, 85, 99, 0.3);
+        }
+
+        body.dark .btn-secondary:hover {
+            background-color: #374151;
+            border-color: #374151;
+            box-shadow: 0 10px 20px rgba(55, 65, 81, 0.3);
+        }
+
+        .status-badge {
+            transition: all 0.3s ease;
+        }
+
+        .status-badge:hover {
+            transform: translateY(-5px);
+        }
+
+        body.dark .status-badge {
+            background: linear-gradient(to right, var(--primary-dark), #eab308);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        body.dark .theme-toggle {
+            background-color: #020617;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark .theme-toggle i {
+            color: var(--primary-dark);
+        }
+
+        .option-correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb) !important;
+            border-color: #34a853 !important;
+            color: #1e8e3e !important;
+            font-weight: bold;
+        }
+
+        .option-incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb) !important;
+            border-color: #ea4335 !important;
+            color: #d93025 !important;
+            font-weight: bold;
+        }
+
+        .option-revealed-correct {
+            background: linear-gradient(135deg, #e8f0fe, #d2e3fc) !important;
+            border-color: #1a73e8 !important;
+            color: #174ea6 !important;
+            font-weight: bold;
+        }
+
+        button:disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #e8f0fe, #d2e3fc);
+            color: #1a73e8;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(26,115,232,0.1);
+        }
+
+        body.dark .question-box {
+            background: linear-gradient(135deg, #1e293b, #2d3748);
+            color: #facc15;
+            box-shadow: 0 4px 12px rgba(250,204,21,0.2);
+        }
+
+        .progress-bar {
+            height: 10px; background-color: #e2e8f0; border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+
+        body.dark .progress-bar {
+            background-color: #4b5563;
+        }
+
+        .progress-indicator {
+            height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); transition: width 0.3s ease-in-out;
+        }
+
+        body.dark .progress-indicator {
+            background: linear-gradient(90deg, #facc15, #eab308);
+        }
+
+        .progress-text {
+            text-align: center; margin-bottom: 10px; font-size: 0.9em; color: #5f6368;
+        }
+
+        body.dark .progress-text {
+            color: #94a3b8;
+        }
+
+        .action-area {
+            margin-top: 30px; text-align: center;
+        }
+
+        .quiz-feedback {
+            text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 1.1em;
+        }
+
+        .circular-progress {
+            position: relative;
+            height: 150px;
+            width: 150px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(#3b82f6 0deg, #e2e8f0 0deg);
+            transition: background 1s ease-in-out;
+        }
+
+        body.dark .circular-progress {
+            background: conic-gradient(#facc15 0deg, #4b5563 0deg);
+        }
+
+        .progress-value {
+            position: absolute;
+            height: 80%;
+            width: 80%;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        body.dark .progress-value {
+            background-color: #0f172a;
+            color: #facc15;
+        }
+
+        .progress-detail {
+             font-size: 0.8em;
+             font-weight: normal;
+             color: #5f6368;
+             margin-top: -5px;
+        }
+
+        body.dark .progress-detail {
+            color: #94a3b8;
+        }
+
+        .final-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .final-buttons button {
+            flex: 1;
+            min-width: 140px;
+            max-width: 220px;
+            padding: 12px 16px;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 640px) {
+            .final-buttons {
+                flex-direction: row;
+            }
+            .final-buttons button {
+                width: auto;
+                max-width: none;
+            }
+        }
+
+        .menu-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            margin-top: 24px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 min-h-screen">
+    <main class="container mx-auto px-6 py-12">
+        <section class="py-12 md:py-16 lg:py-20">
+            <div class="flex justify-between items-center mb-8">
+                <a href="https://sayakurma.github.io/website-saya/" class="btn-outline px-6 py-2 rounded-full font-semibold"><i class="fas fa-arrow-left mr-2"></i>
+                    Kembali
+                </a>
+                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all theme-toggle">
+                    <i class="fas fa-sun text-yellow-500"></i>
+                </button>
+            </div>
+            <div class="bg-white dark:bg-darker p-8 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="app-content"></div>
+            </div>
+        </section>
+    </main>
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-sun','text-yellow-500');
+                themeIcon.classList.add('fa-moon','text-primaryDark');
+                themeToggle.classList.remove('bg-gray-200','hover:bg-gray-300');
+                themeToggle.classList.add('bg-darker','hover:bg-secondary');
+            } else {
+                themeIcon.classList.remove('fa-moon','text-primaryDark');
+                themeIcon.classList.add('fa-sun','text-yellow-500');
+                themeToggle.classList.add('bg-gray-200','hover:bg-gray-300');
+                themeToggle.classList.remove('bg-darker','hover:bg-secondary');
+            }
+        });
+
+        let appData = {};
+        const availableLanguages = [];
+        const appContent = document.getElementById('app-content');
+        let currentQuiz = {
+            lang: null,
+            category: null,
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            totalQuestions: 0
+        };
+
+        // Load data dari file JSON
+        async function loadVocabularyData() {
+            try {
+                const response = await fetch('kosakata.json');
+                if (!response.ok) {
+                    throw new Error('Gagal memuat data kosakata');
+                }
+                appData = await response.json();
+                
+                // Update availableLanguages
+                availableLanguages.length = 0;
+                availableLanguages.push(...Object.keys(appData));
+                
+                // Tampilkan menu bahasa setelah data dimuat
+                showLanguageMenu();
+            } catch (error) {
+                console.error('Error loading vocabulary data:', error);
+                appContent.innerHTML = `
+                    <div class="text-center">
+                        <h2 class="text-2xl font-bold text-red-600 mb-4">Error Memuat Data</h2>
+                        <p class="mb-4">Gagal memuat data kosakata. Pastikan file kosakata.json tersedia.</p>
+                        <button class="btn-primary px-6 py-3 rounded-full font-semibold" onclick="loadVocabularyData()">Coba Lagi</button>
+                    </div>
+                `;
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function showLanguageMenu() {
+            currentQuiz = { lang: null, category: null, questions: [], currentIndex: 0, score: 0, totalQuestions: 0 };
+            let html = '<h1 class="text-3xl md:text-4xl font-bold text-center mb-8">Pilih Bahasa</h1>';
+            html += '<div class="menu-grid">';
+            availableLanguages.forEach(lang => {
+                html += `<button class="btn-primary px-6 py-3 rounded-full font-semibold w-full" onclick="selectLanguage('${lang}')">${lang}</button>`;
+            });
+            html += '</div>';
+            appContent.innerHTML = html;
+        }
+
+        function selectLanguage(lang) {
+            const categories = Object.keys(appData[lang]);
+            currentQuiz.lang = lang;
+            let html = `<h2 class="text-2xl md:text-3xl font-bold text-center mb-8">Pilih Kategori Kuis</h2>`;
+            html += '<div class="menu-grid">';
+            categories.forEach(category => {
+                const count = appData[lang][category].length;
+                html += `<button class="btn-outline px-6 py-3 rounded-full font-semibold w-full" onclick="initializeQuiz('${lang}', '${category}')">
+                    <strong>${category.toUpperCase()}</strong><br><span style="font-size: 0.9em; opacity: 0.8;">(${count} Kosakata)</span>
+                </button>`;
+            });
+            html += '</div>';
+            html += `<div class="action-area mt-8"><button class="btn-secondary px-6 py-3 rounded-full font-semibold" onclick="showLanguageMenu()">Ganti Bahasa</button></div>`;
+            appContent.innerHTML = html;
+        }
+
+        function initializeQuiz(lang, category) {
+            const data = appData[lang][category];
+            if (!data || data.length < 5) {
+                appContent.innerHTML = `
+                    <h2 class="text-2xl font-bold text-center mb-6">Data Kurang!</h2>
+                    <p class="text-center mb-8">Kategori <strong>${category}</strong> hanya memiliki ${data?.length || 0} kosakata. Minimal 5 kosakata.</p>
+                    <div class="action-area"><button class="btn-outline px-6 py-3 rounded-full font-semibold" onclick="selectLanguage('${lang}')">Kembali</button></div>
+                 `;
+                 return;
+            }
+            const questions = [...data];
+            shuffleArray(questions);
+            currentQuiz.category = category;
+            currentQuiz.questions = questions;
+            currentQuiz.currentIndex = 0;
+            currentQuiz.score = 0;
+            currentQuiz.totalQuestions = questions.length;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const { questions, currentIndex, totalQuestions } = currentQuiz;
+            const questionItem = questions[currentIndex];
+            if (!questionItem) {
+                showFinalResults();
+                return;
+            }
+            const correctAnswer = questionItem.translation;
+            const wrongAnswersPool = questions.map(item => item.translation).filter(t => t !== correctAnswer);
+            shuffleArray(wrongAnswersPool);
+            const wrongOptions = wrongAnswersPool.slice(0, Math.min(4, wrongAnswersPool.length));
+            const options = [correctAnswer, ...wrongOptions];
+            shuffleArray(options);
+            const progress = (currentIndex / totalQuestions) * 100;
+            const currentCount = currentIndex + 1;
+            let html = '';
+            html += `<div class="progress-text">Soal ${currentCount} dari ${totalQuestions}</div>`;
+            html += `<div class="progress-bar"><div class="progress-indicator" style="width: ${progress}%;"></div></div>`;
+            html += `<div class="question-box">Terjemahkan: <strong>${questionItem.word}</strong></div>`;
+            html += '<div class="grid gap-4 mt-6">';
+            options.forEach(option => {
+                html += `<button class="p-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-left font-medium transition-all hover:border-primary dark:hover:border-primaryDark quiz-option"
+                            data-option="${option}" data-correct="${correctAnswer}" onclick="checkAnswerInPlace(this, '${correctAnswer}')">
+                            ${option}
+                        </button>`;
+            });
+            html += '</div>';
+            html += `<div id="quiz-action-area" class="action-area"></div>`;
+            appContent.innerHTML = html;
+        }
+
+        function checkAnswerInPlace(selectedButton, correct) {
+            const selectedOption = selectedButton.getAttribute('data-option');
+            const isCorrect = selectedOption === correct;
+            const allOptions = document.querySelectorAll('.quiz-option');
+            allOptions.forEach(btn => btn.disabled = true);
+            if (isCorrect) {
+                selectedButton.classList.add('option-correct');
+                selectedButton.innerHTML += ' <span style="float:right;">✔</span>';
+                currentQuiz.score++;
+            } else {
+                selectedButton.classList.add('option-incorrect');
+                selectedButton.innerHTML += ' <span style="float:right;">❌</span>';
+                allOptions.forEach(btn => {
+                    if (btn.getAttribute('data-option') === correct) {
+                        btn.classList.add('option-revealed-correct');
+                        btn.innerHTML += ' <span style="float:right;">✔</span>';
+                    }
+                });
+            }
+            currentQuiz.currentIndex++;
+            const nextAction = currentQuiz.currentIndex < currentQuiz.totalQuestions ? 'Lanjut' : 'Lihat Hasil';
+            const nextFunction = currentQuiz.currentIndex < currentQuiz.totalQuestions ? 'renderQuizQuestion()' : 'showFinalResults()';
+            const actionArea = document.getElementById('quiz-action-area');
+            let feedbackHTML = `<div class="quiz-feedback" style="color: ${isCorrect ? '#1e8e3e' : '#d93025'};">${isCorrect ? 'BENAR!' : 'SALAH!'}</div>`;
+            actionArea.insertAdjacentHTML('afterbegin', feedbackHTML);
+            actionArea.insertAdjacentHTML('beforeend', `<button class="btn-primary px-8 py-3 rounded-full font-semibold mt-4" onclick="${nextFunction}">${nextAction}</button>`);
+        }
+
+        function showFinalResults() {
+            const { score, totalQuestions, lang, category } = currentQuiz;
+            const percentage = Math.round((score / totalQuestions) * 100);
+            const progressDegree = percentage * 3.6;
+            let html = '<h1 class="text-3xl md:text-4xl font-bold text-center mb-8">Kuis Selesai!</h1>';
+            html += `<div class="question-box text-center">Skor: ${score} / ${totalQuestions}</div>`;
+            html += `<div class="flex justify-center my-8"><div class="circular-progress" id="circular-progress"><div class="progress-value" id="progress-value">0%</div></div></div>`;
+            html += `<div class="action-area"><button class="btn-primary px-8 py-3 rounded-full font-semibold w-full md:w-auto" onclick="initializeQuiz('${lang}', '${category}')">Ulangi Kuis</button></div>`;
+            html += `<div class="final-buttons">
+                <button class="btn-outline px-6 py-3 rounded-xl font-semibold" onclick="selectLanguage('${lang}')">Ganti Kategori</button>
+                <button class="btn-outline px-6 py-3 rounded-xl font-semibold" onclick="showLanguageMenu()">Ganti Bahasa</button>
+            </div>`;
+            appContent.innerHTML = html;
+            const progressEl = document.getElementById('circular-progress');
+            const valueEl = document.getElementById('progress-value');
+            let currentDeg = 0;
+            let currentPercent = 0;
+            const steps = 50;
+            const degIncrement = progressDegree / steps;
+            const percentIncrement = percentage > 0 ? Math.ceil(percentage / steps) : 0;
+            const timer = setInterval(() => {
+                currentDeg += degIncrement;
+                currentPercent += percentIncrement;
+                if (currentDeg >= progressDegree || currentPercent >= percentage) {
+                    currentDeg = progressDegree;
+                    currentPercent = percentage;
+                    clearInterval(timer);
+                    confetti({particleCount: 100, spread: 70, origin: { y: 0.6 }});
+                }
+                progressEl.style.background = `conic-gradient(${document.body.classList.contains('dark') ? '#facc15' : '#3b82f6'} ${currentDeg}deg, ${document.body.classList.contains('dark') ? '#4b5563' : '#e2e8f0'} ${currentDeg}deg)`;
+                valueEl.textContent = `${currentPercent}%`;
+            }, 30);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadVocabularyData);
+    </script>
+</body>
+</html>
