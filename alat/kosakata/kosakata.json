@@ -1,0 +1,38 @@
+{
+    "Belanda": {},
+    "Jepang": {
+        "angka": [
+            {"word": "Satu", "translation": "一 (Ichi)"},
+            {"word": "Dua", "translation": "二 (Ni)"},
+            {"word": "Tiga", "translation": "三 (San)"},
+            {"word": "Empat", "translation": "四 (Yon)"},
+            {"word": "Lima", "translation": "五 (Go)"},
+            {"word": "Enam", "translation": "六 (Roku)"},
+            {"word": "Tujuh", "translation": "七 (Nana)"},
+            {"word": "Delapan", "translation": "八 (Hachi)"},
+            {"word": "Sembilan", "translation": "九 (Kyuu)"},
+            {"word": "Sepuluh", "translation": "十 (Juu)"}        
+        ]
+    },
+    "Portugis": {},
+    "Spanyol": {
+        "minuman": [
+            {"word": "Susu", "translation": "Leche"},
+            {"word": "Jus", "translation": "Jugo"},
+            {"word": "Kopi", "translation": "Café"},
+            {"word": "Teh", "translation": "Té"},
+            {"word": "Air", "translation": "Agua"}
+        ],
+        "makanan": [
+            {"word": "Nasi", "translation": "Arroz"},
+            {"word": "Daging", "translation": "Carne"},
+            {"word": "Roti", "translation": "Pan"},
+            {"word": "Keju", "translation": "Queso"},
+            {"word": "Ikan", "translation": "Pescado"}
+        ]
+    },
+    "Korea": {},
+    "Italia": {},
+    "Swedia": {},
+    "Esperanto": {}
+}
