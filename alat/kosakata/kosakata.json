@@ -23,6 +23,17 @@
             {"word": "Teh", "translation": "Té"},
             {"word": "Air", "translation": "Agua"}
         ],
+        "ungkapan sosial": [
+            {"word": "Halo", "translation": "Hola"},
+            {"word": "Dadah", "translation": "Adiós"},
+            {"word": "Salam kenal", "translation": "Mucho gusto"},
+            {"word": "Mohon maaf", "translation": "Lo siento"},
+            {"word": "Maaf", "translation": "Perdón"},
+            {"word": "Permisi", "translation": "Disculpe"},
+            {"word": "Terima kasih", "translation": "Gracias"},
+            {"word": "Sama-sama", "translation": "De nada"},
+            {"word": "Tak apa", "translation": "Está bien"}
+        ],
         "makanan": [
             {"word": "Nasi", "translation": "Arroz"},
             {"word": "Daging", "translation": "Carne"},
