@@ -34,6 +34,15 @@
             {"word": "Sama-sama", "translation": "De nada"},
             {"word": "Tak apa", "translation": "Está bien"}
         ],
+"hari": [
+            {"word": "Senin", "translation": "Lunes"},
+            {"word": "Selasa", "translation": "Martes"},
+            {"word": "Rabu", "translation": "Miércoles"},
+            {"word": "Kamis", "translation": "Jueves"},
+            {"word": "Jumat", "translation": "Viernes"}, 
+            {"word": "Sabtu", "translation": "Sábado"},
+            {"word": "Minggu", "translation": "Domingo"}
+        ],
         "makanan": [
             {"word": "Nasi", "translation": "Arroz"},
             {"word": "Daging", "translation": "Carne"},
